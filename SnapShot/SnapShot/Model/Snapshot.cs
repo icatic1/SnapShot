@@ -10,15 +10,16 @@ namespace SnapShot
     {
         #region Attributes
 
+        string terminalName = "";
+        bool debugLog = false,
+            licenced = false;
+
         List<Configuration> camera = new List<Configuration>()
         {
             new Configuration(),
             new Configuration(),
             new Configuration()
         };
-
-        bool debugLog = false;
-        string terminalName = "";
 
         #endregion
 
@@ -27,6 +28,7 @@ namespace SnapShot
         public List<Configuration> Camera { get => camera; set => camera = value; }
         public bool DebugLog { get => debugLog; set => debugLog = value; }
         public string TerminalName { get => terminalName; set => terminalName = value; }
+        public bool Licenced { get => licenced; set => licenced = value; }
 
         #endregion
     }

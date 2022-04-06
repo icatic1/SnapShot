@@ -59,5 +59,14 @@ namespace SnapShot.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data Source=SQL8001.site4now.net;Initial Catalog=db_a84fb9_licencing;User Id=db_a84fb9_licencing_admin;Password=12345deset.
+        /// </summary>
+        internal static string connectionString {
+            get {
+                return ResourceManager.GetString("connectionString", resourceCulture);
+            }
+        }
     }
 }
