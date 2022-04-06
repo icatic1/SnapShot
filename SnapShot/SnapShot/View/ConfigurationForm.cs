@@ -83,7 +83,7 @@ namespace SnapShot
 
         #endregion
 
-        #region Configuration saving, export and import
+        #region Save configuration
 
         /// <summary>
         /// Save configuration for later usage
@@ -200,6 +200,10 @@ namespace SnapShot
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
         }
 
+        #endregion
+
+        #region JSON export/import
+
         /// <summary>
         /// Export configuration to JSON
         /// </summary>
@@ -210,53 +214,61 @@ namespace SnapShot
             try
             {
                 string EXPORT = "";
-                EXPORT += "[\n";
+                EXPORT += "{\n";
+                EXPORT += "\t\"cameras\":\n";
+                EXPORT += "\t[\n";
+                int i = 0;
                 foreach (var config in snapshot.Camera)
                 {
-                    EXPORT += "\t{\n";
-
-                    EXPORT += "\t\t'device_configuration':\n";
                     EXPORT += "\t\t{\n";
-                    EXPORT += "\t\t\t'device_type': '" + config.Type + "'\n";
-                    EXPORT += "\t\t\t'id': '" + config.Id + "'\n";
-                    EXPORT += "\t\t\t'trigger_file_path': '" + config.TriggerFilePath + "'\n";
-                    EXPORT += "\t\t\t'output_folder_path': '" + config.OutputFolderPath + "'\n";
-                    EXPORT += "\t\t\t'output_validity_days': " + config.OutputValidity + "\n";
-                    EXPORT += "\t\t}\n";
 
-                    EXPORT += "\t\t'video_configuration':\n";
-                    EXPORT += "\t\t{\n";
-                    EXPORT += "\t\t\t'resolution': '" + config.Resolution + "'\n";
-                    EXPORT += "\t\t\t'contrast_level': " + config.ContrastLevel + "\n";
-                    EXPORT += "\t\t\t'image_color': '" + config.ImageColor.ToString() + "'\n";
-                    EXPORT += "\t\t\t'motion_detection': " + config.MotionDetection + "\n";
-                    EXPORT += "\t\t}\n";
+                    EXPORT += "\t\t\t\"device_configuration\":\n";
+                    EXPORT += "\t\t\t{\n";
+                    EXPORT += "\t\t\t\t\"device_type\": \"" + config.Type + "\",\n";
+                    EXPORT += "\t\t\t\t\"id\": \"" + config.Id + "\",\n";
+                    EXPORT += "\t\t\t\t\"trigger_file_path\": \"" + config.TriggerFilePath + "\",\n";
+                    EXPORT += "\t\t\t\t\"output_folder_path\": \"" + config.OutputFolderPath + "\",\n";
+                    EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\"\n";
+                    EXPORT += "\t\t\t},\n";
 
-                    EXPORT += "\t\t'network_configuration':\n";
-                    EXPORT += "\t\t{\n";
-                    EXPORT += "\t\t\t'server_version': '" + config.ServerVersion + "'\n";
-                    EXPORT += "\t\t\t'server_IP_address': '" + config.ServerIP + "'\n";
-                    EXPORT += "\t\t\t'server_port': " + config.ServerPort + "\n";
-                    EXPORT += "\t\t\t'connection_status': " + config.ConnectionStatus + "\n";
-                    EXPORT += "\t\t}\n";
+                    EXPORT += "\t\t\t\"video_configuration\":\n";
+                    EXPORT += "\t\t\t{\n";
+                    EXPORT += "\t\t\t\t\"resolution\": \"" + config.Resolution + "\",\n";
+                    EXPORT += "\t\t\t\t\"contrast_level\": \"" + config.ContrastLevel + "\",\n";
+                    EXPORT += "\t\t\t\t\"image_color\": \"" + config.ImageColor.Name.ToString() + "\",\n";
+                    EXPORT += "\t\t\t\t\"motion_detection\": \"" + config.MotionDetection + "\"\n";
+                    EXPORT += "\t\t\t},\n";
 
-                    EXPORT += "\t\t'capture_configuration':\n";
-                    EXPORT += "\t\t{\n";
-                    EXPORT += "\t\t\t'image_capture': " + config.ImageCapture + "\n";
-                    EXPORT += "\t\t\t'single_mode': " + config.SingleMode + "\n";
-                    EXPORT += "\t\t\t'duration': " + config.Duration + "\n";
-                    EXPORT += "\t\t\t'burst_period': " + config.Period + "\n";
-                    EXPORT += "\t\t}\n";
+                    EXPORT += "\t\t\t\"network_configuration\":\n";
+                    EXPORT += "\t\t\t{\n";
+                    EXPORT += "\t\t\t\t\"server_version\": \"" + config.ServerVersion + "\",\n";
+                    EXPORT += "\t\t\t\t\"server_IP_address\": \"" + config.ServerIP + "\",\n";
+                    EXPORT += "\t\t\t\t\"server_port\": \"" + config.ServerPort + "\",\n";
+                    EXPORT += "\t\t\t\t\"connection_status\": \"" + config.ConnectionStatus + "\"\n";
+                    EXPORT += "\t\t\t},\n";
 
-                    EXPORT += "\t}\n";
+                    EXPORT += "\t\t\t\"capture_configuration\":\n";
+                    EXPORT += "\t\t\t{\n";
+                    EXPORT += "\t\t\t\t\"image_capture\": \"" + config.ImageCapture + "\",\n";
+                    EXPORT += "\t\t\t\t\"single_mode\": \"" + config.SingleMode + "\",\n";
+                    EXPORT += "\t\t\t\t\"duration\": \"" + config.Duration + "\",\n";
+                    EXPORT += "\t\t\t\t\"burst_period\": \"" + config.Period + "\"\n";
+                    EXPORT += "\t\t\t}\n";
+
+                    EXPORT += "\t\t}";
+                    if (i < 2)
+                        EXPORT += ",";
+                    EXPORT += "\n";
+                    i++;
                 }
-                EXPORT += "]";
+                EXPORT += "\t]\n";
+                EXPORT += "}";
 
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
                     openFileDialog.InitialDirectory = "c:\\";
                     openFileDialog.FileName = "configuration.json";
-                    openFileDialog.Filter = "JSON files (*.JSON)|*.JSON";
+                    openFileDialog.Filter = "JSON files (*.json)|*.json";
                     openFileDialog.FilterIndex = 2;
                     openFileDialog.CheckFileExists = false;
                     openFileDialog.RestoreDirectory = true;
@@ -281,7 +293,151 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            try
+            {
+                using (var openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.InitialDirectory = "c:\\";
+                    openFileDialog.FileName = "configuration.json";
+                    openFileDialog.Filter = "JSON files (*.json)|*.json";
+                    openFileDialog.FilterIndex = 2;
+                    openFileDialog.CheckFileExists = true;
+                    openFileDialog.RestoreDirectory = true;
 
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string IMPORT = File.ReadAllText(openFileDialog.FileName);
+                        string[] rows = IMPORT.Split('\n');
+                        Snapshot newSnapshot = new Snapshot();
+                        int camera = 0;
+                        int i = 4;
+                        while (camera < 3)
+                        {
+                            Configuration config = new Configuration();
+                            if (rows[i].Contains("device_configuration"))
+                            {
+                                i += 2;
+
+                                string[] device_type = rows[i].Split(" ");
+                                device_type[1] = device_type[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] id = rows[i].Split(" ");
+                                id[1] = id[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] trigger_file_path = rows[i].Split(" ");
+                                trigger_file_path[1] = trigger_file_path[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] output_folder_path = rows[i].Split(" ");
+                                output_folder_path[1] = output_folder_path[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] output_validity_days = rows[i].Split(" ");
+                                output_validity_days[1] = output_validity_days[1].Replace("\"", "").Replace(",", "");
+
+                                config.Type = (DeviceType)Enum.Parse(typeof(DeviceType), device_type[1]);
+                                config.Id = id[1];
+                                config.TriggerFilePath = trigger_file_path[1];
+                                config.OutputFolderPath = output_folder_path[1];
+                                config.OutputValidity = Int32.Parse(output_validity_days[1]);
+                            }
+
+                            i += 2;
+                            if (rows[i].Contains("video_configuration"))
+                            {
+                                i += 2;
+
+                                string[] resolution = rows[i].Split(" ");
+                                resolution[1] = resolution[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] contrast_level = rows[i].Split(" ");
+                                contrast_level[1] = contrast_level[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] image_color = rows[i].Split(" ");
+                                image_color[1] = image_color[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] motion_detection = rows[i].Split(" ");
+                                motion_detection[1] = motion_detection[1].Replace("\"", "").Replace(",", "");
+
+                                config.Resolution = (Resolution)Enum.Parse(typeof(Resolution), resolution[1]);
+                                config.ContrastLevel = Int32.Parse(contrast_level[1]);
+                                config.ImageColor = Color.FromName(image_color[1]);
+                                config.MotionDetection = Convert.ToBoolean(motion_detection[1]);
+                            }
+
+                            i += 2;
+                            if (rows[i].Contains("network_configuration"))
+                            {
+                                i += 2;
+
+                                string[] server_version = rows[i].Split(" ");
+                                server_version[1] = server_version[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] server_IP_address = rows[i].Split(" ");
+                                server_IP_address[1] = server_IP_address[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] server_port = rows[i].Split(" ");
+                                server_port[1] = server_port[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] connection_status = rows[i].Split(" ");
+                                connection_status[1] = connection_status[1].Replace("\"", "").Replace(",", "");
+
+                                config.ServerVersion = server_version[1];
+                                config.ServerIP = server_IP_address[1];
+                                config.ServerPort = Int32.Parse(server_port[1]);
+                                config.ConnectionStatus = Convert.ToBoolean(connection_status[1]);
+                            }
+
+                            i += 2;
+                            if (rows[i].Contains("capture_configuration"))
+                            {
+                                i += 2;
+
+                                string[] image_capture = rows[i].Split(" ");
+                                image_capture[1] = image_capture[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] single_mode = rows[i].Split(" ");
+                                single_mode[1] = single_mode[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] duration = rows[i].Split(" ");
+                                duration[1] = duration[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] burst_period = rows[i].Split(" ");
+                                burst_period[1] = burst_period[1].Replace("\"", "").Replace(",", "");
+
+                                config.ImageCapture = Convert.ToBoolean(image_capture[1]);
+                                config.SingleMode = Convert.ToBoolean(single_mode[1]);
+                                config.Duration = Int32.Parse(duration[1]);
+                                config.Period = Int32.Parse(burst_period[1]);
+                            }
+
+                            i += 4;
+                            newSnapshot.Camera[camera] = config;
+                            camera++;
+                        }
+
+                        snapshot = newSnapshot;
+                    }
+                }
+                
+                radioButton5.Checked = true;
+                UpdateConfigurationWindow(0);
+            }
+            catch
+            {
+                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+            }
         }
 
         #endregion
@@ -454,10 +610,11 @@ namespace SnapShot
 
             textBox5.Text = config.ServerVersion;
             textBox3.Text = config.ServerIP;
-            textBox4.Text = config.ServerPort.ToString();
+                textBox4.Text = config.ServerPort.ToString();
 
             radioButton4.Checked = config.ImageCapture;
             radioButton1.Checked = config.SingleMode;
+
 
             string unit = "seconds";
             double time = config.Duration;
@@ -500,6 +657,7 @@ namespace SnapShot
                 numericUpDown3.Value = 1;
                 domainUpDown2.Text = "seconds";
             }
+
         }
 
         #endregion
