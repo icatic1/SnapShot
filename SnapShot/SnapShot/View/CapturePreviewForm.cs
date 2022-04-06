@@ -19,10 +19,10 @@ namespace SnapShot
         #region Attributes
 
         Snapshot snapshot;
-        Bitmap image;
-        Mat frame;
-        Thread camera;
-        VideoCapture capture;
+        Bitmap? image;
+        Mat? frame;
+        Thread? camera;
+        VideoCapture? capture;
         static bool cancel;
         int cameraNumber;
 

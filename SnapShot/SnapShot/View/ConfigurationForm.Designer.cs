@@ -278,9 +278,9 @@
             // domainUpDown2
             // 
             this.domainUpDown2.Enabled = false;
-            this.domainUpDown2.Items.Add("seconds");
-            this.domainUpDown2.Items.Add("minutes");
             this.domainUpDown2.Items.Add("hours");
+            this.domainUpDown2.Items.Add("minutes");
+            this.domainUpDown2.Items.Add("seconds");
             this.domainUpDown2.Location = new System.Drawing.Point(299, 167);
             this.domainUpDown2.Name = "domainUpDown2";
             this.domainUpDown2.ReadOnly = true;
@@ -318,9 +318,9 @@
             // 
             // domainUpDown1
             // 
-            this.domainUpDown1.Items.Add("seconds");
-            this.domainUpDown1.Items.Add("minutes");
             this.domainUpDown1.Items.Add("hours");
+            this.domainUpDown1.Items.Add("minutes");
+            this.domainUpDown1.Items.Add("seconds");
             this.domainUpDown1.Location = new System.Drawing.Point(299, 121);
             this.domainUpDown1.Name = "domainUpDown1";
             this.domainUpDown1.Size = new System.Drawing.Size(150, 27);
