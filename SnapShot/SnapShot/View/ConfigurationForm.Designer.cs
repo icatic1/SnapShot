@@ -745,6 +745,7 @@
             this.radioButton5.TabStop = true;
             this.radioButton5.Text = "Camera 1";
             this.radioButton5.UseVisualStyleBackColor = true;
+            this.radioButton5.CheckedChanged += new System.EventHandler(this.radioButton5_CheckedChanged);
             // 
             // radioButton6
             // 
@@ -756,6 +757,7 @@
             this.radioButton6.TabStop = true;
             this.radioButton6.Text = "Camera 2";
             this.radioButton6.UseVisualStyleBackColor = true;
+            this.radioButton6.CheckedChanged += new System.EventHandler(this.radioButton6_CheckedChanged);
             // 
             // radioButton7
             // 
@@ -767,6 +769,7 @@
             this.radioButton7.TabStop = true;
             this.radioButton7.Text = "Camera 3";
             this.radioButton7.UseVisualStyleBackColor = true;
+            this.radioButton7.CheckedChanged += new System.EventHandler(this.radioButton7_CheckedChanged);
             // 
             // ConfigurationForm
             // 
