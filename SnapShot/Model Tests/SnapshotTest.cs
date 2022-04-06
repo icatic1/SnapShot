@@ -17,9 +17,11 @@ namespace Model_Tests
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void Test1()
         {
-
+            Assert.AreEqual("", snapshot.TerminalName);
+            Assert.IsFalse(snapshot.DebugLog);
+            Assert.IsFalse(snapshot.Licenced);
         }
     }
 }
