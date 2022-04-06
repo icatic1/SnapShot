@@ -24,17 +24,19 @@ namespace SnapShot
         Thread camera;
         VideoCapture capture;
         static bool cancel;
+        int cameraNumber;
 
         #endregion
 
         #region Constructor
 
-        public CapturePreviewForm(Snapshot s, string device)
+        public CapturePreviewForm(Snapshot s, string device, int camNo)
         {
             InitializeComponent();
             cancel = false;
             snapshot = s;
             textBox1.Text = device;
+            cameraNumber = camNo;
             toolStripStatusLabel1.Text = "";
 
             // configure and start using camera input
@@ -43,53 +45,7 @@ namespace SnapShot
 
         private void CapturePreviewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
-        }
-
-        #endregion
-
-        #region Menu items
-
-        /// <summary>
-        /// Go to configuration form
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
             cancel = true;
-            this.Hide();
-            ConfigurationForm f = new ConfigurationForm(snapshot);
-            f.ShowDialog();
-            this.Close();
-        }
-
-        /// <summary>
-        /// Go to licencing form
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            cancel = true;
-            this.Hide();
-            LicencingForm f = new LicencingForm(snapshot);
-            f.ShowDialog();
-            this.Close();
-        }
-
-        /// <summary>
-        /// Go to help form
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            cancel = true;
-            this.Hide();
-            InformationForm f = new InformationForm(snapshot);
-            f.ShowDialog();
-            this.Close();
         }
 
         #endregion
@@ -107,8 +63,8 @@ namespace SnapShot
         {
 
             frame = new Mat();
-            capture = new VideoCapture(0);
-            capture.Open(0);
+            capture = new VideoCapture(cameraNumber);
+            capture.Open(cameraNumber);
 
             if (capture.IsOpened())
             {
@@ -129,17 +85,24 @@ namespace SnapShot
 
         private void SetPicture(Image img)
         {
-            if (pictureBox1.InvokeRequired)
+            try
             {
-                pictureBox1.Invoke(new MethodInvoker(
-                delegate ()
+                if (pictureBox1.InvokeRequired)
+                {
+                    pictureBox1.Invoke(new MethodInvoker(
+                    delegate ()
+                    {
+                        pictureBox1.Image = img;
+                    }));
+                }
+                else
                 {
                     pictureBox1.Image = img;
-                }));
+                }
             }
-            else
+            catch
             {
-                pictureBox1.Image = img;
+
             }
         }
 

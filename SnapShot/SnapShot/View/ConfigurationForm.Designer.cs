@@ -191,6 +191,7 @@
             this.button6.TabIndex = 24;
             this.button6.Text = "Save configuration";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // groupBox4
             // 
@@ -241,6 +242,7 @@
             this.radioButton2.TabIndex = 18;
             this.radioButton2.Text = "Burst";
             this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // panel1
             // 

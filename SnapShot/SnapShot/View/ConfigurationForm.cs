@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Management;
+using System.IO;
 
 namespace SnapShot
 {
@@ -203,6 +204,70 @@ namespace SnapShot
         /// <param name="e"></param>
         private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string EXPORT = "";
+                EXPORT += "[\n";
+                foreach (var config in snapshot.Camera)
+                {
+                    EXPORT += "\t{\n";
+
+                    EXPORT += "\t\t'device_configuration':\n";
+                    EXPORT += "\t\t{\n";
+                    EXPORT += "\t\t\t'device_type': '" + config.Type + "'\n";
+                    EXPORT += "\t\t\t'id': '" + config.Id + "'\n";
+                    EXPORT += "\t\t\t'trigger_file_path': '" + config.TriggerFilePath + "'\n";
+                    EXPORT += "\t\t\t'output_folder_path': '" + config.OutputFolderPath + "'\n";
+                    EXPORT += "\t\t\t'output_validity_days': " + config.OutputValidity + "\n";
+                    EXPORT += "\t\t}\n";
+
+                    EXPORT += "\t\t'video_configuration':\n";
+                    EXPORT += "\t\t{\n";
+                    EXPORT += "\t\t\t'resolution': '" + config.Resolution + "'\n";
+                    EXPORT += "\t\t\t'contrast_level': " + config.ContrastLevel + "\n";
+                    EXPORT += "\t\t\t'image_color': '" + config.ImageColor.ToString() + "'\n";
+                    EXPORT += "\t\t\t'motion_detection': " + config.MotionDetection + "\n";
+                    EXPORT += "\t\t}\n";
+
+                    EXPORT += "\t\t'network_configuration':\n";
+                    EXPORT += "\t\t{\n";
+                    EXPORT += "\t\t\t'server_version': '" + config.ServerVersion + "'\n";
+                    EXPORT += "\t\t\t'server_IP_address': '" + config.ServerIP + "'\n";
+                    EXPORT += "\t\t\t'server_port': " + config.ServerPort + "\n";
+                    EXPORT += "\t\t\t'connection_status': " + config.ConnectionStatus + "\n";
+                    EXPORT += "\t\t}\n";
+
+                    EXPORT += "\t\t'capture_configuration':\n";
+                    EXPORT += "\t\t{\n";
+                    EXPORT += "\t\t\t'image_capture': " + config.ImageCapture + "\n";
+                    EXPORT += "\t\t\t'single_mode': " + config.SingleMode + "\n";
+                    EXPORT += "\t\t\t'duration': " + config.Duration + "\n";
+                    EXPORT += "\t\t\t'burst_period': " + config.Period + "\n";
+                    EXPORT += "\t\t}\n";
+
+                    EXPORT += "\t}\n";
+                }
+                EXPORT += "]";
+
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.InitialDirectory = "c:\\";
+                    openFileDialog.FileName = "configuration.json";
+                    openFileDialog.Filter = "JSON files (*.JSON)|*.JSON";
+                    openFileDialog.FilterIndex = 2;
+                    openFileDialog.CheckFileExists = false;
+                    openFileDialog.RestoreDirectory = true;
+
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        File.WriteAllText(openFileDialog.FileName, EXPORT);
+                        toolStripStatusLabel1.Text = "Export successfully completed.";
+                    }
+                }
+            }
+            catch
+            {
+                toolStripStatusLabel1.Text = "The export could not be completed successfully.";            }
 
         }
 
@@ -261,8 +326,13 @@ namespace SnapShot
 
         #endregion
 
-        #region Color palette
+        #region Color palette and radio buttons
 
+        /// <summary>
+        /// Show color palette dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -270,6 +340,20 @@ namespace SnapShot
 
             toolStripStatusLabel1.Text = "";
         }
+
+        /// <summary>
+        /// Enable/disable burst period selection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            numericUpDown3.Enabled = !numericUpDown3.Enabled;
+            numericUpDown3.ReadOnly = !numericUpDown3.ReadOnly;
+            domainUpDown2.Enabled = !domainUpDown2.Enabled;
+            domainUpDown2.ReadOnly = !domainUpDown2.ReadOnly;
+        }
+
 
         #endregion
 
@@ -299,10 +383,11 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            CapturePreviewForm f = new CapturePreviewForm(snapshot, comboBox1.Text);
-            f.ShowDialog();
-            this.Close();
+            //this.Hide();
+            CapturePreviewForm f = new CapturePreviewForm(snapshot, comboBox1.Text, comboBox1.SelectedIndex);
+            f.Show();
+            //f.ShowDialog();
+            //this.Close();
         }
 
         #endregion
