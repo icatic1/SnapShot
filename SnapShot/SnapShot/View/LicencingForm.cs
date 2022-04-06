@@ -30,6 +30,11 @@ namespace SnapShot
             snapshot = s;
             toolStripStatusLabel1.Text = "";
 
+            if (!File.Exists("config.txt"))
+            {
+               File.Create("config.txt").Close();
+                File.WriteAllText("config.txt", Environment.MachineName + "\nFalse");
+            }
             string IMPORT = File.ReadAllText("config.txt");
             string[] rows = IMPORT.Split('\n');
             snapshot.TerminalName = rows[0];
