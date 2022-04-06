@@ -610,11 +610,20 @@ namespace SnapShot
 
             textBox5.Text = config.ServerVersion;
             textBox3.Text = config.ServerIP;
+            if (config.ServerIP.Length > 0)
                 textBox4.Text = config.ServerPort.ToString();
+            else
+                textBox4.Text = "";
 
             radioButton4.Checked = config.ImageCapture;
+            radioButton3.Checked = !config.ImageCapture;
             radioButton1.Checked = config.SingleMode;
+            radioButton2.Checked = !config.SingleMode;
 
+            numericUpDown3.Enabled = !config.SingleMode;
+            numericUpDown3.ReadOnly = config.SingleMode;
+            domainUpDown2.Enabled = !config.SingleMode;
+            domainUpDown2.ReadOnly = config.SingleMode;
 
             string unit = "seconds";
             double time = config.Duration;
@@ -658,6 +667,7 @@ namespace SnapShot
                 domainUpDown2.Text = "seconds";
             }
 
+            toolStripStatusLabel1.Text = "";
         }
 
         #endregion

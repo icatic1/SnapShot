@@ -21,7 +21,7 @@ namespace SnapShot
         // video configuration
         Resolution resolution;
         int contrastLevel;
-        Color imageColor;
+        Color imageColor = SystemColors.Control;
         bool motionDetection = false;
 
         // network configuration - not a part of this sprint
@@ -68,7 +68,7 @@ namespace SnapShot
 
         #region Methods
 
-        // not a part of this string
+        // not a part of this sprint
         public bool CheckServerConnectionStatus()
         {
             return false;
