@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InformationForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -131,6 +132,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "InformationForm";
             this.Text = "SnapShot";
             this.menuStrip1.ResumeLayout(false);

@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigurationForm));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.domainUpDown2 = new System.Windows.Forms.DomainUpDown();
+            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.label18 = new System.Windows.Forms.Label();
             this.domainUpDown1 = new System.Windows.Forms.DomainUpDown();
             this.label15 = new System.Windows.Forms.Label();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
@@ -41,6 +45,9 @@
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.label13 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
@@ -79,15 +86,10 @@
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.button2 = new System.Windows.Forms.Button();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.domainUpDown2 = new System.Windows.Forms.DomainUpDown();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
-            this.label18 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -96,7 +98,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -144,6 +145,33 @@
             this.groupBox4.TabIndex = 15;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Capture configuration";
+            // 
+            // domainUpDown2
+            // 
+            this.domainUpDown2.Items.Add("seconds");
+            this.domainUpDown2.Items.Add("minutes");
+            this.domainUpDown2.Items.Add("hours");
+            this.domainUpDown2.Location = new System.Drawing.Point(299, 167);
+            this.domainUpDown2.Name = "domainUpDown2";
+            this.domainUpDown2.Size = new System.Drawing.Size(150, 27);
+            this.domainUpDown2.TabIndex = 27;
+            this.domainUpDown2.Text = "seconds";
+            // 
+            // numericUpDown3
+            // 
+            this.numericUpDown3.Location = new System.Drawing.Point(160, 168);
+            this.numericUpDown3.Name = "numericUpDown3";
+            this.numericUpDown3.Size = new System.Drawing.Size(124, 27);
+            this.numericUpDown3.TabIndex = 26;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(23, 168);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(93, 20);
+            this.label18.TabIndex = 25;
+            this.label18.Text = "Burst period:";
             // 
             // domainUpDown1
             // 
@@ -251,6 +279,35 @@
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Network configuration";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label17.ForeColor = System.Drawing.Color.Red;
+            this.label17.Location = new System.Drawing.Point(359, 177);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(136, 28);
+            this.label17.TabIndex = 18;
+            this.label17.Text = "Disconnected!";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(215, 184);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(129, 20);
+            this.label16.TabIndex = 17;
+            this.label16.Text = "Connection status:";
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(42, 180);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(143, 25);
+            this.button2.TabIndex = 16;
+            this.button2.Text = "Check connection";
+            this.button2.UseVisualStyleBackColor = true;
             // 
             // label10
             // 
@@ -601,62 +658,6 @@
             this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.pomoćToolStripMenuItem.Text = "Help";
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(42, 180);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(143, 25);
-            this.button2.TabIndex = 16;
-            this.button2.Text = "Check connection";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(215, 184);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(129, 20);
-            this.label16.TabIndex = 17;
-            this.label16.Text = "Connection status:";
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label17.ForeColor = System.Drawing.Color.Red;
-            this.label17.Location = new System.Drawing.Point(359, 177);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(136, 28);
-            this.label17.TabIndex = 18;
-            this.label17.Text = "Disconnected!";
-            // 
-            // domainUpDown2
-            // 
-            this.domainUpDown2.Items.Add("seconds");
-            this.domainUpDown2.Items.Add("minutes");
-            this.domainUpDown2.Items.Add("hours");
-            this.domainUpDown2.Location = new System.Drawing.Point(299, 167);
-            this.domainUpDown2.Name = "domainUpDown2";
-            this.domainUpDown2.Size = new System.Drawing.Size(150, 27);
-            this.domainUpDown2.TabIndex = 27;
-            this.domainUpDown2.Text = "seconds";
-            // 
-            // numericUpDown3
-            // 
-            this.numericUpDown3.Location = new System.Drawing.Point(160, 168);
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(124, 27);
-            this.numericUpDown3.TabIndex = 26;
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(23, 168);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(93, 20);
-            this.label18.TabIndex = 25;
-            this.label18.Text = "Burst period:";
-            // 
             // ConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -665,6 +666,7 @@
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.tabControl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ConfigurationForm";
             this.Text = "SnapShot";
@@ -672,6 +674,7 @@
             this.tabPage1.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -685,7 +688,6 @@
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
