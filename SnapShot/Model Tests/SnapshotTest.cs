@@ -65,5 +65,42 @@ namespace Model_Tests
             Assert.IsTrue(snapshot.Licenced);
             Assert.IsFalse(snapshot.DebugLog);
         }
+
+        [TestMethod]
+        public void Test5()
+        {
+            string terminalName = "terminal32";
+            try
+            {
+                snapshot.TerminalName = terminalName;
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.ToString());
+            }
+            Assert.AreEqual(terminalName, snapshot.TerminalName);
+        }
+
+        [TestMethod]
+        public void Test6()
+        {
+            var configList = new List<Configuration>()
+            {
+                new Configuration(),
+                new Configuration(),
+                new Configuration(),
+                new Configuration(),
+                new Configuration()
+            };
+            try
+            {
+                snapshot.Camera = configList;
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.ToString());
+            }
+            Assert.AreEqual(configList.Count, snapshot.Camera.Count);
+        }
     }
 }
