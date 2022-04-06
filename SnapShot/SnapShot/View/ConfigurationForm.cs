@@ -42,6 +42,8 @@ namespace SnapShot
             }
 
             comboBox3.Text = "1280x1024";
+
+            UpdateConfigurationWindow(0);
         }
 
         private void ConfigurationForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -139,7 +141,8 @@ namespace SnapShot
             }
             catch
             {
-                errorText = "Server port must be a valid number!";
+                if (textBox4.Text.Length > 0)
+                    errorText = "Server port must be a valid number!";
             }
 
             // capture configuration
@@ -388,6 +391,115 @@ namespace SnapShot
             f.Show();
             //f.ShowDialog();
             //this.Close();
+        }
+
+        #endregion
+
+        #region Radio buttons (devices)
+
+        /// <summary>
+        /// Camera 1
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton5_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton5.Checked)
+                UpdateConfigurationWindow(0);
+        }
+
+        /// <summary>
+        /// Camera 2
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton6_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton6.Checked)
+                UpdateConfigurationWindow(1);
+        }
+
+        /// <summary>
+        /// Camera 3
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton7_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton7.Checked)
+                UpdateConfigurationWindow(2);
+        }
+
+        /// <summary>
+        /// Helper method for changing configuration for different camera
+        /// </summary>
+        /// <param name="cameraNumber"></param>
+        public void UpdateConfigurationWindow(int cameraNumber)
+        {
+            var config = snapshot.Camera[cameraNumber];
+
+            comboBox2.Text = config.Type.ToString();
+            comboBox1.Text = config.Id;
+            textBox1.Text = config.TriggerFilePath;
+            textBox2.Text = config.OutputFolderPath;
+            if (config.OutputValidity > 0)
+                numericUpDown1.Value = config.OutputValidity;
+            else
+                numericUpDown1.Value = 1;
+
+            comboBox3.Text = config.Resolution.ToString();
+            trackBar1.Value = config.ContrastLevel;
+            pictureBox1.BackColor = config.ImageColor;
+            checkBox1.Checked = config.MotionDetection;
+
+            textBox5.Text = config.ServerVersion;
+            textBox3.Text = config.ServerIP;
+            textBox4.Text = config.ServerPort.ToString();
+
+            radioButton4.Checked = config.ImageCapture;
+            radioButton1.Checked = config.SingleMode;
+
+            string unit = "seconds";
+            double time = config.Duration;
+            while (unit != "hours" && (int)(time / 60) > 0)
+            {
+                time = time / 60;
+                if (unit == "seconds")
+                    unit = "minutes";
+                else if (unit == "minutes")
+                    unit = "hours";
+            }
+            if (time > 0)
+            {
+                numericUpDown2.Value = (int)time;
+                domainUpDown1.Text = unit;
+            }
+            else
+            {
+                numericUpDown2.Value = 1;
+                domainUpDown1.Text = "seconds";
+            }
+
+            unit = "seconds";
+            time = config.Period;
+            while (unit != "hours" && (int)(time / 60) > 0)
+            {
+                time = time / 60;
+                if (unit == "seconds")
+                    unit = "minutes";
+                else if (unit == "minutes")
+                    unit = "hours";
+            }
+            if (time > 0)
+            {
+                numericUpDown3.Value = (int)time;
+                domainUpDown2.Text = unit;
+            }
+            else
+            {
+                numericUpDown3.Value = 1;
+                domainUpDown2.Text = "seconds";
+            }
         }
 
         #endregion
