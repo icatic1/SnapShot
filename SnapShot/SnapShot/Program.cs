@@ -17,7 +17,7 @@ namespace SnapShot
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LicencingForm());
+            Application.Run(new LicencingForm(new Snapshot()));
         }
     }
 }
