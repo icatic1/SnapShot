@@ -1,15 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnapShot;
+
+
 
 namespace Model_Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class SnapshotTest
     {
         [TestMethod]
         public void TestMethod1()
         {
-            var x = new Snapshot();
+
         }
     }
 }
