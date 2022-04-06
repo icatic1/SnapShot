@@ -2,6 +2,10 @@
 
 ## SI - Set 1
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/73041886/162007995-de799515-409a-4ec0-8a11-b6baad338c48.png" alt="snapshot-logo"/>
+</p>
+
 ## Introduction
 
 Snapshot is a Windows application that can be used to take photos and record videos on devices with one or multiple cameras. 
