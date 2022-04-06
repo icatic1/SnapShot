@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnapShot;
-
-
+using System.Collections.Generic;
 
 namespace Model_Tests
 {
@@ -23,5 +22,19 @@ namespace Model_Tests
             Assert.IsFalse(snapshot.DebugLog);
             Assert.IsFalse(snapshot.Licenced);
         }
+
+        [TestMethod]
+        public void Test2()
+        {
+            var configList = new List<Configuration>()
+            {
+                new Configuration(),
+                new Configuration(),
+                new Configuration()
+            };
+            Assert.AreEqual(configList.Count, snapshot.Camera.Count);
+        }
+
+
     }
 }
