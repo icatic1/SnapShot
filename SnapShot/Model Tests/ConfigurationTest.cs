@@ -2,6 +2,7 @@
 using SnapShot;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Model_Tests
 {
@@ -193,6 +194,76 @@ namespace Model_Tests
             Configuration configuration = new Configuration();
             Assert.AreEqual(0, configuration.OutputValidity);
         }
+        
+        // Resolution
+        [TestMethod]
+        public void GetInitialResolutionTest()
+        {
+            Assert.IsNotNull(configuration.Resolution);
+        }
 
+        [TestMethod]
+        public void SetResolutionTest()
+        {
+            configuration.Resolution = Resolution.Resolution720x480;
+            Assert.AreEqual(Resolution.Resolution720x480, configuration.Resolution);
+        }
+
+        // ContrastLevel
+        [TestMethod]
+        public void GetInitialContrastLevelTest()
+        {
+            Assert.AreEqual(0, configuration.ContrastLevel);
+        }
+
+        [TestMethod]
+        public void SetContrastLevelTest()
+        {
+            configuration.ContrastLevel = 6;
+            Assert.AreEqual(6, configuration.ContrastLevel);
+        }
+
+        // ImageColor
+        [TestMethod]
+        public void GetInitialImageColorTest()
+        {
+            Assert.AreEqual(SystemColors.Control, configuration.ImageColor);
+        }
+
+        [TestMethod]
+        public void SetImageColorTest()
+        {
+            configuration.ImageColor = SystemColors.ControlDark;
+            Assert.AreEqual(SystemColors.ControlDark, configuration.ImageColor);
+        }
+
+        // MotionDetection
+        [TestMethod]
+        public void GetInitialMotionDetectionTest()
+        {
+            Assert.IsFalse(configuration.MotionDetection);
+        }
+
+        [TestMethod]
+        public void SetMotionDetectionTest()
+        {
+            configuration.MotionDetection = true;
+            Assert.IsTrue(configuration.MotionDetection);
+        }
+
+        // ServerVersion
+        [TestMethod]
+        public void GetInitialServerVersionTest()
+        {
+            Assert.AreEqual("", configuration.ServerVersion);
+        }
+
+        [TestMethod] 
+        public void SetServerVersionTest()
+        {
+            configuration.ServerVersion = "Server Version";
+            Assert.AreEqual("Server Version", configuration.ServerVersion);
+        }
+        
     }
 }
