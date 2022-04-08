@@ -164,5 +164,20 @@ namespace SnapShot
         }
 
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LicenceCheck();
+            if (snapshot.Licenced)
+            {
+                label3.Text = "Licenced version";
+                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
+            }
+            else
+            {
+                label3.Text = "Demo version";
+                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
+            }
+        }
     }
 }
