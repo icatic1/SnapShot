@@ -16,6 +16,8 @@ namespace SnapShot.Model
 
         #endregion
 
+        #region Methods
+
         public static bool Connect()
         {
             try
@@ -37,9 +39,41 @@ namespace SnapShot.Model
                 connection.Close();
         }
 
+        public static string? GetMACAddress()
+        {
+            return (from nic in NetworkInterface.GetAllNetworkInterfaces()
+                    where nic.OperationalStatus == OperationalStatus.Up
+                    select nic.GetPhysicalAddress().ToString()
+                    ).FirstOrDefault();
+        }
+
+        public static bool CheckLicence()
+        {
+            string SQL = "SELECT * FROM licences WHERE MAC_address = '" + GetMACAddress() + "' AND licenced = 1;";
+            SqlCommand command = new SqlCommand(SQL, connection);
+            SqlDataReader result = command.ExecuteReader();
+
+            return result.HasRows;
+        }
+
+        public static void WriteConfiguration(string configuration)
+        {
+            string SQL = "DELETE FROM JSON_configurations WHERE MAC_address = '" + GetMACAddress() + "';";
+            SqlCommand command = new SqlCommand(SQL, connection);
+            command.ExecuteNonQuery();
+
+            command.CommandText = "INSERT INTO JSON_configurations (MAC_address, configuration) VALUES ('" + GetMACAddress() + "', @configuration);";
+            SqlParameter param = new SqlParameter("@configuration", System.Data.SqlDbType.Text, configuration.Length);
+            param.Value = configuration;
+            command.Parameters.Add(param);
+
+            command.Prepare();
+            command.ExecuteNonQuery();
+        }
+
         public static string ReadConfiguration()
         {
-            string SQL = "SELECT * FROM JSON_configurations WHERE MAC_address = '" + "AAAAA" + "';"; //TODO Implement GetMacAddress
+            string SQL = "SELECT * FROM JSON_configurations WHERE MAC_address = '" + GetMACAddress() + "';";
             SqlCommand command = new SqlCommand(SQL, connection);
             SqlDataReader result = command.ExecuteReader();
             while (result.Read())
@@ -49,19 +83,6 @@ namespace SnapShot.Model
             return "";
         }
 
-        public static void WriteConfiguration(string configuration)
-        {
-            string SQL = "DELETE FROM JSON_configurations WHERE MAC_address = '" + "AAAA" + "';";
-            SqlCommand command = new SqlCommand(SQL, connection);
-            command.ExecuteNonQuery();
-
-            command.CommandText = "INSERT INTO JSON_configurations (MAC_address, configuration) VALUES ('" + "AAAAAA" + "', @configuration);";
-            SqlParameter param = new SqlParameter("@configuration", System.Data.SqlDbType.Text, configuration.Length);
-            param.Value = configuration;
-            command.Parameters.Add(param);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
+        #endregion
     }
 }

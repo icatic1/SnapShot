@@ -14,8 +14,16 @@ namespace SnapShot
 {
     internal static class Program
     {
+        #region Properties
+
         static Snapshot snapshot = new Snapshot();
+
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
+
+        #endregion
+
+        #region Main
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -25,9 +33,15 @@ namespace SnapShot
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
             RunRecordings();
+
             Application.Run(new LicencingForm());
         }
+
+        #endregion
+
+        #region Recording
 
         static void RunRecordings()
         {
@@ -44,6 +58,7 @@ namespace SnapShot
                 camera.Start();
             }
         }
+
         static void Record(ref Snapshot snapshot, int index)
         {
             while (1 == 1)
@@ -104,7 +119,7 @@ namespace SnapShot
 
                                         Bitmap image = BitmapConverter.ToBitmap(frame);
                                         image.Save(@snapshot.Camera[index].OutputFolderPath + "/image" + timestamp + "burst" + (i + 1) + ".png");
-
+                                        
                                         // wait for next burst
                                         Thread.Sleep(snapshot.Camera[index].Period * 1000);
                                     }
@@ -143,5 +158,7 @@ namespace SnapShot
                 }
             }
         }
+
+        #endregion
     }
 }

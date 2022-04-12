@@ -220,9 +220,23 @@ namespace SnapShot
                     openFileDialog.CheckFileExists = false;
                     openFileDialog.RestoreDirectory = true;
 
-                    
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var result = Configuration.ExportToJSON(openFileDialog.FileName, mode);
+                        if (result)
+                            toolStripStatusLabel1.Text = "Export successfully completed.";
+                        else
+                            toolStripStatusLabel1.Text = "The export could not be completed successfully.";
+                    }
                 }
-            
+            else
+            {
+                var result = Configuration.ExportToJSON("", mode);
+                if (result)
+                    toolStripStatusLabel1.Text = "Export successfully completed.";
+                else
+                    toolStripStatusLabel1.Text = "The export could not be completed successfully.";
+            }
         }
 
         /// <summary>
