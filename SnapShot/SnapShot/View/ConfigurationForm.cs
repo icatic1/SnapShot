@@ -96,8 +96,9 @@ namespace SnapShot
 
             string deviceName = comboBox1.Text,
                    triggerPath = textBox1.Text,
+                   regex = textBox6.Text,
                    outputPath = textBox2.Text;
-            if (deviceName == "" || triggerPath == "" || outputPath == "")
+            if (deviceName == "" || triggerPath == "" || regex == "" || outputPath == "")
                 errorText = "Empty values found in configuration options!";
 
             int validity = (int)numericUpDown1.Value;
@@ -175,6 +176,7 @@ namespace SnapShot
                 Type = type,
                 Id = deviceName,
                 TriggerFilePath = triggerPath,
+                Regex = regex,
                 OutputFolderPath = outputPath,
                 OutputValidity = validity,
                 CameraNumber = cameraNo,
@@ -357,13 +359,18 @@ namespace SnapShot
         /// <param name="e"></param>
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            // burst selected - allow for burst period to be selected
+            // burst selected - allow for burst duration and period to be selected
             if (radioButton2.Checked)
             {
                 numericUpDown3.Enabled = true;
                 numericUpDown3.ReadOnly = false;
                 domainUpDown2.Enabled = true;
                 domainUpDown2.ReadOnly = false;
+
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
             }
 
             // burst not selected - do not allow burst period to be selected
@@ -383,7 +390,7 @@ namespace SnapShot
         /// <param name="e"></param>
         private void radioButton3_CheckedChanged(object sender, EventArgs e)
         {
-            // video is selected - burst not available
+            // video is selected - burst not available, duration is available
             if (radioButton3.Checked)
             {
                 radioButton1.Checked = true;
@@ -395,6 +402,11 @@ namespace SnapShot
                 numericUpDown3.ReadOnly = true;
                 domainUpDown2.Enabled = false;
                 domainUpDown2.ReadOnly = true;
+
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
             }
 
             // video is not selected - enable burst to be selected
@@ -423,9 +435,38 @@ namespace SnapShot
                 numericUpDown3.ReadOnly = true;
                 domainUpDown2.Enabled = false;
                 domainUpDown2.ReadOnly = true;
+
+                numericUpDown2.Enabled = false;
+                numericUpDown2.ReadOnly = true;
+                domainUpDown1.Enabled = false;
+                domainUpDown1.ReadOnly = true;
             }
         }
 
+        /// <summary>
+        /// Automatically disable duration when single image is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            // single image selected - disable duration
+            if (radioButton4.Checked && radioButton1.Checked)
+            {
+                numericUpDown2.Enabled = false;
+                numericUpDown2.ReadOnly = true;
+                domainUpDown1.Enabled = false;
+                domainUpDown1.ReadOnly = true;
+            }
+            // any other combination - enable duration
+            else
+            {
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
+            }
+        }
 
         #endregion
 
