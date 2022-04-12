@@ -12,7 +12,8 @@ namespace SnapShot
 
         string terminalName = "";
         bool debugLog = false,
-            licenced = false;
+            licenced = false,
+            connected = false;
 
         List<Configuration> camera = new List<Configuration>()
         {
@@ -29,6 +30,7 @@ namespace SnapShot
         public bool DebugLog { get => debugLog; set => debugLog = value; }
         public string TerminalName { get => terminalName; set => terminalName = value; }
         public bool Licenced { get => licenced; set => licenced = value; }
+        public bool Connected { get => connected; set => connected = value; }
 
         #endregion
     }

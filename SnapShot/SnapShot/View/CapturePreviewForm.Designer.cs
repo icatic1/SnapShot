@@ -44,7 +44,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(28, 24);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(438, 27);
+            this.label1.Size = new System.Drawing.Size(57, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "Device:";
             // 
@@ -54,7 +54,7 @@
             this.textBox1.Location = new System.Drawing.Point(114, 21);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(438, 23);
+            this.textBox1.Size = new System.Drawing.Size(438, 27);
             this.textBox1.TabIndex = 1;
             // 
             // label2
@@ -113,7 +113,6 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
-            
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(650, 700);
             this.MinimumSize = new System.Drawing.Size(650, 700);
