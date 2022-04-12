@@ -20,11 +20,16 @@ namespace SnapShot
         {
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
-            comboBox2.Text = "USB camera";
             panel1.BorderStyle = BorderStyle.None;
             panel2.BorderStyle = BorderStyle.None;
 
-            // add all available camera devices to collection
+            // automatically select USB camera - disable network configuration
+            comboBox2.Text = "USB camera";
+            textBox5.ReadOnly = true;
+            textBox3.ReadOnly = true;
+            textBox4.ReadOnly = true;
+
+            // add all available USB camera devices to combo box list
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
             {
                 foreach (var device in searcher.Get())
@@ -34,7 +39,7 @@ namespace SnapShot
                 }
             }
 
-            comboBox3.Text = "1280x1024";
+            comboBox3.Text = "640x480";
 
             UpdateConfigurationWindow(0);
         }
@@ -55,8 +60,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
             LicencingForm f = new LicencingForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }
@@ -68,8 +73,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
             InformationForm f = new InformationForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }
@@ -86,58 +91,114 @@ namespace SnapShot
         private void button6_Click(object sender, EventArgs e)
         {
             string errorText = "";
+            errorProvider1.Clear();
 
             // device configuration
             DeviceType type = DeviceType.USBCamera;
             if (comboBox2.Text == "IP camera")
                 type = DeviceType.IPCamera;
-            else if (comboBox2.Text != "USB camera")
-                errorText = "You need to select device type!";
 
             string deviceName = comboBox1.Text,
                    triggerPath = textBox1.Text,
                    regex = textBox6.Text,
                    outputPath = textBox2.Text;
-            if (deviceName == "" || triggerPath == "" || regex == "" || outputPath == "")
-                errorText = "Empty values found in configuration options!";
+
+            // check whether all fields that must have values have been filled
+            if (triggerPath == "")
+            {
+                errorText = "Trigger path must not be empty!";
+                errorProvider1.SetError(textBox1, errorText);
+                textBox1.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox1.BackColor = Color.White;
+                errorProvider1.SetError(textBox1, null);
+            }
+
+            if (regex == "")
+            {
+                errorText = "Regex must not be empty!";
+                errorProvider1.SetError(textBox6, errorText);
+                textBox6.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox6.BackColor = Color.White;
+                errorProvider1.SetError(textBox6, null);
+            }
+
+            if (outputPath == "")
+            {
+                errorText = "Output path must not be empty!";
+                errorProvider1.SetError(textBox2, errorText);
+                textBox2.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox2.BackColor = Color.White;
+                errorProvider1.SetError(textBox2, null);
+            }
+
+            if (type == DeviceType.USBCamera && deviceName == "")
+            {
+                errorText = "USB device needs to be selected!";
+                errorProvider1.SetError(comboBox1, errorText);
+                comboBox1.BackColor = Color.Red;
+            }
+            else
+            {
+                comboBox1.BackColor = Color.White;
+                errorProvider1.SetError(comboBox1, null);
+            }
 
             int validity = (int)numericUpDown1.Value;
             int cameraNo = (int)comboBox1.SelectedIndex;
 
             // video configuration
-            Resolution resolution = Resolution.Resolution720x480;
-            if (comboBox3.Text == "1280x960")
-                resolution = Resolution.Resolution1280x960;
-            if (comboBox3.Text == "1280x1024")
-                resolution = Resolution.Resolution1280x1024;
-            else if (comboBox3.Text == "1920X1080")
-                resolution = Resolution.Resolution1920x1080;
-            else if (comboBox3.Text == "2048x1536")
-                resolution = Resolution.Resolution2048x1536;
-            else if (comboBox3.Text != "720x480")
-                errorText = "No capture device resolution selected!";
+            string res = "Resolution" + comboBox3.Text;
+            Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), res);
 
             int contrast = trackBar1.Value;
             Color color = pictureBox1.BackColor;
             bool motionDetection = checkBox1.Checked;
 
-            // network configuration
             string version = textBox5.Text,
-                   ip = textBox3.Text,
-                   statusText = label17.Text;
+                       ip = textBox3.Text,
+                       statusText = label17.Text;
 
             bool status = statusText == "Connected!" ? true : false;
 
             int port = 0;
 
-            try
+            // IP camera server configuration
+            if (type == DeviceType.IPCamera)
             {
-                port = Int32.Parse(textBox4.Text);
-            }
-            catch
-            {
-                if (textBox4.Text.Length > 0)
+                try
+                {
+                    port = Int32.Parse(textBox4.Text);
+                    textBox4.BackColor = Color.White;
+                    errorProvider1.SetError(textBox4, null);
+                }
+                catch
+                {
                     errorText = "Server port must be a valid number!";
+                    errorProvider1.SetError(textBox4, errorText);
+                    textBox4.BackColor = Color.Red;
+                }
+
+                // check whether all fields that must have values have been filled
+                if (type == DeviceType.IPCamera && ip.Length < 1)
+                {
+                    errorText = "IP camera server configurations need to be specified!";
+                    errorProvider1.SetError(textBox3, errorText);
+                    textBox3.BackColor = Color.Red;
+                }
+                else
+                {
+                    textBox3.BackColor = Color.White;
+                    errorProvider1.SetError(textBox3, null);
+                }
             }
 
             // capture configuration
@@ -166,9 +227,11 @@ namespace SnapShot
             // something was not correct - do not allow configuration to be created
             if (errorText.Length > 0)
             {
-                toolStripStatusLabel1.Text = errorText;
+                toolStripStatusLabel1.Text = "Configuration could not be saved due to errors!";
                 return;
             }
+
+            errorProvider1.Clear();
 
             // create new configuration for the specified camera
             Program.Snapshot.Camera[camera] = new Configuration()
@@ -313,6 +376,8 @@ namespace SnapShot
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     textBox1.Text = openFileDialog.FileName;
+                    errorProvider1.SetError(textBox1, null);
+                    textBox1.BackColor = Color.White;
                 }
             }
 
@@ -330,6 +395,8 @@ namespace SnapShot
             if (result == DialogResult.OK)
             {
                 textBox2.Text = folderBrowserDialog1.SelectedPath;
+                errorProvider1.SetError(textBox2, null);
+                textBox2.BackColor = Color.White;
             }
 
             toolStripStatusLabel1.Text = "";
@@ -548,6 +615,7 @@ namespace SnapShot
             comboBox2.Text = config.Type.ToString();
             comboBox1.Text = config.Id;
             textBox1.Text = config.TriggerFilePath;
+            textBox6.Text = config.Regex;
             textBox2.Text = config.OutputFolderPath;
             if (config.OutputValidity > 0)
                 numericUpDown1.Value = config.OutputValidity;
@@ -619,6 +687,39 @@ namespace SnapShot
             }
 
             toolStripStatusLabel1.Text = "";
+        }
+
+        #endregion
+
+        #region IP camera
+
+        /// <summary>
+        /// Change available items on form depending on the selected device
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // USB camera selected - disable server configuration
+            if (comboBox2.SelectedItem.ToString() == "USB camera")
+            {
+                textBox5.ReadOnly = true;
+                textBox3.ReadOnly = true;
+                textBox4.ReadOnly = true;
+
+                comboBox1.Enabled = true;
+            }
+
+            // IP camera selected - disable USB device selection
+            else
+            {
+                comboBox1.SelectedItem = null;
+                comboBox1.Enabled = false;
+
+                textBox5.ReadOnly = false;
+                textBox3.ReadOnly = false;
+                textBox4.ReadOnly = false;
+            }
         }
 
         #endregion

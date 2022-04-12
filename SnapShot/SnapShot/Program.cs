@@ -69,7 +69,7 @@ namespace SnapShot
             {
                 // configuration not set - wait a little bit, then check again
                 if (snapshot.Camera[index].OutputFolderPath.Length < 1)
-                    Thread.Sleep(100);
+                    Thread.Sleep(1000);
 
                 // ignore any old content of trigger file, then check again
                 else if (!firstCheck)
@@ -106,7 +106,7 @@ namespace SnapShot
                             // regex match not found - wait for a while, then check again for file lines change
                             if (!matchFound)
                             {
-                                Thread.Sleep(5 * 1000);
+                                Thread.Sleep(1000);
                                 continue;
                             }
                         }
@@ -114,7 +114,7 @@ namespace SnapShot
                         // wait for a while, then check again for file lines change
                         else
                         {
-                            Thread.Sleep(5 * 1000);
+                            Thread.Sleep(1000);
                             continue;
                         }
 
@@ -129,7 +129,6 @@ namespace SnapShot
                         capture.FrameWidth = Int32.Parse(dimensions[1]);
 
                         // change contrast
-
 
                         // change image color
 
@@ -178,12 +177,12 @@ namespace SnapShot
                         // record a video
                         else
                         {
-                            using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(640, 480)))
+                            using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1]))))
                             {
                                 Mat frame = new Mat();
                                 Stopwatch sw = new Stopwatch();
                                 sw.Start();
-                                while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000)
+                                while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000 + 1000)
                                 {
                                     capture.Read(frame);
                                     writer.Write(frame);
@@ -196,7 +195,7 @@ namespace SnapShot
                     // file unavailable - probably being edited, wait 5 seconds then check again
                     catch
                     {
-                        Thread.Sleep(5 * 1000);
+                        Thread.Sleep(1000);
                     }
                 }
             }
