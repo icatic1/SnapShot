@@ -27,11 +27,13 @@ namespace SnapShot
         {
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
+
             if (!File.Exists("config.txt"))
             {
                 File.Create("config.txt").Close();
                 File.WriteAllText("config.txt", Environment.MachineName + "\nFalse");
             }
+
             string IMPORT = File.ReadAllText("config.txt");
             string[] rows = IMPORT.Split('\n');
             Program.Snapshot.TerminalName = rows[0];
@@ -161,20 +163,5 @@ namespace SnapShot
         }
 
         #endregion
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            LicenceCheck();
-            if (Program.Snapshot.Licenced)
-            {
-                label3.Text = "Licenced version";
-                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
-            }
-            else
-            {
-                label3.Text = "Demo version";
-                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
-            }
-        }
     }
 }
