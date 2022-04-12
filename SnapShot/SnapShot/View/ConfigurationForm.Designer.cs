@@ -150,14 +150,14 @@
             // exportToJSONToolStripMenuItem
             // 
             this.exportToJSONToolStripMenuItem.Name = "exportToJSONToolStripMenuItem";
-            this.exportToJSONToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exportToJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             this.exportToJSONToolStripMenuItem.Text = "Export to JSON";
             this.exportToJSONToolStripMenuItem.Click += new System.EventHandler(this.exportToJSONToolStripMenuItem_Click);
             // 
             // importFromJSONToolStripMenuItem
             // 
             this.importFromJSONToolStripMenuItem.Name = "importFromJSONToolStripMenuItem";
-            this.importFromJSONToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.importFromJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             this.importFromJSONToolStripMenuItem.Text = "Import from JSON";
             this.importFromJSONToolStripMenuItem.Click += new System.EventHandler(this.importFromJSONToolStripMenuItem_Click);
             // 
@@ -267,6 +267,7 @@
             this.radioButton4.TabStop = true;
             this.radioButton4.Text = "Image";
             this.radioButton4.UseVisualStyleBackColor = true;
+            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
             // 
             // domainUpDown2
             // 
