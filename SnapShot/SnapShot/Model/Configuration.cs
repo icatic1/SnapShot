@@ -17,6 +17,7 @@ namespace SnapShot
         DeviceType type;
         string id = "";
         string triggerFilePath = "",
+               regex = "",
                outputFolderPath = "";
         int outputValidity,
             cameraNumber;
@@ -44,22 +45,41 @@ namespace SnapShot
         #region Properties
 
         public DeviceType Type { get => type; set => type = value; }
+
         public string Id { get => id; set => id = value; }
-        public string TriggerFilePath { get => triggerFilePath; set => triggerFilePath = value; }
+
+        public string TriggerFilePath { get => triggerFilePath; set => triggerFilePath = value; }   
+        
+        public string Regex { get => regex; set => regex = value; }
+        
         public string OutputFolderPath { get => outputFolderPath; set => outputFolderPath = value; }
+        
         public int OutputValidity { get => outputValidity; set => outputValidity = value; }
+        
         public int CameraNumber { get => cameraNumber; set => cameraNumber = value; }
+        
         public Resolution Resolution { get => resolution; set => resolution = value; }
+        
         public int ContrastLevel { get => contrastLevel; set => contrastLevel = value; }
+        
         public Color ImageColor { get => imageColor; set => imageColor = value; }
+        
         public bool MotionDetection { get => motionDetection; set => motionDetection = value; }
+        
         public string ServerVersion { get => serverVersion; set => serverVersion = value; }
+        
         public string ServerIP { get => serverIP; set => serverIP = value; }
+        
         public int ServerPort { get => serverPort; set => serverPort = value; }
+        
         public bool ConnectionStatus { get => connectionStatus; set => connectionStatus = value; }
+        
         public bool ImageCapture { get => imageCapture; set => imageCapture = value; }
+        
         public bool SingleMode { get => singleMode; set => singleMode = value; }
+        
         public int Duration { get => duration; set => duration = value; }
+        
         public int Period { get => period; set => period = value; }
 
         #endregion
@@ -82,6 +102,7 @@ namespace SnapShot
                 EXPORT += "\t\t\t\t\"device_type\": \"" + config.Type + "\",\n";
                 EXPORT += "\t\t\t\t\"id\": \"" + config.Id + "\",\n";
                 EXPORT += "\t\t\t\t\"trigger_file_path\": \"" + config.TriggerFilePath + "\",\n";
+                EXPORT += "\t\t\t\t\"regex\": \"" + config.Regex + "\", \n";
                 EXPORT += "\t\t\t\t\"output_folder_path\": \"" + config.OutputFolderPath + "\",\n";
                 EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\",\n";
                 EXPORT += "\t\t\t\t\"camera_number\": \"" + config.CameraNumber + "\"\n";
@@ -183,6 +204,10 @@ namespace SnapShot
                         trigger_file_path[1] = trigger_file_path[1].Replace("\"", "").Replace(",", "");
                         i++;
 
+                        string[] regex = rows[i].Split(" ");
+                        regex[1] = regex[1].Replace("\"", "").Replace(",", "");
+                        i++;
+
                         string[] output_folder_path = rows[i].Split(" ");
                         output_folder_path[1] = output_folder_path[1].Replace("\"", "").Replace(",", "");
                         i++;
@@ -197,6 +222,7 @@ namespace SnapShot
                         config.Type = (DeviceType)Enum.Parse(typeof(DeviceType), device_type[1]);
                         config.Id = id[1];
                         config.TriggerFilePath = trigger_file_path[1];
+                        config.Regex = regex[1];
                         config.OutputFolderPath = output_folder_path[1];
                         config.OutputValidity = Int32.Parse(output_validity_days[1]);
                         config.CameraNumber = Int32.Parse(camera_number[1]);
