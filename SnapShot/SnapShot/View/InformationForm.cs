@@ -36,8 +36,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
             ConfigurationForm f = new ConfigurationForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }
@@ -49,8 +49,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Hide();
             LicencingForm f = new LicencingForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }

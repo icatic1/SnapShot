@@ -8,6 +8,7 @@ namespace SnapShot
 {
     public enum Resolution
     {
+        Resolution640x480,
         Resolution720x480,
         Resolution1280x960,
         Resolution1280x1024,
