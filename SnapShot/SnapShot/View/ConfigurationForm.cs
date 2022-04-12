@@ -246,8 +246,34 @@ namespace SnapShot
                     openFileDialog.CheckFileExists = true;
                     openFileDialog.RestoreDirectory = true;
 
-                    
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+
+                        bool result = Configuration.ImportFromJSON(openFileDialog.FileName, mode);
+                        if (result)
+                        {
+                            radioButton5.Checked = true;
+                            UpdateConfigurationWindow(0);
+                        }
+                        else
+                        {
+                            toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                        }
+                    }
                 }
+            else
+            {
+                bool result = Configuration.ImportFromJSON("", mode);
+                if (result)
+                {
+                    radioButton5.Checked = true;
+                    UpdateConfigurationWindow(0);
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                }
+            }
         }
 
         #endregion
