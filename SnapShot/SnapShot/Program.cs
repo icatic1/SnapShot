@@ -2,6 +2,7 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -24,7 +25,24 @@ namespace SnapShot
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            RunRecordings();
             Application.Run(new LicencingForm());
+        }
+
+        static void RunRecordings()
+        {
+            List<Thread> cameras = new List<Thread>()
+            {
+                new Thread(() => Record(ref snapshot, 0)),
+                new Thread(() => Record(ref snapshot, 1)),
+                new Thread(() => Record(ref snapshot, 2))
+            };
+
+            foreach (var camera in cameras)
+            {
+                camera.IsBackground = true;
+                camera.Start();
+            }
         }
         static void Record(ref Snapshot snapshot, int index)
         {
@@ -93,13 +111,29 @@ namespace SnapShot
 
                                     capture.Release();
                                 }
-
-                                // sleep for one minute so that the file contents can change
-                                Thread.Sleep(60 * 1000);
                             }
+                            // record a video
                             else
-                                Thread.Sleep(100);
+                            {
+                                using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/video" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(640, 480)))
+                                {
+                                    Mat frame = new Mat();
+                                    Stopwatch sw = new Stopwatch();
+                                    sw.Start();
+                                    while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000)
+                                    {
+                                        capture.Read(frame);
+                                        writer.Write(frame);
+                                    }
+                                }
+
+                                capture.Release();
+                            }
+                            // sleep for one minute so that the file contents can change
+                            Thread.Sleep(60 * 1000);
                         }
+                        else
+                            Thread.Sleep(100);
                     }
                     // file unavailable - probably being edited, wait 5 seconds then check again
                     catch
