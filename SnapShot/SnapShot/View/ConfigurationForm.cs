@@ -14,18 +14,11 @@ namespace SnapShot
 {
     public partial class ConfigurationForm : Form
     {
-        #region Attributes
-
-        Snapshot snapshot;
-
-        #endregion
-
         #region Constructor
 
-        public ConfigurationForm(Snapshot s)
+        public ConfigurationForm()
         {
             InitializeComponent();
-            snapshot = s;
             toolStripStatusLabel1.Text = "";
             comboBox2.Text = "USB camera";
             panel1.BorderStyle = BorderStyle.None;
@@ -63,7 +56,7 @@ namespace SnapShot
         private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Hide();
-            LicencingForm f = new LicencingForm(snapshot);
+            LicencingForm f = new LicencingForm();
             f.ShowDialog();
             this.Close();
         }
@@ -76,7 +69,7 @@ namespace SnapShot
         private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Hide();
-            InformationForm f = new InformationForm(snapshot);
+            InformationForm f = new InformationForm();
             f.ShowDialog();
             this.Close();
         }
@@ -108,6 +101,7 @@ namespace SnapShot
                 errorText = "Empty values found in configuration options!";
 
             int validity = (int)numericUpDown1.Value;
+            int cameraNo = (int)comboBox1.SelectedIndex;
 
             // video configuration
             Resolution resolution = Resolution.Resolution720x480;
@@ -176,13 +170,14 @@ namespace SnapShot
             }
 
             // create new configuration for the specified camera
-            snapshot.Camera[camera] = new Configuration()
+            Program.Snapshot.Camera[camera] = new Configuration()
             {
                 Type = type,
                 Id = deviceName,
                 TriggerFilePath = triggerPath,
                 OutputFolderPath = outputPath,
                 OutputValidity = validity,
+                CameraNumber = cameraNo,
                 Resolution = resolution,
                 ContrastLevel = contrast,
                 ImageColor = color,
@@ -218,7 +213,7 @@ namespace SnapShot
                 EXPORT += "\t\"cameras\":\n";
                 EXPORT += "\t[\n";
                 int i = 0;
-                foreach (var config in snapshot.Camera)
+                foreach (var config in Program.Snapshot.Camera)
                 {
                     EXPORT += "\t\t{\n";
 
@@ -228,7 +223,8 @@ namespace SnapShot
                     EXPORT += "\t\t\t\t\"id\": \"" + config.Id + "\",\n";
                     EXPORT += "\t\t\t\t\"trigger_file_path\": \"" + config.TriggerFilePath + "\",\n";
                     EXPORT += "\t\t\t\t\"output_folder_path\": \"" + config.OutputFolderPath + "\",\n";
-                    EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\"\n";
+                    EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\",\n";
+                    EXPORT += "\t\t\t\t\"camera_number\": \"" + config.CameraNumber + "\"\n";
                     EXPORT += "\t\t\t},\n";
 
                     EXPORT += "\t\t\t\"video_configuration\":\n";
@@ -336,12 +332,17 @@ namespace SnapShot
 
                                 string[] output_validity_days = rows[i].Split(" ");
                                 output_validity_days[1] = output_validity_days[1].Replace("\"", "").Replace(",", "");
+                                i++;
+
+                                string[] camera_number = rows[i].Split(" ");
+                                camera_number[1] = camera_number[1].Replace("\"", "").Replace(",", "");
 
                                 config.Type = (DeviceType)Enum.Parse(typeof(DeviceType), device_type[1]);
                                 config.Id = id[1];
                                 config.TriggerFilePath = trigger_file_path[1];
                                 config.OutputFolderPath = output_folder_path[1];
                                 config.OutputValidity = Int32.Parse(output_validity_days[1]);
+                                config.CameraNumber = Int32.Parse(camera_number[1]);
                             }
 
                             i += 2;
@@ -427,7 +428,7 @@ namespace SnapShot
                             camera++;
                         }
 
-                        snapshot = newSnapshot;
+                        Program.Snapshot = newSnapshot;
                     }
                 }
                 
@@ -513,6 +514,13 @@ namespace SnapShot
             domainUpDown2.ReadOnly = !domainUpDown2.ReadOnly;
         }
 
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            numericUpDown3.Enabled = !radioButton3.Checked;
+            numericUpDown3.ReadOnly = radioButton3.Checked;
+            domainUpDown2.Enabled = !radioButton3.Checked;
+            domainUpDown2.ReadOnly = radioButton3.Checked;
+        }
 
         #endregion
 
@@ -542,11 +550,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            //this.Hide();
-            CapturePreviewForm f = new CapturePreviewForm(snapshot, comboBox1.Text, comboBox1.SelectedIndex);
+            CapturePreviewForm f = new CapturePreviewForm(comboBox1.Text, comboBox1.SelectedIndex);
             f.Show();
-            //f.ShowDialog();
-            //this.Close();
         }
 
         #endregion
@@ -592,7 +597,7 @@ namespace SnapShot
         /// <param name="cameraNumber"></param>
         public void UpdateConfigurationWindow(int cameraNumber)
         {
-            var config = snapshot.Camera[cameraNumber];
+            var config = Program.Snapshot.Camera[cameraNumber];
 
             comboBox2.Text = config.Type.ToString();
             comboBox1.Text = config.Id;

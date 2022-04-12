@@ -17,37 +17,36 @@ namespace SnapShot
     {
         #region Attributes
 
-        Snapshot snapshot;
         string error = "";
 
         #endregion
 
         #region Constructor
 
-        public LicencingForm(Snapshot s)
+        public LicencingForm()
         {
             InitializeComponent();
-            snapshot = s;
             toolStripStatusLabel1.Text = "";
 
             if (!File.Exists("config.txt"))
             {
-               File.Create("config.txt").Close();
+                File.Create("config.txt").Close();
                 File.WriteAllText("config.txt", Environment.MachineName + "\nFalse");
             }
+
             string IMPORT = File.ReadAllText("config.txt");
             string[] rows = IMPORT.Split('\n');
-            snapshot.TerminalName = rows[0];
-            snapshot.DebugLog = Convert.ToBoolean(rows[1]);
+            Program.Snapshot.TerminalName = rows[0];
+            Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
 
-            textBox2.Text = snapshot.TerminalName;
-            checkBox1.Checked = snapshot.DebugLog;
+            textBox2.Text = Program.Snapshot.TerminalName;
+            checkBox1.Checked = Program.Snapshot.DebugLog;
 
             error = "";
             LicenceCheck();
             toolStripStatusLabel1.Text = error;
 
-            if (snapshot.Licenced)
+            if (Program.Snapshot.Licenced)
             {
                 label3.Text = "Licenced version";
                 textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
@@ -78,7 +77,7 @@ namespace SnapShot
         {
             UpdateConfigurationFile();
             this.Hide();
-            ConfigurationForm f = new ConfigurationForm(snapshot);
+            ConfigurationForm f = new ConfigurationForm();
             f.ShowDialog();
             this.Close();
         }
@@ -92,7 +91,7 @@ namespace SnapShot
         {
             UpdateConfigurationFile();
             this.Hide();
-            InformationForm f = new InformationForm(snapshot);
+            InformationForm f = new InformationForm();
             f.ShowDialog();
             this.Close();
         }
@@ -108,7 +107,7 @@ namespace SnapShot
         /// <param name="e"></param>
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            snapshot.TerminalName = textBox2.Text;
+            Program.Snapshot.TerminalName = textBox2.Text;
         }
 
         /// <summary>
@@ -118,12 +117,12 @@ namespace SnapShot
         /// <param name="e"></param>
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            snapshot.DebugLog = checkBox1.Checked;
+            Program.Snapshot.DebugLog = checkBox1.Checked;
         }
 
         private void UpdateConfigurationFile()
         {
-            string EXPORT = snapshot.TerminalName + "\n" + snapshot.DebugLog;
+            string EXPORT = Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog;
             File.WriteAllText("config.txt", EXPORT);
         }
 
@@ -153,7 +152,7 @@ namespace SnapShot
                 SqlCommand command = new SqlCommand(SQL, connection);
                 SqlDataReader result = command.ExecuteReader();
 
-                snapshot.Licenced = result.HasRows;
+                Program.Snapshot.Licenced = result.HasRows;
 
                 connection.Close();
             }
@@ -164,20 +163,5 @@ namespace SnapShot
         }
 
         #endregion
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            LicenceCheck();
-            if (snapshot.Licenced)
-            {
-                label3.Text = "Licenced version";
-                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
-            }
-            else
-            {
-                label3.Text = "Demo version";
-                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
-            }
-        }
     }
 }

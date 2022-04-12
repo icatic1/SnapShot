@@ -12,18 +12,11 @@ namespace SnapShot
 {
     public partial class InformationForm : Form
     {
-        #region Attributes
-
-        Snapshot snapshot;
-
-        #endregion
-
         #region Constructor
 
-        public InformationForm(Snapshot s)
+        public InformationForm()
         {
             InitializeComponent();
-            snapshot = s;
             toolStripStatusLabel1.Text = "";
         }
 
@@ -44,7 +37,7 @@ namespace SnapShot
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Hide();
-            ConfigurationForm f = new ConfigurationForm(snapshot);
+            ConfigurationForm f = new ConfigurationForm();
             f.ShowDialog();
             this.Close();
         }
@@ -57,7 +50,7 @@ namespace SnapShot
         private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Hide();
-            LicencingForm f = new LicencingForm(snapshot);
+            LicencingForm f = new LicencingForm();
             f.ShowDialog();
             this.Close();
         }
