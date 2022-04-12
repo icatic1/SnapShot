@@ -48,5 +48,20 @@ namespace SnapShot.Model
             }
             return "";
         }
+
+        public static void WriteConfiguration(string configuration)
+        {
+            string SQL = "DELETE FROM JSON_configurations WHERE MAC_address = '" + "AAAA" + "';";
+            SqlCommand command = new SqlCommand(SQL, connection);
+            command.ExecuteNonQuery();
+
+            command.CommandText = "INSERT INTO JSON_configurations (MAC_address, configuration) VALUES ('" + "AAAAAA" + "', @configuration);";
+            SqlParameter param = new SqlParameter("@configuration", System.Data.SqlDbType.Text, configuration.Length);
+            param.Value = configuration;
+            command.Parameters.Add(param);
+
+            command.Prepare();
+            command.ExecuteNonQuery();
+        }
     }
 }

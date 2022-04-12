@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
+using SnapShot.Model;
 
 namespace SnapShot
 {
@@ -222,6 +224,82 @@ namespace SnapShot
             }
         }
 
-            #endregion
+        public static bool ExportToJSON(string path, int mode)
+        {
+            string EXPORT = "";
+            EXPORT += "{\n";
+            EXPORT += "\t\"cameras\":\n";
+            EXPORT += "\t[\n";
+            int i = 0;
+            foreach (var config in Program.Snapshot.Camera)
+            {
+                EXPORT += "\t\t{\n";
+
+                EXPORT += "\t\t\t\"device_configuration\":\n";
+                EXPORT += "\t\t\t{\n";
+                EXPORT += "\t\t\t\t\"device_type\": \"" + config.Type + "\",\n";
+                EXPORT += "\t\t\t\t\"id\": \"" + config.Id + "\",\n";
+                EXPORT += "\t\t\t\t\"trigger_file_path\": \"" + config.TriggerFilePath + "\",\n";
+                EXPORT += "\t\t\t\t\"output_folder_path\": \"" + config.OutputFolderPath + "\",\n";
+                EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\",\n";
+                EXPORT += "\t\t\t\t\"camera_number\": \"" + config.CameraNumber + "\"\n";
+                EXPORT += "\t\t\t},\n";
+
+                EXPORT += "\t\t\t\"video_configuration\":\n";
+                EXPORT += "\t\t\t{\n";
+                EXPORT += "\t\t\t\t\"resolution\": \"" + config.Resolution + "\",\n";
+                EXPORT += "\t\t\t\t\"contrast_level\": \"" + config.ContrastLevel + "\",\n";
+                EXPORT += "\t\t\t\t\"image_color\": \"" + config.ImageColor.Name.ToString() + "\",\n";
+                EXPORT += "\t\t\t\t\"motion_detection\": \"" + config.MotionDetection + "\"\n";
+                EXPORT += "\t\t\t},\n";
+
+                EXPORT += "\t\t\t\"network_configuration\":\n";
+                EXPORT += "\t\t\t{\n";
+                EXPORT += "\t\t\t\t\"server_version\": \"" + config.ServerVersion + "\",\n";
+                EXPORT += "\t\t\t\t\"server_IP_address\": \"" + config.ServerIP + "\",\n";
+                EXPORT += "\t\t\t\t\"server_port\": \"" + config.ServerPort + "\",\n";
+                EXPORT += "\t\t\t\t\"connection_status\": \"" + config.ConnectionStatus + "\"\n";
+                EXPORT += "\t\t\t},\n";
+
+                EXPORT += "\t\t\t\"capture_configuration\":\n";
+                EXPORT += "\t\t\t{\n";
+                EXPORT += "\t\t\t\t\"image_capture\": \"" + config.ImageCapture + "\",\n";
+                EXPORT += "\t\t\t\t\"single_mode\": \"" + config.SingleMode + "\",\n";
+                EXPORT += "\t\t\t\t\"duration\": \"" + config.Duration + "\",\n";
+                EXPORT += "\t\t\t\t\"burst_period\": \"" + config.Period + "\"\n";
+                EXPORT += "\t\t\t}\n";
+
+                EXPORT += "\t\t}";
+                if (i < 2)
+                    EXPORT += ",";
+                EXPORT += "\n";
+                i++;
+            }
+            EXPORT += "\t]\n";
+            EXPORT += "}";
+
+            try
+            {
+                // local export
+                if (mode == 1)
+                    File.WriteAllText(path, EXPORT);
+
+                // export to server
+                else if (mode == 2)
+                {
+                    Database.Connect();
+                    Database.WriteConfiguration(EXPORT);
+                    Database.Disconnect();
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
+
+        #endregion
+    }
 }
