@@ -18,7 +18,6 @@ namespace SnapShot
     {
         #region Attributes
 
-        Snapshot snapshot;
         Bitmap? image;
         Mat? frame;
         Thread? camera;
@@ -30,11 +29,10 @@ namespace SnapShot
 
         #region Constructor
 
-        public CapturePreviewForm(Snapshot s, string device, int camNo)
+        public CapturePreviewForm(string device, int camNo)
         {
             InitializeComponent();
             cancel = false;
-            snapshot = s;
             textBox1.Text = device;
             cameraNumber = camNo;
             toolStripStatusLabel1.Text = "";

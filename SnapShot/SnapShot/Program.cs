@@ -8,6 +8,8 @@ namespace SnapShot
 {
     internal static class Program
     {
+        static Snapshot snapshot = new Snapshot();
+        public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -17,7 +19,7 @@ namespace SnapShot
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LicencingForm(new Snapshot()));
+            Application.Run(new LicencingForm());
         }
     }
 }

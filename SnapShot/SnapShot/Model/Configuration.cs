@@ -16,7 +16,8 @@ namespace SnapShot
         string id = "";
         string triggerFilePath = "",
                outputFolderPath = "";
-        int outputValidity;
+        int outputValidity,
+            cameraNumber;
 
         // video configuration
         Resolution resolution;
@@ -45,6 +46,7 @@ namespace SnapShot
         public string TriggerFilePath { get => triggerFilePath; set => triggerFilePath = value; }
         public string OutputFolderPath { get => outputFolderPath; set => outputFolderPath = value; }
         public int OutputValidity { get => outputValidity; set => outputValidity = value; }
+        public int CameraNumber { get => cameraNumber; set => cameraNumber = value; }
         public Resolution Resolution { get => resolution; set => resolution = value; }
         public int ContrastLevel { get => contrastLevel; set => contrastLevel = value; }
         public Color ImageColor { get => imageColor; set => imageColor = value; }
@@ -57,12 +59,6 @@ namespace SnapShot
         public bool SingleMode { get => singleMode; set => singleMode = value; }
         public int Duration { get => duration; set => duration = value; }
         public int Period { get => period; set => period = value; }
-
-        #endregion
-
-        #region Constructor
-
-        public Configuration() { }
 
         #endregion
 
