@@ -75,6 +75,24 @@ namespace SnapShot
 
                                     capture.Release();
                                 }
+                                // take burst images
+                                else
+                                {
+                                    int noOfImages = (int)(snapshot.Camera[index].Duration / snapshot.Camera[index].Period);
+                                    for (int i = 0; i < noOfImages; i++)
+                                    {
+                                        Mat frame = new Mat();
+                                        capture.Read(frame);
+
+                                        Bitmap image = BitmapConverter.ToBitmap(frame);
+                                        image.Save(@snapshot.Camera[index].OutputFolderPath + "/image" + timestamp + "burst" + (i + 1) + ".png");
+
+                                        // wait for next burst
+                                        Thread.Sleep(snapshot.Camera[index].Period * 1000);
+                                    }
+
+                                    capture.Release();
+                                }
 
                                 // sleep for one minute so that the file contents can change
                                 Thread.Sleep(60 * 1000);
