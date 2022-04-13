@@ -63,8 +63,7 @@ namespace SnapShot
 
         static void Record(ref Snapshot snapshot, int index)
         {
-            
-            String initialContent = "";
+            string initialContent = "";
             bool firstCheck = false;
             
             while (1 == 1)
@@ -76,7 +75,6 @@ namespace SnapShot
                 // ignore any old content of trigger file, then check again
                 else if (!firstCheck)
                 {
-                   
                     firstCheck = true;
                     try
                     {
@@ -159,6 +157,15 @@ namespace SnapShot
                                 capture.Read(frame);
 
                                 Bitmap image = BitmapConverter.ToBitmap(frame);
+
+                                // put demo watermark on image if not licenced
+                                if (!Program.Snapshot.Licenced)
+                                    using (Graphics g = Graphics.FromImage(image))
+                                    {
+                                        Font myFont = new Font("Arial", 14);
+                                        g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
+                                    }
+
                                 image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/IMG" + timestamp + ".png");
 
                                 capture.Release();
@@ -173,6 +180,15 @@ namespace SnapShot
                                     capture.Read(frame);
 
                                     Bitmap image = BitmapConverter.ToBitmap(frame);
+
+                                    // put demo watermark on image if not licenced
+                                    if (!Program.Snapshot.Licenced)
+                                        using (Graphics g = Graphics.FromImage(image))
+                                        {
+                                            Font myFont = new Font("Arial", 14);
+                                            g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
+                                        }
+
                                     image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/IMG" + timestamp + "-BURST" + (i + 1) + ".png");
                                         
                                     // wait for next burst
@@ -193,6 +209,11 @@ namespace SnapShot
                                 while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000 + 1000)
                                 {
                                     capture.Read(frame);
+
+                                    //put demo watermark to frame if not licenced
+                                    if (!Program.Snapshot.Licenced)
+                                        frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
+                                    
                                     writer.Write(frame);
                                 }
                             }
@@ -200,7 +221,7 @@ namespace SnapShot
                             capture.Release();
                         }
                     }
-                    // file unavailable - probably being edited, wait 5 seconds then check again
+                    // file unavailable - probably being edited, wait for a while then check again
                     catch
                     {
                         Thread.Sleep(1000);
