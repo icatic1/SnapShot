@@ -1,5 +1,6 @@
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using SnapShot.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,7 +63,8 @@ namespace SnapShot
 
         static void Record(ref Snapshot snapshot, int index)
         {
-            int initialLines = 0;
+            
+            String initialContent = "";
             bool firstCheck = false;
             
             while (1 == 1)
@@ -74,8 +76,16 @@ namespace SnapShot
                 // ignore any old content of trigger file, then check again
                 else if (!firstCheck)
                 {
+                   
                     firstCheck = true;
-                    initialLines = File.ReadAllLines(snapshot.Camera[index].TriggerFilePath).Length;
+                    try
+                    {
+                        initialContent = File.ReadAllText(snapshot.Camera[index].TriggerFilePath);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
 
                 // old content already ignored - check whether trigger has been activated
@@ -83,25 +93,23 @@ namespace SnapShot
                 {
                     try
                     {
-                        string[] entireText = File.ReadAllLines(snapshot.Camera[index].TriggerFilePath);
-                        int lines = entireText.Length;
+                        string entireText = File.ReadAllText(snapshot.Camera[index].TriggerFilePath);
 
-                        // new lines detected in file - check whether trigger regex is present
-                        if (lines > initialLines)
+                        // new content detected in file - check whether trigger regex is present
+                        if (entireText != initialContent)
                         {
+                            // get everything that was added or edited
+                            string editedText = Levenshtein.FindDifferences(initialContent, entireText);
+
                             // check whether regex matches the new content
                             Regex regex = new Regex(@snapshot.Camera[index].Regex);
                             bool matchFound = false;
 
-                            for (int i = initialLines; i < lines; i++)
-                                if (regex.IsMatch(entireText[i]))
-                                {
-                                    matchFound = true;
-                                    break;
-                                }
+                            if (regex.IsMatch(editedText))
+                                matchFound = true;
 
                             // register change for next check
-                            initialLines = lines;
+                            initialContent = entireText;
 
                             // regex match not found - wait for a while, then check again for file lines change
                             if (!matchFound)
