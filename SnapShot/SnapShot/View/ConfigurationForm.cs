@@ -172,33 +172,33 @@ namespace SnapShot
             int port = 0;
 
             // IP camera server configuration
-            if (type == DeviceType.IPCamera)
+            try
             {
-                try
+                if (type == DeviceType.IPCamera)
                 {
                     port = Int32.Parse(textBox4.Text);
-                    textBox4.BackColor = Color.White;
-                    errorProvider1.SetError(textBox4, null);
                 }
-                catch
-                {
-                    errorText = "Server port must be a valid number!";
-                    errorProvider1.SetError(textBox4, errorText);
-                    textBox4.BackColor = Color.Red;
-                }
+                textBox4.BackColor = Color.White;
+                errorProvider1.SetError(textBox4, null);
+            }
+            catch
+            {
+                errorText = "Server port must be a valid number!";
+                errorProvider1.SetError(textBox4, errorText);
+                textBox4.BackColor = Color.Red;
+            }
 
-                // check whether all fields that must have values have been filled
-                if (type == DeviceType.IPCamera && ip.Length < 1)
-                {
-                    errorText = "IP camera server configurations need to be specified!";
-                    errorProvider1.SetError(textBox3, errorText);
-                    textBox3.BackColor = Color.Red;
-                }
-                else
-                {
-                    textBox3.BackColor = Color.White;
-                    errorProvider1.SetError(textBox3, null);
-                }
+            // check whether all fields that must have values have been filled
+            if (type == DeviceType.IPCamera && ip.Length < 1)
+            {
+                errorText = "IP camera server configurations need to be specified!";
+                errorProvider1.SetError(textBox3, errorText);
+                textBox3.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox3.BackColor = Color.White;
+                errorProvider1.SetError(textBox3, null);
             }
 
             // capture configuration
@@ -333,6 +333,7 @@ namespace SnapShot
                         {
                             radioButton5.Checked = true;
                             UpdateConfigurationWindow(0);
+                            toolStripStatusLabel1.Text = "Import successfully completed.";
                         }
                         else
                         {
@@ -347,6 +348,7 @@ namespace SnapShot
                 {
                     radioButton5.Checked = true;
                     UpdateConfigurationWindow(0);
+                    toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
                 else
                 {
@@ -701,16 +703,29 @@ namespace SnapShot
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             // USB camera selected - disable server configuration
+            // and clear error provider
             if (comboBox2.SelectedItem.ToString() == "USB camera")
             {
+                errorProvider1.SetError(textBox5, null);
+                errorProvider1.SetError(textBox3, null);
+                errorProvider1.SetError(textBox4, null);
+
+                textBox5.BackColor = Color.White;
+                textBox3.BackColor = Color.White;
+                textBox4.BackColor = Color.White;
+
                 textBox5.ReadOnly = true;
                 textBox3.ReadOnly = true;
                 textBox4.ReadOnly = true;
+                textBox5.Enabled = false;
+                textBox3.Enabled = false;
+                textBox4.Enabled = false;
 
                 comboBox1.Enabled = true;
             }
 
             // IP camera selected - disable USB device selection
+            // and enable server configurations
             else
             {
                 comboBox1.SelectedItem = null;
@@ -719,6 +734,9 @@ namespace SnapShot
                 textBox5.ReadOnly = false;
                 textBox3.ReadOnly = false;
                 textBox4.ReadOnly = false;
+                textBox5.Enabled = true;
+                textBox3.Enabled = true;
+                textBox4.Enabled = true;
             }
         }
 
