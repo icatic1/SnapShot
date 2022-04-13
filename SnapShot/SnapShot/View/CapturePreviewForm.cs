@@ -18,7 +18,6 @@ namespace SnapShot
     {
         #region Attributes
 
-        Snapshot snapshot;
         Bitmap? image;
         Mat? frame;
         Thread? camera;
@@ -30,11 +29,10 @@ namespace SnapShot
 
         #region Constructor
 
-        public CapturePreviewForm(Snapshot s, string device, int camNo)
+        public CapturePreviewForm(string device, int camNo)
         {
             InitializeComponent();
             cancel = false;
-            snapshot = s;
             textBox1.Text = device;
             cameraNumber = camNo;
             toolStripStatusLabel1.Text = "";
@@ -87,6 +85,15 @@ namespace SnapShot
         {
             try
             {
+                // put demo watermark on image if not licenced
+                if (!Program.Snapshot.Licenced)
+                    using (Graphics g = Graphics.FromImage(img))
+                    {
+                        Font myFont = new Font("Arial", 14);
+                        g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
+                    }
+
+                // send the image to the painter
                 if (pictureBox1.InvokeRequired)
                 {
                     pictureBox1.Invoke(new MethodInvoker(
@@ -102,7 +109,7 @@ namespace SnapShot
             }
             catch
             {
-
+                // ignore errors
             }
         }
 

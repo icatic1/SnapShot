@@ -14,24 +14,22 @@ namespace SnapShot
 {
     public partial class ConfigurationForm : Form
     {
-        #region Attributes
-
-        Snapshot snapshot;
-
-        #endregion
-
         #region Constructor
 
-        public ConfigurationForm(Snapshot s)
+        public ConfigurationForm()
         {
             InitializeComponent();
-            snapshot = s;
             toolStripStatusLabel1.Text = "";
-            comboBox2.Text = "USB camera";
             panel1.BorderStyle = BorderStyle.None;
             panel2.BorderStyle = BorderStyle.None;
 
-            // add all available camera devices to collection
+            // automatically select USB camera - disable network configuration
+            comboBox2.Text = "USB camera";
+            textBox5.ReadOnly = true;
+            textBox3.ReadOnly = true;
+            textBox4.ReadOnly = true;
+
+            // add all available USB camera devices to combo box list
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
             {
                 foreach (var device in searcher.Get())
@@ -41,7 +39,7 @@ namespace SnapShot
                 }
             }
 
-            comboBox3.Text = "1280x1024";
+            comboBox3.Text = "640x480";
 
             UpdateConfigurationWindow(0);
         }
@@ -62,8 +60,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            LicencingForm f = new LicencingForm();
             this.Hide();
-            LicencingForm f = new LicencingForm(snapshot);
             f.ShowDialog();
             this.Close();
         }
@@ -75,8 +73,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            InformationForm f = new InformationForm();
             this.Hide();
-            InformationForm f = new InformationForm(snapshot);
             f.ShowDialog();
             this.Close();
         }
@@ -93,56 +91,114 @@ namespace SnapShot
         private void button6_Click(object sender, EventArgs e)
         {
             string errorText = "";
+            errorProvider1.Clear();
 
             // device configuration
             DeviceType type = DeviceType.USBCamera;
             if (comboBox2.Text == "IP camera")
                 type = DeviceType.IPCamera;
-            else if (comboBox2.Text != "USB camera")
-                errorText = "You need to select device type!";
 
             string deviceName = comboBox1.Text,
                    triggerPath = textBox1.Text,
+                   regex = textBox6.Text,
                    outputPath = textBox2.Text;
-            if (deviceName == "" || triggerPath == "" || outputPath == "")
-                errorText = "Empty values found in configuration options!";
+
+            // check whether all fields that must have values have been filled
+            if (triggerPath == "")
+            {
+                errorText = "Trigger path must not be empty!";
+                errorProvider1.SetError(textBox1, errorText);
+                textBox1.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox1.BackColor = Color.White;
+                errorProvider1.SetError(textBox1, null);
+            }
+
+            if (regex == "")
+            {
+                errorText = "Regex must not be empty!";
+                errorProvider1.SetError(textBox6, errorText);
+                textBox6.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox6.BackColor = Color.White;
+                errorProvider1.SetError(textBox6, null);
+            }
+
+            if (outputPath == "")
+            {
+                errorText = "Output path must not be empty!";
+                errorProvider1.SetError(textBox2, errorText);
+                textBox2.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox2.BackColor = Color.White;
+                errorProvider1.SetError(textBox2, null);
+            }
+
+            if (type == DeviceType.USBCamera && deviceName == "")
+            {
+                errorText = "USB device needs to be selected!";
+                errorProvider1.SetError(comboBox1, errorText);
+                comboBox1.BackColor = Color.Red;
+            }
+            else
+            {
+                comboBox1.BackColor = Color.White;
+                errorProvider1.SetError(comboBox1, null);
+            }
 
             int validity = (int)numericUpDown1.Value;
+            int cameraNo = (int)comboBox1.SelectedIndex;
 
             // video configuration
-            Resolution resolution = Resolution.Resolution720x480;
-            if (comboBox3.Text == "1280x960")
-                resolution = Resolution.Resolution1280x960;
-            if (comboBox3.Text == "1280x1024")
-                resolution = Resolution.Resolution1280x1024;
-            else if (comboBox3.Text == "1920X1080")
-                resolution = Resolution.Resolution1920x1080;
-            else if (comboBox3.Text == "2048x1536")
-                resolution = Resolution.Resolution2048x1536;
-            else if (comboBox3.Text != "720x480")
-                errorText = "No capture device resolution selected!";
+            string res = "Resolution" + comboBox3.Text;
+            Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), res);
 
             int contrast = trackBar1.Value;
             Color color = pictureBox1.BackColor;
             bool motionDetection = checkBox1.Checked;
 
-            // network configuration
             string version = textBox5.Text,
-                   ip = textBox3.Text,
-                   statusText = label17.Text;
+                       ip = textBox3.Text,
+                       statusText = label17.Text;
 
             bool status = statusText == "Connected!" ? true : false;
 
             int port = 0;
 
+            // IP camera server configuration
             try
             {
-                port = Int32.Parse(textBox4.Text);
+                if (type == DeviceType.IPCamera)
+                {
+                    port = Int32.Parse(textBox4.Text);
+                }
+                textBox4.BackColor = Color.White;
+                errorProvider1.SetError(textBox4, null);
             }
             catch
             {
-                if (textBox4.Text.Length > 0)
-                    errorText = "Server port must be a valid number!";
+                errorText = "Server port must be a valid number!";
+                errorProvider1.SetError(textBox4, errorText);
+                textBox4.BackColor = Color.Red;
+            }
+
+            // check whether all fields that must have values have been filled
+            if (type == DeviceType.IPCamera && ip.Length < 1)
+            {
+                errorText = "IP camera server configurations need to be specified!";
+                errorProvider1.SetError(textBox3, errorText);
+                textBox3.BackColor = Color.Red;
+            }
+            else
+            {
+                textBox3.BackColor = Color.White;
+                errorProvider1.SetError(textBox3, null);
             }
 
             // capture configuration
@@ -171,18 +227,22 @@ namespace SnapShot
             // something was not correct - do not allow configuration to be created
             if (errorText.Length > 0)
             {
-                toolStripStatusLabel1.Text = errorText;
+                toolStripStatusLabel1.Text = "Configuration could not be saved due to errors!";
                 return;
             }
 
+            errorProvider1.Clear();
+
             // create new configuration for the specified camera
-            snapshot.Camera[camera] = new Configuration()
+            Program.Snapshot.Camera[camera] = new Configuration()
             {
                 Type = type,
                 Id = deviceName,
                 TriggerFilePath = triggerPath,
+                Regex = regex,
                 OutputFolderPath = outputPath,
                 OutputValidity = validity,
+                CameraNumber = cameraNo,
                 Resolution = resolution,
                 ContrastLevel = contrast,
                 ImageColor = color,
@@ -211,59 +271,11 @@ namespace SnapShot
         /// <param name="e"></param>
         private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                string EXPORT = "";
-                EXPORT += "{\n";
-                EXPORT += "\t\"cameras\":\n";
-                EXPORT += "\t[\n";
-                int i = 0;
-                foreach (var config in snapshot.Camera)
-                {
-                    EXPORT += "\t\t{\n";
+            int mode = 1;
+            if (Program.Snapshot.Connected)
+                mode = 2;
 
-                    EXPORT += "\t\t\t\"device_configuration\":\n";
-                    EXPORT += "\t\t\t{\n";
-                    EXPORT += "\t\t\t\t\"device_type\": \"" + config.Type + "\",\n";
-                    EXPORT += "\t\t\t\t\"id\": \"" + config.Id + "\",\n";
-                    EXPORT += "\t\t\t\t\"trigger_file_path\": \"" + config.TriggerFilePath + "\",\n";
-                    EXPORT += "\t\t\t\t\"output_folder_path\": \"" + config.OutputFolderPath + "\",\n";
-                    EXPORT += "\t\t\t\t\"output_validity_days\": \"" + config.OutputValidity + "\"\n";
-                    EXPORT += "\t\t\t},\n";
-
-                    EXPORT += "\t\t\t\"video_configuration\":\n";
-                    EXPORT += "\t\t\t{\n";
-                    EXPORT += "\t\t\t\t\"resolution\": \"" + config.Resolution + "\",\n";
-                    EXPORT += "\t\t\t\t\"contrast_level\": \"" + config.ContrastLevel + "\",\n";
-                    EXPORT += "\t\t\t\t\"image_color\": \"" + config.ImageColor.Name.ToString() + "\",\n";
-                    EXPORT += "\t\t\t\t\"motion_detection\": \"" + config.MotionDetection + "\"\n";
-                    EXPORT += "\t\t\t},\n";
-
-                    EXPORT += "\t\t\t\"network_configuration\":\n";
-                    EXPORT += "\t\t\t{\n";
-                    EXPORT += "\t\t\t\t\"server_version\": \"" + config.ServerVersion + "\",\n";
-                    EXPORT += "\t\t\t\t\"server_IP_address\": \"" + config.ServerIP + "\",\n";
-                    EXPORT += "\t\t\t\t\"server_port\": \"" + config.ServerPort + "\",\n";
-                    EXPORT += "\t\t\t\t\"connection_status\": \"" + config.ConnectionStatus + "\"\n";
-                    EXPORT += "\t\t\t},\n";
-
-                    EXPORT += "\t\t\t\"capture_configuration\":\n";
-                    EXPORT += "\t\t\t{\n";
-                    EXPORT += "\t\t\t\t\"image_capture\": \"" + config.ImageCapture + "\",\n";
-                    EXPORT += "\t\t\t\t\"single_mode\": \"" + config.SingleMode + "\",\n";
-                    EXPORT += "\t\t\t\t\"duration\": \"" + config.Duration + "\",\n";
-                    EXPORT += "\t\t\t\t\"burst_period\": \"" + config.Period + "\"\n";
-                    EXPORT += "\t\t\t}\n";
-
-                    EXPORT += "\t\t}";
-                    if (i < 2)
-                        EXPORT += ",";
-                    EXPORT += "\n";
-                    i++;
-                }
-                EXPORT += "\t]\n";
-                EXPORT += "}";
-
+            if (mode == 1)
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
                     openFileDialog.InitialDirectory = "c:\\";
@@ -275,15 +287,21 @@ namespace SnapShot
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        File.WriteAllText(openFileDialog.FileName, EXPORT);
-                        toolStripStatusLabel1.Text = "Export successfully completed.";
+                        var result = Configuration.ExportToJSON(openFileDialog.FileName, mode);
+                        if (result)
+                            toolStripStatusLabel1.Text = "Export successfully completed.";
+                        else
+                            toolStripStatusLabel1.Text = "The export could not be completed successfully.";
                     }
                 }
-            }
-            catch
+            else
             {
-                toolStripStatusLabel1.Text = "The export could not be completed successfully.";            }
-
+                var result = Configuration.ExportToJSON("", mode);
+                if (result)
+                    toolStripStatusLabel1.Text = "Export successfully completed.";
+                else
+                    toolStripStatusLabel1.Text = "The export could not be completed successfully.";
+            }
         }
 
         /// <summary>
@@ -293,8 +311,11 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
+            int mode = 1;
+            if (Program.Snapshot.Connected)
+                mode = 2;
+
+            if (mode == 1)
                 using (var openFileDialog = new OpenFileDialog())
                 {
                     openFileDialog.InitialDirectory = "c:\\";
@@ -306,137 +327,33 @@ namespace SnapShot
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string IMPORT = File.ReadAllText(openFileDialog.FileName);
-                        string[] rows = IMPORT.Split('\n');
-                        Snapshot newSnapshot = new Snapshot();
-                        int camera = 0;
-                        int i = 4;
-                        while (camera < 3)
+
+                        bool result = Configuration.ImportFromJSON(openFileDialog.FileName, mode);
+                        if (result)
                         {
-                            Configuration config = new Configuration();
-                            if (rows[i].Contains("device_configuration"))
-                            {
-                                i += 2;
-
-                                string[] device_type = rows[i].Split(" ");
-                                device_type[1] = device_type[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] id = rows[i].Split(" ");
-                                id[1] = id[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] trigger_file_path = rows[i].Split(" ");
-                                trigger_file_path[1] = trigger_file_path[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] output_folder_path = rows[i].Split(" ");
-                                output_folder_path[1] = output_folder_path[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] output_validity_days = rows[i].Split(" ");
-                                output_validity_days[1] = output_validity_days[1].Replace("\"", "").Replace(",", "");
-
-                                config.Type = (DeviceType)Enum.Parse(typeof(DeviceType), device_type[1]);
-                                config.Id = id[1];
-                                config.TriggerFilePath = trigger_file_path[1];
-                                config.OutputFolderPath = output_folder_path[1];
-                                config.OutputValidity = Int32.Parse(output_validity_days[1]);
-                            }
-
-                            i += 2;
-                            if (rows[i].Contains("video_configuration"))
-                            {
-                                i += 2;
-
-                                string[] resolution = rows[i].Split(" ");
-                                resolution[1] = resolution[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] contrast_level = rows[i].Split(" ");
-                                contrast_level[1] = contrast_level[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] image_color = rows[i].Split(" ");
-                                image_color[1] = image_color[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] motion_detection = rows[i].Split(" ");
-                                motion_detection[1] = motion_detection[1].Replace("\"", "").Replace(",", "");
-
-                                config.Resolution = (Resolution)Enum.Parse(typeof(Resolution), resolution[1]);
-                                config.ContrastLevel = Int32.Parse(contrast_level[1]);
-                                config.ImageColor = Color.FromName(image_color[1]);
-                                config.MotionDetection = Convert.ToBoolean(motion_detection[1]);
-                            }
-
-                            i += 2;
-                            if (rows[i].Contains("network_configuration"))
-                            {
-                                i += 2;
-
-                                string[] server_version = rows[i].Split(" ");
-                                server_version[1] = server_version[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] server_IP_address = rows[i].Split(" ");
-                                server_IP_address[1] = server_IP_address[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] server_port = rows[i].Split(" ");
-                                server_port[1] = server_port[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] connection_status = rows[i].Split(" ");
-                                connection_status[1] = connection_status[1].Replace("\"", "").Replace(",", "");
-
-                                config.ServerVersion = server_version[1];
-                                config.ServerIP = server_IP_address[1];
-                                config.ServerPort = Int32.Parse(server_port[1]);
-                                config.ConnectionStatus = Convert.ToBoolean(connection_status[1]);
-                            }
-
-                            i += 2;
-                            if (rows[i].Contains("capture_configuration"))
-                            {
-                                i += 2;
-
-                                string[] image_capture = rows[i].Split(" ");
-                                image_capture[1] = image_capture[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] single_mode = rows[i].Split(" ");
-                                single_mode[1] = single_mode[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] duration = rows[i].Split(" ");
-                                duration[1] = duration[1].Replace("\"", "").Replace(",", "");
-                                i++;
-
-                                string[] burst_period = rows[i].Split(" ");
-                                burst_period[1] = burst_period[1].Replace("\"", "").Replace(",", "");
-
-                                config.ImageCapture = Convert.ToBoolean(image_capture[1]);
-                                config.SingleMode = Convert.ToBoolean(single_mode[1]);
-                                config.Duration = Int32.Parse(duration[1]);
-                                config.Period = Int32.Parse(burst_period[1]);
-                            }
-
-                            i += 4;
-                            newSnapshot.Camera[camera] = config;
-                            camera++;
+                            radioButton5.Checked = true;
+                            UpdateConfigurationWindow(0);
+                            toolStripStatusLabel1.Text = "Import successfully completed.";
                         }
-
-                        snapshot = newSnapshot;
+                        else
+                        {
+                            toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                        }
                     }
                 }
-                
-                radioButton5.Checked = true;
-                UpdateConfigurationWindow(0);
-            }
-            catch
+            else
             {
-                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                bool result = Configuration.ImportFromJSON("", mode);
+                if (result)
+                {
+                    radioButton5.Checked = true;
+                    UpdateConfigurationWindow(0);
+                    toolStripStatusLabel1.Text = "Import successfully completed.";
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                }
             }
         }
 
@@ -461,6 +378,8 @@ namespace SnapShot
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     textBox1.Text = openFileDialog.FileName;
+                    errorProvider1.SetError(textBox1, null);
+                    textBox1.BackColor = Color.White;
                 }
             }
 
@@ -478,6 +397,8 @@ namespace SnapShot
             if (result == DialogResult.OK)
             {
                 textBox2.Text = folderBrowserDialog1.SelectedPath;
+                errorProvider1.SetError(textBox2, null);
+                textBox2.BackColor = Color.White;
             }
 
             toolStripStatusLabel1.Text = "";
@@ -507,12 +428,114 @@ namespace SnapShot
         /// <param name="e"></param>
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            numericUpDown3.Enabled = !numericUpDown3.Enabled;
-            numericUpDown3.ReadOnly = !numericUpDown3.ReadOnly;
-            domainUpDown2.Enabled = !domainUpDown2.Enabled;
-            domainUpDown2.ReadOnly = !domainUpDown2.ReadOnly;
+            // burst selected - allow for burst duration and period to be selected
+            if (radioButton2.Checked)
+            {
+                numericUpDown3.Enabled = true;
+                numericUpDown3.ReadOnly = false;
+                domainUpDown2.Enabled = true;
+                domainUpDown2.ReadOnly = false;
+
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
+            }
+
+            // burst not selected - do not allow burst period to be selected
+            else
+            {
+                numericUpDown3.Enabled = false;
+                numericUpDown3.ReadOnly = true;
+                domainUpDown2.Enabled = false;
+                domainUpDown2.ReadOnly = true;
+            }
         }
 
+        /// <summary>
+        /// Disable burst when video mode is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            // video is selected - burst not available, duration is available
+            if (radioButton3.Checked)
+            {
+                radioButton1.Checked = true;
+
+                radioButton2.Enabled = false;
+                radioButton2.Checked = false;
+
+                numericUpDown3.Enabled = false;
+                numericUpDown3.ReadOnly = true;
+                domainUpDown2.Enabled = false;
+                domainUpDown2.ReadOnly = true;
+
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
+            }
+
+            // video is not selected - enable burst to be selected
+            else
+            {
+                radioButton2.Enabled = true;
+
+                numericUpDown3.Enabled = true;
+                numericUpDown3.ReadOnly = false;
+                domainUpDown2.Enabled = true;
+                domainUpDown2.ReadOnly = false;
+            }
+        }
+
+        /// <summary>
+        /// Automatically select single when selecting image
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton4.Checked)
+            {
+                radioButton1.Checked = true;
+                numericUpDown3.Enabled = false;
+                numericUpDown3.ReadOnly = true;
+                domainUpDown2.Enabled = false;
+                domainUpDown2.ReadOnly = true;
+
+                numericUpDown2.Enabled = false;
+                numericUpDown2.ReadOnly = true;
+                domainUpDown1.Enabled = false;
+                domainUpDown1.ReadOnly = true;
+            }
+        }
+
+        /// <summary>
+        /// Automatically disable duration when single image is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            // single image selected - disable duration
+            if (radioButton4.Checked && radioButton1.Checked)
+            {
+                numericUpDown2.Enabled = false;
+                numericUpDown2.ReadOnly = true;
+                domainUpDown1.Enabled = false;
+                domainUpDown1.ReadOnly = true;
+            }
+            // any other combination - enable duration
+            else
+            {
+                numericUpDown2.Enabled = true;
+                numericUpDown2.ReadOnly = false;
+                domainUpDown1.Enabled = true;
+                domainUpDown1.ReadOnly = false;
+            }
+        }
 
         #endregion
 
@@ -542,11 +565,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            //this.Hide();
-            CapturePreviewForm f = new CapturePreviewForm(snapshot, comboBox1.Text, comboBox1.SelectedIndex);
+            CapturePreviewForm f = new CapturePreviewForm(comboBox1.Text, comboBox1.SelectedIndex);
             f.Show();
-            //f.ShowDialog();
-            //this.Close();
         }
 
         #endregion
@@ -592,11 +612,12 @@ namespace SnapShot
         /// <param name="cameraNumber"></param>
         public void UpdateConfigurationWindow(int cameraNumber)
         {
-            var config = snapshot.Camera[cameraNumber];
+            var config = Program.Snapshot.Camera[cameraNumber];
 
             comboBox2.Text = config.Type.ToString();
             comboBox1.Text = config.Id;
             textBox1.Text = config.TriggerFilePath;
+            textBox6.Text = config.Regex;
             textBox2.Text = config.OutputFolderPath;
             if (config.OutputValidity > 0)
                 numericUpDown1.Value = config.OutputValidity;
@@ -668,6 +689,55 @@ namespace SnapShot
             }
 
             toolStripStatusLabel1.Text = "";
+        }
+
+        #endregion
+
+        #region IP camera
+
+        /// <summary>
+        /// Change available items on form depending on the selected device
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // USB camera selected - disable server configuration
+            // and clear error provider
+            if (comboBox2.SelectedItem.ToString() == "USB camera")
+            {
+                errorProvider1.SetError(textBox5, null);
+                errorProvider1.SetError(textBox3, null);
+                errorProvider1.SetError(textBox4, null);
+
+                textBox5.BackColor = Color.White;
+                textBox3.BackColor = Color.White;
+                textBox4.BackColor = Color.White;
+
+                textBox5.ReadOnly = true;
+                textBox3.ReadOnly = true;
+                textBox4.ReadOnly = true;
+                textBox5.Enabled = false;
+                textBox3.Enabled = false;
+                textBox4.Enabled = false;
+
+                comboBox1.Enabled = true;
+            }
+
+            // IP camera selected - disable USB device selection
+            // and enable server configurations
+            else
+            {
+                comboBox1.SelectedItem = null;
+                comboBox1.Enabled = false;
+
+                textBox5.ReadOnly = false;
+                textBox3.ReadOnly = false;
+                textBox4.ReadOnly = false;
+                textBox5.Enabled = true;
+                textBox3.Enabled = true;
+                textBox4.Enabled = true;
+            }
         }
 
         #endregion
