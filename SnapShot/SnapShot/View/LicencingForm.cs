@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
+using SnapShot.Utilities;
 
 namespace SnapShot
 {
@@ -20,6 +21,22 @@ namespace SnapShot
         #region Attributes
 
         string error = "";
+        private Rectangle buttonCheckLicenceOriginal;
+        private Rectangle greetingTextOriginal;
+        private Rectangle formSizeOriginal;
+        private Rectangle groupBoxLicenceOriginal;
+        private Rectangle checkBoxOriginal;
+        private Rectangle terminalLabelOriginal;
+        private Rectangle inputOriginal;
+        private Rectangle statusLabelOriginal;
+        private Rectangle statusOriginal;
+        private Rectangle licencingLabelOriginal;
+        private Rectangle versionLabelOriginal;
+        private Rectangle groupBoxConnectionOriginal;
+        private Rectangle connectionStatusLabelOriginal;
+        private Rectangle connectionStatusOriginal;
+        private Rectangle connectionStatusButtonOriginal;
+        private Rectangle groupBoxTerminalOriginal;
 
         #endregion
 
@@ -198,6 +215,67 @@ namespace SnapShot
 
                 Program.Snapshot.Connected = false;
             }
+        }
+
+        #endregion
+
+        #region Resize methods
+        private void LicencingForm_Load(object sender, EventArgs e)
+        {
+            formSizeOriginal = new Rectangle(this.Location.X, this.Location.Y, this.Size.Width, this.Size.Height);
+            buttonCheckLicenceOriginal = new Rectangle(button1.Location.X, button1.Location.Y, button1.Size.Width, button1.Size.Height);
+            greetingTextOriginal = new Rectangle(label1.Location.X, label1.Location.Y, label1.Size.Width, label1.Size.Height);
+            groupBoxLicenceOriginal = new Rectangle(groupBox1.Location.X, groupBox1.Location.Y, groupBox1.Size.Width, groupBox1.Size.Height);
+            checkBoxOriginal = new Rectangle(checkBox1.Location.X, checkBox1.Location.Y, checkBox1.Size.Width, checkBox1.Size.Height);
+            inputOriginal = new Rectangle(textBox2.Location.X, textBox2.Location.Y, textBox2.Size.Width, textBox2.Size.Height);
+            statusLabelOriginal = new Rectangle(label4.Location.X, label4.Location.Y, label4.Size.Width, label4.Size.Height);
+            statusOriginal = new Rectangle(textBox1.Location.X, textBox1.Location.Y, textBox1.Size.Width, textBox1.Size.Height);
+            terminalLabelOriginal = new Rectangle(label5.Location.X, label5.Location.Y, label5.Size.Width, label5.Size.Height);
+            licencingLabelOriginal = new Rectangle(label2.Location.X, label2.Location.Y, label2.Size.Width, label2.Size.Height);
+            versionLabelOriginal = new Rectangle(label3.Location.X, label3.Location.Y, label3.Size.Width, label3.Size.Height);
+            groupBoxConnectionOriginal = new Rectangle(groupBox3.Location.X, groupBox3.Location.Y, groupBox3.Size.Width, groupBox3.Size.Height);
+            connectionStatusLabelOriginal = new Rectangle(label6.Location.X, label6.Location.Y, label6.Size.Width, label6.Size.Height);
+            connectionStatusOriginal = new Rectangle(label7.Location.X, label7.Location.Y, label7.Size.Width, label7.Size.Height);
+            connectionStatusButtonOriginal = new Rectangle(button2.Location.X, button2.Location.Y, button2.Size.Width, button2.Size.Height);
+            groupBoxTerminalOriginal = new Rectangle(groupBox2.Location.X, groupBox2.Location.Y, groupBox2.Size.Width, groupBox2.Size.Height);
+        }
+
+        
+
+        private void LicencingForm_Resize(object sender, EventArgs e)
+        {
+            ResizeUtil.resizeControl(this, formSizeOriginal,buttonCheckLicenceOriginal, button1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, greetingTextOriginal, label1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, statusOriginal, textBox1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, statusLabelOriginal, label4);
+            ResizeUtil.resizeControl(this, formSizeOriginal, inputOriginal, textBox2);
+            ResizeUtil.resizeControl(this, formSizeOriginal, groupBoxLicenceOriginal, groupBox1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, checkBoxOriginal, checkBox1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, terminalLabelOriginal, label5);
+            ResizeUtil.resizeControl(this, formSizeOriginal, licencingLabelOriginal, label2);
+            ResizeUtil.resizeControl(this, formSizeOriginal, versionLabelOriginal, label3);
+            ResizeUtil.resizeControl(this, formSizeOriginal, groupBoxTerminalOriginal, groupBox2);
+            ResizeUtil.resizeControl(this, formSizeOriginal, groupBoxConnectionOriginal, groupBox3);
+            ResizeUtil.resizeControl(this, formSizeOriginal, connectionStatusLabelOriginal, label6);
+            ResizeUtil.resizeControl(this, formSizeOriginal, connectionStatusOriginal, label7);
+            ResizeUtil.resizeControl(this, formSizeOriginal, connectionStatusButtonOriginal, button2);
+
+            ResizeUtil.resizeFontTypes(this, label1, "Normal", formSizeOriginal, 18);
+            ResizeUtil.resizeFontTypes(this, label2, "Normal", formSizeOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, label3, "Normal", formSizeOriginal, 13.5f);
+            ResizeUtil.resizeFontTypes(this, label4, "Normal", formSizeOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, label5, "Normal", formSizeOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, label6, "Normal", formSizeOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, label7, "Normal", formSizeOriginal, 13.5f);
+            ResizeUtil.resizeFontTypes(this, button1, "Inside", buttonCheckLicenceOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, button2, "Inside", connectionStatusButtonOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, groupBox1, "Inside", groupBoxLicenceOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, groupBox2, "Inside", groupBoxTerminalOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, groupBox3, "Inside", groupBoxConnectionOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, textBox1, "Inside", statusOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, textBox2, "Inside", inputOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, checkBox1, "Normal", formSizeOriginal, 9);
+            ResizeUtil.resizeFontTypes(this, menuStrip1, "Normal", formSizeOriginal, 9);
         }
 
         #endregion

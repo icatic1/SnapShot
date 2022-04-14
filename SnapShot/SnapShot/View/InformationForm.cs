@@ -7,11 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SnapShot.Utilities;
 
 namespace SnapShot
 {
     public partial class InformationForm : Form
     {
+        #region Attributes
+        private Rectangle formSizeOriginal;
+        private Rectangle label1Original;
+        private Rectangle label2Original;
+        #endregion
         #region Constructor
 
         public InformationForm()
@@ -56,5 +62,30 @@ namespace SnapShot
         }
 
         #endregion
+
+        #region Methods
+        private void InformationForm_Load(object sender, EventArgs e)
+        {
+            formSizeOriginal = new Rectangle(this.Location.X, this.Location.Y, this.Size.Width, this.Size.Height);
+            label1Original = new Rectangle(label1.Location.X, label1.Location.Y, label1.Size.Width, label1.Size.Height);
+            label2Original = new Rectangle(label2.Location.X, label2.Location.Y, label2.Size.Width, label2.Size.Height);
+        }
+
+       
+        private void InformationForm_Resize(object sender, EventArgs e)
+        {
+            ResizeUtil.resizeControl(this, formSizeOriginal, label1Original, label1);
+            ResizeUtil.resizeControl(this, formSizeOriginal, label2Original, label2);
+
+
+            ResizeUtil.resizeFont(this, formSizeOriginal, label1, 9);
+            ResizeUtil.resizeFont(this, formSizeOriginal, label2, 12);
+            ResizeUtil.resizeFont(this, formSizeOriginal, menuStrip1, 9);
+
+        }
+
+
+        #endregion
+
     }
 }

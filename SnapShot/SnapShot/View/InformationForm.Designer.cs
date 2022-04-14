@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InformationForm));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,9 +46,9 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 211);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 309);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(636, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(635, 26);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -62,34 +62,27 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(28, 103);
+            this.label1.Location = new System.Drawing.Point(27, 103);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(561, 20);
+            this.label1.Size = new System.Drawing.Size(615, 40);
             this.label1.TabIndex = 5;
-            this.label1.Text = "This app was created by Team Set1 at the Faculty of Electrical Engineering Saraje" +
-    "vo.";
+            this.label1.Text = "This app was created by a team of students at the Faculty of Electrical Engineeri" +
+    "ng Sarajevo.\r\nContact us at sbehic2@etf.unsa.ba if you encounter any problems wi" +
+    "th the application.";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(28, 51);
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label2.Location = new System.Drawing.Point(27, 51);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(152, 20);
+            this.label2.Size = new System.Drawing.Size(221, 28);
             this.label2.TabIndex = 6;
-            this.label2.Text = "SnapShot, version: 0.1";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(28, 159);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(578, 20);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Contact us at sbehic2@etf.unsa.ba if you encounter any problems with the applicat" +
-    "ion.";
+            this.label2.Text = "SnapShot, version: 0.2";
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.Highlight;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.postavkeToolStripMenuItem,
@@ -97,12 +90,14 @@
             this.pomoćToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(636, 28);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 3, 0, 3);
+            this.menuStrip1.Size = new System.Drawing.Size(635, 30);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // postavkeToolStripMenuItem
             // 
+            this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
             this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(114, 24);
             this.postavkeToolStripMenuItem.Text = "Configuration";
@@ -110,6 +105,7 @@
             // 
             // registracijaToolStripMenuItem
             // 
+            this.registracijaToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.registracijaToolStripMenuItem.Name = "registracijaToolStripMenuItem";
             this.registracijaToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.registracijaToolStripMenuItem.Text = "Licence";
@@ -117,6 +113,7 @@
             // 
             // pomoćToolStripMenuItem
             // 
+            this.pomoćToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.pomoćToolStripMenuItem.Name = "pomoćToolStripMenuItem";
             this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.pomoćToolStripMenuItem.Text = "Help";
@@ -125,15 +122,19 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(636, 237);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(635, 335);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.statusStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(649, 371);
             this.Name = "InformationForm";
             this.Text = "SnapShot";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.InformationForm_FormClosing);
+            this.Load += new System.EventHandler(this.InformationForm_Load);
+            this.Resize += new System.EventHandler(this.InformationForm_Resize);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -148,7 +149,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem postavkeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem registracijaToolStripMenuItem;
