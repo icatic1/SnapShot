@@ -109,5 +109,41 @@ namespace GUI_Tests
 
 
         }
+
+        [TestMethod]
+        public void TestDebugLoggingStatus()
+        {
+            // LeftClick on CheckBox "Debug logging" at (5,7)
+            Console.WriteLine("LeftClick on CheckBox \"Debug logging\" at (5,7)");
+            string xpath_LeftClickCheckBoxDebugloggi_5_7 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/Group[@Name=\"Terminal information\"][starts-with(@AutomationId,\"groupBox\")]/CheckBox[@Name=\"Debug logging\"][starts-with(@AutomationId,\"checkBox\")]";
+            var winElem_LeftClickCheckBoxDebugloggi_5_7 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickCheckBoxDebugloggi_5_7);
+            if (winElem_LeftClickCheckBoxDebugloggi_5_7 != null)
+            {
+                winElem_LeftClickCheckBoxDebugloggi_5_7.Click();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickCheckBoxDebugloggi_5_7}");
+                return;
+            }
+
+
+            // LeftClick on Button "Close" at (32,10)
+            Console.WriteLine("LeftClick on Button \"Close\" at (32,10)");
+            string xpath_LeftClickButtonClose_32_10 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/TitleBar[@AutomationId=\"TitleBar\"]/Button[@Name=\"Close\"]";
+            var winElem_LeftClickButtonClose_32_10 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonClose_32_10);
+            if (winElem_LeftClickButtonClose_32_10 != null)
+            {
+                winElem_LeftClickButtonClose_32_10.Click();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonClose_32_10}");
+                return;
+            }
+
+
+
+        }
     }
 }
