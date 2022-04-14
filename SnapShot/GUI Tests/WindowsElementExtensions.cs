@@ -34,7 +34,35 @@ namespace GUI_Tests
             return uiTarget;
         }
 
-        
+        public static void DoubleClick(this WindowsElement element, int offsetX = 0, int offsetY = 0)
+        {
+            Actions actions = new Actions(element.WrappedDriver);
+            actions.Build();
+            actions.MoveToElement(element);
+            actions.MoveByOffset(offsetX, offsetY);
+            actions.DoubleClick();
+            actions.Perform();
+        }
+
+        public static void Click(this WindowsElement element, int offsetX = 0, int offsetY = 0)
+        {
+            Actions actions = new Actions(element.WrappedDriver);
+            actions.Build();
+            actions.MoveToElement(element);
+            actions.MoveByOffset(offsetX, offsetY);
+            actions.Click();
+            actions.Perform();
+        }
+
+        public static void RightClick(this WindowsElement element, int offsetX = 0, int offsetY = 0)
+        {
+            Actions actions = new Actions(element.WrappedDriver);
+            actions.Build();
+            actions.MoveToElement(element);
+            actions.MoveByOffset(offsetX, offsetY);
+            actions.ContextClick();
+            actions.Perform();
+        }
 
     }
 }
