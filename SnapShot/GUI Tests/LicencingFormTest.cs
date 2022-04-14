@@ -73,5 +73,41 @@ namespace GUI_Tests
                 Assert.Fail("Empty clipboard");
             }*/
         }
+
+        [TestMethod]
+        public void TestCheckConnectioStatus ()
+        {
+            // LeftClick on Button "Connect" at (82,19)
+            Console.WriteLine("LeftClick on Button \"Connect\" at (82,19)");
+            string xpath_LeftClickButtonConnect_82_19 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/Group[@Name=\"Connection information\"][starts-with(@AutomationId,\"groupBox\")]/Button[@Name=\"Connect\"][starts-with(@AutomationId,\"button\")]";
+            var winElem_LeftClickButtonConnect_82_19 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonConnect_82_19);
+            if (winElem_LeftClickButtonConnect_82_19 != null)
+            {
+                winElem_LeftClickButtonConnect_82_19.Click();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonConnect_82_19}");
+                return;
+            }
+
+
+            // LeftClick on Button "Close" at (5,15)
+            Console.WriteLine("LeftClick on Button \"Close\" at (5,15)");
+            string xpath_LeftClickButtonClose_5_15 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/TitleBar[@AutomationId=\"TitleBar\"]/Button[@Name=\"Close\"]";
+            var winElem_LeftClickButtonClose_5_15 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonClose_5_15);
+            if (winElem_LeftClickButtonClose_5_15 != null)
+            {
+                winElem_LeftClickButtonClose_5_15.Click();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonClose_5_15}");
+                return;
+            }
+
+
+
+        }
     }
 }
