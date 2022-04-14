@@ -11,6 +11,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
 
 namespace SnapShot
 {
@@ -147,22 +148,29 @@ namespace SnapShot
         /// <summary>
         /// Helper method for determining whether the user is licenced or not
         /// </summary>
-        private void LicenceCheck()
+       private void LicenceCheck()
         {
             try
             {
-                bool success = Database.Connect();
-                if (!success)
-                {
-                    error = "Licence check could not be performed. Contact nbadzak1@etf.unsa.ba for help.";
-                }
+                HttpWebRequest webRequest;
 
-                Program.Snapshot.Licenced = Database.CheckLicence();
-                Database.Disconnect();
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + Configuration.GetMACAddress());
+
+                webRequest.Method = "GET";
+
+                using (WebResponse response = webRequest.GetResponse())
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                        string Json = rdr.ReadToEnd();
+                        Program.Snapshot.Licenced = Json == "true";
+                    }
+                }
             }
             catch
             {
-                
+                error = "Licence check could not be performed. Contact nbadzak1@etf.unsa.ba for help.";
             }
         }
 

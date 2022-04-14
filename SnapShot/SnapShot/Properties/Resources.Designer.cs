@@ -61,7 +61,7 @@ namespace SnapShot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data Source=SQL8001.site4now.net;Initial Catalog=db_a84fb9_licencing;User Id=db_a84fb9_licencing_admin;Password=12345deset.
+        ///   Looks up a localized string similar to Data Source=SQL5107.site4now.net;Initial Catalog=db_a84abc_sprint1;User Id=db_a84abc_sprint1_admin;Password=123123SI.
         /// </summary>
         internal static string connectionString {
             get {

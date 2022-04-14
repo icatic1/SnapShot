@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using SnapShot.Model;
+using System.Net.NetworkInformation;
+using System.Net;
 
 namespace SnapShot
 {
@@ -86,6 +88,14 @@ namespace SnapShot
 
         #region Methods
 
+        public static string? GetMACAddress()
+        {
+            return (from nic in NetworkInterface.GetAllNetworkInterfaces()
+                    where nic.OperationalStatus == OperationalStatus.Up
+                    select nic.GetPhysicalAddress().ToString()
+                    ).FirstOrDefault();
+        }
+
         #region Export JSON
 
         public static string CreateJSON()
@@ -158,9 +168,28 @@ namespace SnapShot
                 // export to server
                 else if (mode == 2)
                 {
-                    Database.Connect();
-                    Database.WriteConfiguration(EXPORT);
-                    Database.Disconnect();
+                    HttpWebRequest webRequest;
+                    string requestParams = "MACAddress=" + GetMACAddress();
+
+                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/JSONConfiguration/setJSON?" + requestParams);
+
+                    webRequest.Method = "POST";
+                    webRequest.ContentType = "application/json";
+
+                    using (StreamWriter sw = new StreamWriter(webRequest.GetRequestStream()))
+                    {
+                        sw.Write(EXPORT);
+                    }
+
+                    using (WebResponse response = webRequest.GetResponse())
+                    {
+                        using (Stream responseStream = response.GetResponseStream())
+                        {
+                            StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                            string Json = rdr.ReadToEnd();
+                            return Json == "true";
+                        }
+                    }
                 }
 
                 return true;
@@ -322,10 +351,23 @@ namespace SnapShot
                 // import from server
                 else if (mode == 2)
                 {
-                    Database.Connect();
-                    IMPORT = Database.ReadConfiguration();
-                    Database.Disconnect();
+                    HttpWebRequest webRequest;
+
+                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/JSONConfiguration/getJSON/" + GetMACAddress());
+
+                    webRequest.Method = "GET";
+
+                    using (WebResponse response = webRequest.GetResponse())
+                    {
+                        using (Stream responseStream = response.GetResponseStream())
+                        {
+                            StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                            string Json = rdr.ReadToEnd();
+                            IMPORT = Json;
+                        }
+                    }
                 }
+
                 Snapshot newSnapshot = CreateConfiguration(IMPORT);
 
                 newSnapshot.Connected = Program.Snapshot.Connected;
