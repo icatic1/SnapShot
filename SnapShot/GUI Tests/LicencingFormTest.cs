@@ -75,7 +75,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestCheckConnectioStatus ()
+        public void TestCheckConnectioStatus()
         {
             // LeftClick on Button "Connect" at (82,19)
             Console.WriteLine("LeftClick on Button \"Connect\" at (82,19)");
@@ -87,26 +87,11 @@ namespace GUI_Tests
             }
             else
             {
-                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonConnect_82_19}");
+                string message = $"Failed to find element using xpath: {xpath_LeftClickButtonConnect_82_19}";
+                Console.WriteLine(message);
+                Assert.Fail(message);
                 return;
             }
-
-
-            // LeftClick on Button "Close" at (5,15)
-            Console.WriteLine("LeftClick on Button \"Close\" at (5,15)");
-            string xpath_LeftClickButtonClose_5_15 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/TitleBar[@AutomationId=\"TitleBar\"]/Button[@Name=\"Close\"]";
-            var winElem_LeftClickButtonClose_5_15 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonClose_5_15);
-            if (winElem_LeftClickButtonClose_5_15 != null)
-            {
-                winElem_LeftClickButtonClose_5_15.Click();
-            }
-            else
-            {
-                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonClose_5_15}");
-                return;
-            }
-
-
 
         }
 
@@ -123,22 +108,71 @@ namespace GUI_Tests
             }
             else
             {
-                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickCheckBoxDebugloggi_5_7}");
+                string message = $"Failed to find element using xpath: {xpath_LeftClickCheckBoxDebugloggi_5_7}";
+                Console.WriteLine(message);
+                Assert.Fail(message);
+                return;
+            }
+
+        }
+
+        [TestMethod]
+        public void TestOpenConfigurationForm()
+        {
+            // LeftClick on MenuItem "Configuration" at (39,16)
+            Console.WriteLine("LeftClick on MenuItem \"Configuration\" at (39,16)");
+            string xpath_LeftClickMenuItemConfigurat_39_16 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/MenuBar[@Name=\"menuStrip1\"][starts-with(@AutomationId,\"menuStrip\")]/MenuItem[@Name=\"Configuration\"]";
+            var winElem_LeftClickMenuItemConfigurat_39_16 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickMenuItemConfigurat_39_16);
+            if (winElem_LeftClickMenuItemConfigurat_39_16 != null)
+            {
+                winElem_LeftClickMenuItemConfigurat_39_16.Click();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickMenuItemConfigurat_39_16}");
                 return;
             }
 
 
-            // LeftClick on Button "Close" at (32,10)
-            Console.WriteLine("LeftClick on Button \"Close\" at (32,10)");
-            string xpath_LeftClickButtonClose_32_10 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/TitleBar[@AutomationId=\"TitleBar\"]/Button[@Name=\"Close\"]";
-            var winElem_LeftClickButtonClose_32_10 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonClose_32_10);
-            if (winElem_LeftClickButtonClose_32_10 != null)
+            // LeftClick on MenuItem "Licence" at (44,13)
+            Console.WriteLine("LeftClick on MenuItem \"Licence\" at (44,13)");
+            string xpath_LeftClickMenuItemLicence_44_13 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"ConfigurationForm\"]/MenuBar[@Name=\"menuStrip1\"][starts-with(@AutomationId,\"menuStrip\")]/MenuItem[@Name=\"Licence\"]";
+            var winElem_LeftClickMenuItemLicence_44_13 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickMenuItemLicence_44_13);
+            if (winElem_LeftClickMenuItemLicence_44_13 != null)
             {
-                winElem_LeftClickButtonClose_32_10.Click();
+                winElem_LeftClickMenuItemLicence_44_13.Click();
             }
             else
             {
-                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickButtonClose_32_10}");
+                Console.WriteLine($"Failed to find element using xpath: {xpath_LeftClickMenuItemLicence_44_13}");
+                return;
+            }
+
+
+
+
+
+
+
+
+        }
+
+        [TestMethod]
+        public void TestOpenHelpForm()
+        {
+            // LeftClick on MenuItem "Help" at (9,2)
+            Console.WriteLine("LeftClick on MenuItem \"Help\" at (9,2)");
+            string xpath_LeftClickMenuItemHelp_9_2 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/MenuBar[@Name=\"menuStrip1\"][starts-with(@AutomationId,\"menuStrip\")]/MenuItem[@Name=\"Help\"]";
+            var winElem_LeftClickMenuItemHelp_9_2 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickMenuItemHelp_9_2);
+            if (winElem_LeftClickMenuItemHelp_9_2 != null)
+            {
+                winElem_LeftClickMenuItemHelp_9_2.Click();
+            }
+            else
+            {
+                string message = $"Failed to find element using xpath: {xpath_LeftClickMenuItemHelp_9_2}";
+                Console.WriteLine(message);
+                Assert.Fail(message);
                 return;
             }
 
