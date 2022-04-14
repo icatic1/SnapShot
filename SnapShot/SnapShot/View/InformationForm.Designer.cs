@@ -46,10 +46,9 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 229);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 309);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 12, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(556, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(635, 26);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -57,15 +56,15 @@
             // 
             this.toolStripStatusLabel1.ForeColor = System.Drawing.Color.Firebrick;
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(151, 20);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 77);
+            this.label1.Location = new System.Drawing.Point(27, 103);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(487, 30);
+            this.label1.Size = new System.Drawing.Size(615, 40);
             this.label1.TabIndex = 5;
             this.label1.Text = "This app was created by a team of students at the Faculty of Electrical Engineeri" +
     "ng Sarajevo.\r\nContact us at sbehic2@etf.unsa.ba if you encounter any problems wi" +
@@ -75,9 +74,9 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(24, 38);
+            this.label2.Location = new System.Drawing.Point(27, 51);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(177, 21);
+            this.label2.Size = new System.Drawing.Size(221, 28);
             this.label2.TabIndex = 6;
             this.label2.Text = "SnapShot, version: 0.2";
             // 
@@ -91,8 +90,8 @@
             this.pomoćToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(556, 24);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 3, 0, 3);
+            this.menuStrip1.Size = new System.Drawing.Size(635, 30);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -100,7 +99,7 @@
             // 
             this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
-            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
+            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(114, 24);
             this.postavkeToolStripMenuItem.Text = "Configuration";
             this.postavkeToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -108,7 +107,7 @@
             // 
             this.registracijaToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.registracijaToolStripMenuItem.Name = "registracijaToolStripMenuItem";
-            this.registracijaToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+            this.registracijaToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.registracijaToolStripMenuItem.Text = "Licence";
             this.registracijaToolStripMenuItem.Click += new System.EventHandler(this.registracijaToolStripMenuItem_Click);
             // 
@@ -116,22 +115,21 @@
             // 
             this.pomoćToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.pomoćToolStripMenuItem.Name = "pomoćToolStripMenuItem";
-            this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.pomoćToolStripMenuItem.Text = "Help";
             // 
             // InformationForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(556, 251);
+            this.ClientSize = new System.Drawing.Size(635, 335);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.MinimumSize = new System.Drawing.Size(570, 290);
+            this.MinimumSize = new System.Drawing.Size(649, 371);
             this.Name = "InformationForm";
             this.Text = "SnapShot";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.InformationForm_FormClosing);
