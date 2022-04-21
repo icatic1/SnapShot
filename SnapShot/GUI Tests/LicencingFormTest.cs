@@ -32,22 +32,6 @@ namespace GUI_Tests
         [TestMethod]
         public void TestCheckLicenceStatus()
         {
-            // LeftClick on Button "Check my licence status" at (62,10)
-            /*Console.WriteLine("LeftClick on Button \"Check my licence status\" at (62,10)");
-            string xpath_LeftClickButtonCheckmylic_62_10 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/Group[@Name=\"Licencing information\"][starts-with(@AutomationId,\"groupBox\")]/Button[@Name=\"Check my licence status\"][starts-with(@AutomationId,\"button\")]";
-            var winElem_LeftClickButtonCheckmylic_62_10 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonCheckmylic_62_10);
-            if (winElem_LeftClickButtonCheckmylic_62_10 != null)
-            {
-                winElem_LeftClickButtonCheckmylic_62_10.Click();
-            }
-            else
-            {
-                string message = $"Failed to find element using xpath: {xpath_LeftClickButtonCheckmylic_62_10}";
-                Console.WriteLine(message);
-                Assert.Fail(message);
-                return;
-            }*/
-
             var checkLicenceButton = desktopSession.FindElementByAccessibilityId("button1");
             Assert.IsNotNull(checkLicenceButton);
             checkLicenceButton.Click();
@@ -58,32 +42,32 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestCheckConnectioStatus()
+        public void TestConnectionStatus()
         {
+            var label3 = desktopSession.FindElementByAccessibilityId("label3");
+            Assert.IsNotNull(label3);
+            Assert.AreEqual("Not checked", label3.Text);
 
             var label7 = desktopSession.FindElementByAccessibilityId("label7");
             Assert.IsNotNull(label7);
             Assert.AreEqual("Disconnected", label7.Text);
+        }
 
+        [TestMethod]
+        public void TestCheckConnectioStatus()
+        {
+                        
+            var checkConnectionButton = desktopSession.FindElementByAccessibilityId("button1");
+            Assert.IsNotNull(checkConnectionButton);
+            checkConnectionButton.Click();
 
-            // LeftClick on Button "Connect" at (82,19)
-            Console.WriteLine("LeftClick on Button \"Connect\" at (82,19)");
-            string xpath_LeftClickButtonConnect_82_19 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/Group[@Name=\"Connection information\"][starts-with(@AutomationId,\"groupBox\")]/Button[@Name=\"Connect\"][starts-with(@AutomationId,\"button\")]";
-            var winElem_LeftClickButtonConnect_82_19 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickButtonConnect_82_19);
-            if (winElem_LeftClickButtonConnect_82_19 != null)
-            {
-                winElem_LeftClickButtonConnect_82_19.Click();
-            }
-            else
-            {
-                string message = $"Failed to find element using xpath: {xpath_LeftClickButtonConnect_82_19}";
-                Console.WriteLine(message);
-                Assert.Fail(message);
-                return;
-            }
+            var label3 = desktopSession.FindElementByAccessibilityId("label3");
+            Assert.IsNotNull(label3);
+            Assert.AreEqual("Demo version", label3.Text);
 
-            
-            Assert.AreEqual("Connected", label7.Text);
+            var tb = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(tb);
+            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", tb.Text);
 
         }
 
