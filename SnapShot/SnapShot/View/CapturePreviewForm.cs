@@ -24,17 +24,19 @@ namespace SnapShot
         VideoCapture? capture;
         static bool cancel;
         int cameraNumber;
+        string deviceType;
 
         #endregion
 
         #region Constructor
 
-        public CapturePreviewForm(string device, int camNo)
+        public CapturePreviewForm(string device, int camNo, string type)
         {
             InitializeComponent();
             cancel = false;
             textBox1.Text = device;
             cameraNumber = camNo;
+            deviceType = type;
             toolStripStatusLabel1.Text = "";
 
             // configure and start using camera input
@@ -61,8 +63,16 @@ namespace SnapShot
         {
 
             frame = new Mat();
-            capture = new VideoCapture(cameraNumber);
-            capture.Open(cameraNumber);
+            if (deviceType == "USB")
+            {
+                capture = new VideoCapture(cameraNumber);
+                capture.Open(cameraNumber);
+            }
+            else
+            {
+                capture = new VideoCapture("http://" + textBox1.Text + ":" + cameraNumber + "/video");
+                capture.Open("http://" + textBox1.Text + ":" + cameraNumber + "/video");
+            }
 
             if (capture.IsOpened())
             {
