@@ -22,6 +22,7 @@ namespace Model_Tests
         {
             Assert.IsTrue(configuration.ServerIP.Length == 0);
             Assert.AreEqual("", configuration.ServerIP);
+            
         }
 
         [TestMethod]
