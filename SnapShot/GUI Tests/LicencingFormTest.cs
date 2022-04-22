@@ -12,37 +12,36 @@ namespace GUI_Tests
         public static void ClassInitialize(TestContext context)
         {
             Setup(context);
+
+            /*var textBox2 = desktopSession.FindElementByAccessibilityId("textBox2");
+            textBox2.SendKeys(Environment.MachineName.ToString());*/
+
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
+            
+           /* var textBox2 = desktopSession.FindElementByAccessibilityId("textBox2");
+            textBox2.SendKeys(Environment.MachineName.ToString());
+
+            var closeButton = desktopSession.FindElementByAccessibilityId("Close");
+            closeButton.Click();*/
+
             TearDown();
         }
 
 
         [TestMethod]
-        public void TestLicenceStatus()
+        public void Test1LicenceStatus()
         {
-            var tb1 = desktopSession.FindElementByAccessibilityId("textBox1");
-            Assert.IsNotNull(tb1);
-            Assert.AreEqual("Licence check has not been performed.", tb1.Text);
+            var textBox1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(textBox1);
+            Assert.AreEqual("Licence check has not been performed.", textBox1.Text);
         }
 
         [TestMethod]
-        public void TestCheckLicenceStatus()
-        {
-            var checkLicenceButton = desktopSession.FindElementByAccessibilityId("button1");
-            Assert.IsNotNull(checkLicenceButton);
-            checkLicenceButton.Click();
-
-            var tb1 = desktopSession.FindElementByAccessibilityId("textBox1");
-            Assert.IsNotNull(tb1);
-            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", tb1.Text);
-        }
-
-        [TestMethod]
-        public void TestConnectionStatus()
+        public void Test2ConnectionStatus()
         {
             var label3 = desktopSession.FindElementByAccessibilityId("label3");
             Assert.IsNotNull(label3);
@@ -54,7 +53,19 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestCheckConnectioStatus()
+        public void Test3CheckLicenceStatus()
+        {
+            var checkLicenceButton = desktopSession.FindElementByAccessibilityId("button1");
+            Assert.IsNotNull(checkLicenceButton);
+            checkLicenceButton.Click();
+
+            var textBox1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(textBox1);
+            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", textBox1.Text);
+        }
+
+        [TestMethod]
+        public void Test4CheckConnectioStatus()
         {
                         
             var checkConnectionButton = desktopSession.FindElementByAccessibilityId("button1");
@@ -72,11 +83,17 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestLoggingStatus()
+        public void Test5LoggingStatus()
         {
+
             var textBox2 = desktopSession.FindElementByAccessibilityId("textBox2");
             Assert.IsNotNull(textBox2);
-            Assert.AreEqual(Environment.MachineName.ToString(), textBox2.Text);
+            //Assert.AreEqual(Environment.MachineName.ToString(), textBox2.Text);
+
+            const string newComputerName = "new_desktop";
+            textBox2.SendKeys(newComputerName);
+
+            Assert.AreEqual(newComputerName, textBox2.Text);
 
             var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
             Assert.IsNotNull(checkBox1);
@@ -85,7 +102,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestDebugLoggingStatus()
+        public void Test6DebugLoggingStatus()
         {
             var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
             Assert.IsNotNull(checkBox1);
@@ -94,7 +111,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void TestOpenConfigurationForm()
+        public void Test7OpenConfigurationForm()
         {
             // LeftClick on MenuItem "Configuration" at (39,16)
             Console.WriteLine("LeftClick on MenuItem \"Configuration\" at (39,16)");
@@ -125,17 +142,10 @@ namespace GUI_Tests
                 return;
             }
 
-
-
-
-
-
-
-
         }
 
         [TestMethod]
-        public void TestOpenHelpForm()
+        public void Test8OpenHelpForm()
         {
             // LeftClick on MenuItem "Help" at (9,2)
             Console.WriteLine("LeftClick on MenuItem \"Help\" at (9,2)");
