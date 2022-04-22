@@ -2,6 +2,8 @@
 using System.Windows;
 using System;
 using Xamarin.Essentials;
+using System.IO;
+using OpenQA.Selenium;
 
 namespace GUI_Tests
 {
@@ -33,7 +35,7 @@ namespace GUI_Tests
 
 
         [TestMethod]
-        public void Test1LicenceStatus()
+        public void Test1_LicenceStatus()
         {
             var textBox1 = desktopSession.FindElementByAccessibilityId("textBox1");
             Assert.IsNotNull(textBox1);
@@ -41,7 +43,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test2ConnectionStatus()
+        public void Test2_ConnectionStatus()
         {
             var label3 = desktopSession.FindElementByAccessibilityId("label3");
             Assert.IsNotNull(label3);
@@ -53,7 +55,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test3CheckLicenceStatus()
+        public void Test3_CheckLicenceStatus()
         {
             var checkLicenceButton = desktopSession.FindElementByAccessibilityId("button1");
             Assert.IsNotNull(checkLicenceButton);
@@ -65,7 +67,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test4CheckConnectioStatus()
+        public void Test4_CheckConnectioStatus()
         {
                         
             var checkConnectionButton = desktopSession.FindElementByAccessibilityId("button1");
@@ -83,35 +85,43 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test5LoggingStatus()
+        public void Test5_LoggingStatus()
         {
-
             var textBox2 = desktopSession.FindElementByAccessibilityId("textBox2");
             Assert.IsNotNull(textBox2);
-            //Assert.AreEqual(Environment.MachineName.ToString(), textBox2.Text);
+            Assert.AreEqual(Environment.MachineName.ToString(), textBox2.Text);
 
+            string oldName = textBox2.Text;
             const string newComputerName = "new_desktop";
             textBox2.SendKeys(newComputerName);
 
             Assert.AreEqual(newComputerName, textBox2.Text);
+            textBox2.Clear();
+            textBox2.SendKeys(oldName);
+
 
             var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
             Assert.IsNotNull(checkBox1);
-            //Assert not checked
+
+            Assert.IsFalse(checkBox1.Selected);
 
         }
 
         [TestMethod]
-        public void Test6DebugLoggingStatus()
+        public void Test6_DebugLoggingStatus()
         {
             var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
             Assert.IsNotNull(checkBox1);
+            
             checkBox1.Click();
-            //Assert checked
+            Assert.IsTrue(checkBox1.Selected);
+
+            checkBox1.Click();
+            Assert.IsFalse(checkBox1.Selected);
         }
 
         [TestMethod]
-        public void Test7OpenConfigurationForm()
+        public void Test7_OpenConfigurationForm()
         {
             // LeftClick on MenuItem "Configuration" at (39,16)
             Console.WriteLine("LeftClick on MenuItem \"Configuration\" at (39,16)");
@@ -145,7 +155,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test8OpenHelpForm()
+        public void Test8_OpenHelpForm()
         {
             // LeftClick on MenuItem "Help" at (9,2)
             Console.WriteLine("LeftClick on MenuItem \"Help\" at (9,2)");
@@ -162,9 +172,6 @@ namespace GUI_Tests
                 Assert.Fail(message);
                 return;
             }
-
-
-
         }
     }
 }

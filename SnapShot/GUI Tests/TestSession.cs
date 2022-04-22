@@ -15,7 +15,7 @@ namespace GUI_Tests
         private const string WINAPP_DRIVER_URL = "http://127.0.0.1:4723/";
         //private const string TEST_APP = @"C:\Windows\System32\calc.exe";
         //private const string TEST_APP = "Notepad";
-        private const string TEST_APP = @"C:\Set 1\Snapshot Setup\SnapShot.exe";
+        private const string TEST_APP = @"C:\Set 1\Snapshot\SnapShot.exe";
 
         public static void Setup(TestContext context)
         {
