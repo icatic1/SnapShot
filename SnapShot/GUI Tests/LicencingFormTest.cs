@@ -24,9 +24,9 @@ namespace GUI_Tests
         [TestMethod]
         public void TestLicenceStatus()
         {
-            var tb = desktopSession.FindElementByAccessibilityId("textBox1");
-            Assert.IsNotNull(tb);
-            Assert.AreEqual("Licence check has not been performed.", tb.Text);
+            var tb1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(tb1);
+            Assert.AreEqual("Licence check has not been performed.", tb1.Text);
         }
 
         [TestMethod]
@@ -36,9 +36,9 @@ namespace GUI_Tests
             Assert.IsNotNull(checkLicenceButton);
             checkLicenceButton.Click();
 
-            var tb = desktopSession.FindElementByAccessibilityId("textBox1");
-            Assert.IsNotNull(tb);
-            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", tb.Text);
+            var tb1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(tb1);
+            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", tb1.Text);
         }
 
         [TestMethod]
@@ -65,31 +65,32 @@ namespace GUI_Tests
             Assert.IsNotNull(label3);
             Assert.AreEqual("Demo version", label3.Text);
 
-            var tb = desktopSession.FindElementByAccessibilityId("textBox1");
-            Assert.IsNotNull(tb);
-            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", tb.Text);
+            var textBox1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(textBox1);
+            Assert.AreEqual("Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.", textBox1.Text);
+
+        }
+
+        [TestMethod]
+        public void TestLoggingStatus()
+        {
+            var textBox2 = desktopSession.FindElementByAccessibilityId("textBox2");
+            Assert.IsNotNull(textBox2);
+            Assert.AreEqual(Environment.MachineName.ToString(), textBox2.Text);
+
+            var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
+            Assert.IsNotNull(checkBox1);
+            //Assert not checked
 
         }
 
         [TestMethod]
         public void TestDebugLoggingStatus()
         {
-            // LeftClick on CheckBox "Debug logging" at (5,7)
-            Console.WriteLine("LeftClick on CheckBox \"Debug logging\" at (5,7)");
-            string xpath_LeftClickCheckBoxDebugloggi_5_7 = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 2\"]/Window[@Name=\"SnapShot\"][@AutomationId=\"LicencingForm\"]/Group[@Name=\"Terminal information\"][starts-with(@AutomationId,\"groupBox\")]/CheckBox[@Name=\"Debug logging\"][starts-with(@AutomationId,\"checkBox\")]";
-            var winElem_LeftClickCheckBoxDebugloggi_5_7 = desktopSession.FindElementByAbsoluteXPath(xpath_LeftClickCheckBoxDebugloggi_5_7);
-            if (winElem_LeftClickCheckBoxDebugloggi_5_7 != null)
-            {
-                winElem_LeftClickCheckBoxDebugloggi_5_7.Click();
-            }
-            else
-            {
-                string message = $"Failed to find element using xpath: {xpath_LeftClickCheckBoxDebugloggi_5_7}";
-                Console.WriteLine(message);
-                Assert.Fail(message);
-                return;
-            }
-
+            var checkBox1 = desktopSession.FindElementByAccessibilityId("checkBox1");
+            Assert.IsNotNull(checkBox1);
+            checkBox1.Click();
+            //Assert checked
         }
 
         [TestMethod]
