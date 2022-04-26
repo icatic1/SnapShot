@@ -9,11 +9,20 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Management;
 using System.IO;
+using SnapShot.View;
 
 namespace SnapShot
 {
     public partial class ConfigurationForm : Form
     {
+        #region Properties
+
+        static string JSONlocation = "";
+
+        public static string JSONLocation { get => JSONlocation; set => JSONlocation = value; }
+
+        #endregion
+
         #region Constructor
 
         public ConfigurationForm()
@@ -25,9 +34,6 @@ namespace SnapShot
 
             // automatically select USB camera - disable network configuration
             comboBox2.Text = "USB camera";
-            textBox5.ReadOnly = true;
-            textBox3.ReadOnly = true;
-            textBox4.ReadOnly = true;
 
             // add all available USB camera devices to combo box list
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
@@ -163,9 +169,17 @@ namespace SnapShot
             Color color = pictureBox1.BackColor;
             bool motionDetection = checkBox1.Checked;
 
-            string version = textBox5.Text,
+            string savingPath = textBox5.Text,
                        ip = textBox3.Text,
                        statusText = label17.Text;
+
+            int syncPeriod = (int)numericUpDown4.Value;
+            if (domainUpDown3.Text == "minutes")
+                syncPeriod *= 60;
+            else if (domainUpDown3.Text == "hours")
+                syncPeriod *= 3600;
+            else if (domainUpDown3.Text == "days")
+                syncPeriod *= 86400;
 
             bool status = statusText == "Connected!" ? true : false;
 
@@ -247,9 +261,10 @@ namespace SnapShot
                 ContrastLevel = contrast,
                 ImageColor = color,
                 MotionDetection = motionDetection,
-                ServerVersion = version,
+                SavingPath = savingPath,
                 ServerIP = ip,
                 ServerPort = port,
+                SynchronizationPeriod = syncPeriod,
                 ConnectionStatus = status,
                 ImageCapture = image,
                 SingleMode = single,
@@ -271,33 +286,12 @@ namespace SnapShot
         /// <param name="e"></param>
         private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int mode = 1;
-            if (Program.Snapshot.Connected)
-                mode = 2;
-
-            if (mode == 1)
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
-                {
-                    openFileDialog.InitialDirectory = "c:\\";
-                    openFileDialog.FileName = "configuration.json";
-                    openFileDialog.Filter = "JSON files (*.json)|*.json";
-                    openFileDialog.FilterIndex = 2;
-                    openFileDialog.CheckFileExists = false;
-                    openFileDialog.RestoreDirectory = true;
-
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        var result = Configuration.ExportToJSON(openFileDialog.FileName, mode);
-                        if (result)
-                            toolStripStatusLabel1.Text = "Export successfully completed.";
-                        else
-                            toolStripStatusLabel1.Text = "The export could not be completed successfully.";
-                    }
-                }
-            else
+            JSONPopup popup = new JSONPopup();
+            var result = popup.ShowDialog();
+            if (result == DialogResult.OK)
             {
-                var result = Configuration.ExportToJSON("", mode);
-                if (result)
+                bool res = Configuration.ExportToJSON(JSONLocation);
+                if (res)
                     toolStripStatusLabel1.Text = "Export successfully completed.";
                 else
                     toolStripStatusLabel1.Text = "The export could not be completed successfully.";
@@ -311,49 +305,19 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int mode = 1;
-            if (Program.Snapshot.Connected)
-                mode = 2;
-
-            if (mode == 1)
-                using (var openFileDialog = new OpenFileDialog())
-                {
-                    openFileDialog.InitialDirectory = "c:\\";
-                    openFileDialog.FileName = "configuration.json";
-                    openFileDialog.Filter = "JSON files (*.json)|*.json";
-                    openFileDialog.FilterIndex = 2;
-                    openFileDialog.CheckFileExists = true;
-                    openFileDialog.RestoreDirectory = true;
-
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-
-                        bool result = Configuration.ImportFromJSON(openFileDialog.FileName, mode);
-                        if (result)
-                        {
-                            radioButton5.Checked = true;
-                            UpdateConfigurationWindow(0);
-                            toolStripStatusLabel1.Text = "Import successfully completed.";
-                        }
-                        else
-                        {
-                            toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
-                        }
-                    }
-                }
-            else
+            JSONPopup popup = new JSONPopup();
+            var result = popup.ShowDialog();
+            if (result == DialogResult.OK)
             {
-                bool result = Configuration.ImportFromJSON("", mode);
-                if (result)
+                bool res = Configuration.ImportFromJSON(JSONLocation);
+                if (res)
                 {
                     radioButton5.Checked = true;
                     UpdateConfigurationWindow(0);
                     toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
                 else
-                {
                     toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
-                }
             }
         }
 
@@ -378,7 +342,6 @@ namespace SnapShot
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     textBox1.Text = openFileDialog.FileName;
-                    textBox1.Text = textBox1.Text.Replace("\\", "/");
                     errorProvider1.SetError(textBox1, null);
                     textBox1.BackColor = Color.White;
                 }
@@ -398,7 +361,6 @@ namespace SnapShot
             if (result == DialogResult.OK)
             {
                 textBox2.Text = folderBrowserDialog1.SelectedPath;
-                textBox2.Text = textBox2.Text.Replace("\\", "/");
                 errorProvider1.SetError(textBox2, null);
                 textBox2.BackColor = Color.White;
             }
@@ -648,7 +610,7 @@ namespace SnapShot
             pictureBox1.BackColor = config.ImageColor;
             checkBox1.Checked = config.MotionDetection;
 
-            textBox5.Text = config.ServerVersion;
+            textBox5.Text = config.SavingPath;
             textBox3.Text = config.ServerIP;
             if (config.ServerIP.Length > 0)
                 textBox4.Text = config.ServerPort.ToString();
@@ -712,50 +674,31 @@ namespace SnapShot
 
         #endregion
 
-        #region IP camera
+        #region Server connection
 
-        /// <summary>
-        /// Change available items on form depending on the selected device
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            // USB camera selected - disable server configuration
-            // and clear error provider
-            if (comboBox2.SelectedItem.ToString() == "USB camera")
+            try
             {
-                errorProvider1.SetError(textBox5, null);
-                errorProvider1.SetError(textBox3, null);
-                errorProvider1.SetError(textBox4, null);
+                // try to connect to server
 
-                textBox5.BackColor = Color.White;
-                textBox3.BackColor = Color.White;
-                textBox4.BackColor = Color.White;
+                label17.Text = "Connected";
+                label17.ForeColor = System.Drawing.Color.Green;
 
-                textBox5.ReadOnly = true;
-                textBox3.ReadOnly = true;
-                textBox4.ReadOnly = true;
-                textBox5.Enabled = false;
-                textBox3.Enabled = false;
-                textBox4.Enabled = false;
-
-                comboBox1.Enabled = true;
+                numericUpDown4.ReadOnly = false;
+                numericUpDown4.Enabled = true;
+                domainUpDown3.ReadOnly = false;
+                domainUpDown3.Enabled = true;
             }
-
-            // IP camera selected - disable USB device selection
-            // and enable server configurations
-            else
+            catch
             {
-                comboBox1.SelectedItem = null;
-                comboBox1.Enabled = false;
+                label17.Text = "Disconnected";
+                label17.ForeColor = System.Drawing.Color.Red;
 
-                textBox5.ReadOnly = false;
-                textBox3.ReadOnly = false;
-                textBox4.ReadOnly = false;
-                textBox5.Enabled = true;
-                textBox3.Enabled = true;
-                textBox4.Enabled = true;
+                numericUpDown4.ReadOnly = true;
+                numericUpDown4.Enabled = false;
+                domainUpDown3.ReadOnly = true;
+                domainUpDown3.Enabled = false;
             }
         }
 

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
-using SnapShot.Model;
 using System.Net.NetworkInformation;
 using System.Net;
 
@@ -31,10 +30,11 @@ namespace SnapShot
         bool motionDetection = false;
 
         // network configuration - not a part of this sprint
-        string serverVersion = "",
+        string savingPath = "",
                serverIP = "";
         int serverPort;
         bool connectionStatus = false;
+        int synchronizationPeriod = 0;
 
         // capture configuration
         bool imageCapture = true,
@@ -68,11 +68,13 @@ namespace SnapShot
         
         public bool MotionDetection { get => motionDetection; set => motionDetection = value; }
         
-        public string ServerVersion { get => serverVersion; set => serverVersion = value; }
+        public string SavingPath { get => savingPath; set => savingPath = value; }
         
         public string ServerIP { get => serverIP; set => serverIP = value; }
         
         public int ServerPort { get => serverPort; set => serverPort = value; }
+
+        public int SynchronizationPeriod { get => synchronizationPeriod; set => synchronizationPeriod = value; }
         
         public bool ConnectionStatus { get => connectionStatus; set => connectionStatus = value; }
         
@@ -130,9 +132,10 @@ namespace SnapShot
 
                 EXPORT += "\t\t\t\"network_configuration\":\n";
                 EXPORT += "\t\t\t{\n";
-                EXPORT += "\t\t\t\t\"server_version\": \"" + config.ServerVersion + "\",\n";
+                EXPORT += "\t\t\t\t\"saving_path\": \"" + config.SavingPath + "\",\n";
                 EXPORT += "\t\t\t\t\"server_IP_address\": \"" + config.ServerIP + "\",\n";
                 EXPORT += "\t\t\t\t\"server_port\": \"" + config.ServerPort + "\",\n";
+                EXPORT += "\t\t\t\t\"synchronization_period\": \"" + config.SynchronizationPeriod + "\",\n";
                 EXPORT += "\t\t\t\t\"connection_status\": \"" + config.ConnectionStatus + "\"\n";
                 EXPORT += "\t\t\t},\n";
 
@@ -156,22 +159,22 @@ namespace SnapShot
             return EXPORT;
         }
 
-        public static bool ExportToJSON(string path, int mode)
+        public static bool ExportToJSON(string path)
         {
             string EXPORT = CreateJSON();
             try
             {
                 // local export
-                if (mode == 1)
+                if (!path.StartsWith("http"))
                     File.WriteAllText(path, EXPORT);
 
                 // export to server
-                else if (mode == 2)
+                else
                 {
                     HttpWebRequest webRequest;
                     string requestParams = "MACAddress=" + GetMACAddress();
 
-                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/JSONConfiguration/setJSON?" + requestParams);
+                    webRequest = (HttpWebRequest)WebRequest.Create(path);
 
                     webRequest.Method = "POST";
                     webRequest.ContentType = "application/json";
@@ -284,8 +287,8 @@ namespace SnapShot
                 {
                     i += 2;
 
-                    string[] server_version = rows[i].Split(new[] { ' ' }, 2);
-                    server_version[1] = server_version[1].Replace("\"", "").Replace(",", "");
+                    string[] saving_path = rows[i].Split(new[] { ' ' }, 2);
+                    saving_path[1] = saving_path[1].Replace("\"", "").Replace(",", "");
                     i++;
 
                     string[] server_IP_address = rows[i].Split(new[] { ' ' }, 2);
@@ -296,12 +299,17 @@ namespace SnapShot
                     server_port[1] = server_port[1].Replace("\"", "").Replace(",", "");
                     i++;
 
+                    string[] synchronization_period = rows[i].Split(new[] { ' ' }, 2);
+                    synchronization_period[1] = synchronization_period[1].Replace("\"", "").Replace(",", "");
+                    i++;
+
                     string[] connection_status = rows[i].Split(new[] { ' ' }, 2);
                     connection_status[1] = connection_status[1].Replace("\"", "").Replace(",", "");
 
-                    config.ServerVersion = server_version[1];
+                    config.SavingPath = saving_path[1];
                     config.ServerIP = server_IP_address[1];
                     config.ServerPort = Int32.Parse(server_port[1]);
+                    config.SynchronizationPeriod = Int32.Parse(synchronization_period[1]);
                     config.ConnectionStatus = Convert.ToBoolean(connection_status[1]);
                 }
 
@@ -338,22 +346,22 @@ namespace SnapShot
             return newSnapshot;
         }
 
-        public static bool ImportFromJSON(string path, int mode)
+        public static bool ImportFromJSON(string path)
         {
             try
             {
                 string IMPORT = "";
 
                 // local import
-                if (mode == 1)
+                if (!path.StartsWith("http"))
                     IMPORT = File.ReadAllText(path);
 
                 // import from server
-                else if (mode == 2)
+                else
                 {
                     HttpWebRequest webRequest;
 
-                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/JSONConfiguration/getJSON/" + GetMACAddress());
+                    webRequest = (HttpWebRequest)WebRequest.Create(path);
 
                     webRequest.Method = "GET";
 

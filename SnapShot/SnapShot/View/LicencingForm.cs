@@ -1,5 +1,4 @@
-﻿using SnapShot.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,12 +6,11 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net;
-
 
 namespace SnapShot
 {
@@ -21,22 +19,6 @@ namespace SnapShot
         #region Attributes
 
         string error = "";
-        private Rectangle buttonCheckLicenceOriginal;
-        private Rectangle greetingTextOriginal;
-        private Rectangle formSizeOriginal;
-        private Rectangle groupBoxLicenceOriginal;
-        private Rectangle checkBoxOriginal;
-        private Rectangle terminalLabelOriginal;
-        private Rectangle inputOriginal;
-        private Rectangle statusLabelOriginal;
-        private Rectangle statusOriginal;
-        private Rectangle licencingLabelOriginal;
-        private Rectangle versionLabelOriginal;
-        private Rectangle groupBoxConnectionOriginal;
-        private Rectangle connectionStatusLabelOriginal;
-        private Rectangle connectionStatusOriginal;
-        private Rectangle connectionStatusButtonOriginal;
-        private Rectangle groupBoxTerminalOriginal;
 
         #endregion
 
@@ -46,25 +28,30 @@ namespace SnapShot
         {
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
-            if (!File.Exists("config.txt"))
+
+            // we are disconnected - use local config file
+            if (!Program.Snapshot.Connected)
             {
-                File.Create("config.txt").Close();
-                File.WriteAllText("config.txt", Environment.MachineName + "\nFalse");
+                if (!File.Exists("config.txt"))
+                    File.WriteAllText(" \n ", "config.txt");
+
+                string IMPORT = File.ReadAllText("config.txt");
+                string[] rows = IMPORT.Split('\n');
+                Program.Snapshot.TerminalName = rows[0];
+                Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
             }
 
-            string IMPORT = File.ReadAllText("config.txt");
-            string[] rows = IMPORT.Split('\n');
-            Program.Snapshot.TerminalName = rows[0];
-            Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
-
-            textBox2.Text = Program.Snapshot.TerminalName;
-            checkBox1.Checked = Program.Snapshot.DebugLog;
-
-            if (Program.Snapshot.Connected)
+            // we are connected - grab information from server
+            else
             {
                 label7.Text = "Connected";
                 label7.ForeColor = System.Drawing.Color.Green;
+
+                // web request
             }
+
+            textBox2.Text = Program.Snapshot.TerminalName;
+            checkBox1.Checked = Program.Snapshot.DebugLog;
         }
 
         private void LicencingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -85,8 +72,8 @@ namespace SnapShot
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UpdateConfigurationFile();
-            this.Hide();
             ConfigurationForm f = new ConfigurationForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }
@@ -99,8 +86,8 @@ namespace SnapShot
         private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UpdateConfigurationFile();
-            this.Hide();
             InformationForm f = new InformationForm();
+            this.Hide();
             f.ShowDialog();
             this.Close();
         }
@@ -131,8 +118,15 @@ namespace SnapShot
 
         private void UpdateConfigurationFile()
         {
+            // we are not connected - locally save terminal name and debug log
             string EXPORT = Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog;
             File.WriteAllText("config.txt", EXPORT);
+
+            // we are connected - save information to server
+            if (Program.Snapshot.Connected)
+            {
+                // web request
+            }
         }
 
         #endregion
@@ -147,25 +141,32 @@ namespace SnapShot
         private void button1_Click(object sender, EventArgs e)
         {
             error = "";
-            LicenceCheck();
-            toolStripStatusLabel1.Text = error;
+            try
+            {
+                LicenceCheck();
+                toolStripStatusLabel1.Text = error;
 
-            if (Program.Snapshot.Licenced)
-            {
-                label3.Text = "Licenced version";
-                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
+                if (Program.Snapshot.Licenced)
+                {
+                    label3.Text = "Licenced version";
+                    textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
+                }
+                else
+                {
+                    label3.Text = "Demo version";
+                    textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
+                }
             }
-            else
+            catch
             {
-                label3.Text = "Demo version";
-                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
+
             }
         }
 
         /// <summary>
         /// Helper method for determining whether the user is licenced or not
         /// </summary>
-       private void LicenceCheck()
+        private void LicenceCheck()
         {
             try
             {
@@ -199,9 +200,22 @@ namespace SnapShot
         {
             try
             {
-                string connectionString = @Properties.Resources.connectionString;
-                SqlConnection connection = new SqlConnection(connectionString);
-                connection.Open();
+                HttpWebRequest webRequest;
+
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + Configuration.GetMACAddress());
+
+                webRequest.Method = "GET";
+
+                using (WebResponse response = webRequest.GetResponse())
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                        string Json = rdr.ReadToEnd();
+                        if (Json != "OK")
+                            throw new Exception("Bad response!");
+                    }
+                }
 
                 label7.Text = "Connected";
                 label7.ForeColor = System.Drawing.Color.Green;
@@ -218,7 +232,5 @@ namespace SnapShot
         }
 
         #endregion
-
-    
     }
 }

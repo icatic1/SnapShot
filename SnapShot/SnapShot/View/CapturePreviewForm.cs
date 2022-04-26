@@ -63,16 +63,8 @@ namespace SnapShot
         {
 
             frame = new Mat();
-            if (deviceType == "USB")
-            {
-                capture = new VideoCapture(cameraNumber);
-                capture.Open(cameraNumber);
-            }
-            else
-            {
-                capture = new VideoCapture("http://" + textBox1.Text + ":" + cameraNumber + "/video");
-                capture.Open("http://" + textBox1.Text + ":" + cameraNumber + "/video");
-            }
+            capture = new VideoCapture(cameraNumber);
+            capture.Open(cameraNumber);
 
             if (capture.IsOpened())
             {
