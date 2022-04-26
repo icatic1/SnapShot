@@ -8,16 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
 namespace SnapShot
 {
     public partial class InformationForm : Form
     {
-        #region Attributes
-        private Rectangle formSizeOriginal;
-        private Rectangle label1Original;
-        private Rectangle label2Original;
-        #endregion
         #region Constructor
 
         public InformationForm()
@@ -62,8 +56,5 @@ namespace SnapShot
         }
 
         #endregion
-
-        
-
     }
 }
