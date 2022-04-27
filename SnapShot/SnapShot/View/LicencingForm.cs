@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,12 +17,6 @@ namespace SnapShot
 {
     public partial class LicencingForm : Form
     {
-        #region Attributes
-
-        string error = "";
-
-        #endregion
-
         #region Constructor
 
         public LicencingForm()
@@ -47,7 +42,7 @@ namespace SnapShot
                 label7.Text = "Connected";
                 label7.ForeColor = System.Drawing.Color.Green;
 
-                // web request
+                GetInformationFromServer();
             }
 
             textBox2.Text = Program.Snapshot.TerminalName;
@@ -96,6 +91,100 @@ namespace SnapShot
 
         #region Settings changes
 
+        private void GetInformationFromServer()
+        {
+            try
+            {
+                HttpWebRequest webRequest;
+                string requestParams = "MacAddress=" + Configuration.GetMACAddress();
+
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+
+                webRequest.Method = "GET";
+
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Bad request!");
+
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                    string Json = rdr.ReadToEnd();
+                    var obj = JObject.Parse(Json);
+                    string terminalID = (string)obj["terminalID"] ?? "";
+                    bool debugLog = (bool)obj["debugLog"];
+
+                    // server information and local config not synchronized - ask the user whether they want to keep the server or local info
+                    if (terminalID != Program.Snapshot.TerminalName || debugLog != Program.Snapshot.DebugLog)
+
+                    {
+                        string message = "Do you want to update the current local configuration:\n" +
+                                     "terminal name = " + Program.Snapshot.TerminalName + ", debug log = " + Program.Snapshot.DebugLog + "\n" +
+                                     "to the configuration currently on server:\n" +
+                                     "terminal name = " + terminalID + ", debug log = " + debugLog + "?\n" +
+                                     "Choose Yes if you want to keep the server configuration\n" +
+                                     "or choose No if you want to keep the local configuration.";
+
+                        DialogResult result = MessageBox.Show(message, "Action necessary - conflict found", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (result == DialogResult.Yes)
+                        {
+                            Program.Snapshot.TerminalName = terminalID;
+                            Program.Snapshot.DebugLog = debugLog;
+
+                            textBox2.Text = Program.Snapshot.TerminalName;
+                            checkBox1.Checked = Program.Snapshot.DebugLog;
+                        }
+                        else
+                        {
+                            SendInformationToServer();
+                        }
+                    }
+                }
+            }
+            // information about the terminal is not present at the server - 
+            // create new configuration at the server
+            catch
+            {
+                HttpWebRequest webRequest;
+                string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
+                                       + "TerminalID=" + Program.Snapshot.TerminalName + "&"
+                                       + "DebugLog=" + Program.Snapshot.DebugLog;
+
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
+
+                webRequest.Method = "POST";
+
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Bad request!");
+            }
+        }
+
+        private void SendInformationToServer()
+        {
+            // request will fail if terminal name is empty
+            if (Program.Snapshot.TerminalName.Length < 1)
+            {
+                toolStripStatusLabel1.Text = "Terminal name cannot be empty.";
+                return;
+            }
+
+            toolStripStatusLabel1.Text = "";
+
+            HttpWebRequest webRequest;
+            string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
+                                   + "TerminalID=" + Program.Snapshot.TerminalName + "&"
+                                   + "DebugLog=" + Program.Snapshot.DebugLog;
+
+            webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
+
+            webRequest.Method = "POST";
+
+            HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Bad request!");
+        }
+
         /// <summary>
         /// Terminal ID change saving
         /// </summary>
@@ -125,7 +214,7 @@ namespace SnapShot
             // we are connected - save information to server
             if (Program.Snapshot.Connected)
             {
-                // web request
+                SendInformationToServer();
             }
         }
 
@@ -140,26 +229,26 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            error = "";
-            try
+            // cannot check licence status if we are disconnected
+            if (!Program.Snapshot.Connected)
             {
-                LicenceCheck();
-                toolStripStatusLabel1.Text = error;
-
-                if (Program.Snapshot.Licenced)
-                {
-                    label3.Text = "Licenced version";
-                    textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
-                }
-                else
-                {
-                    label3.Text = "Demo version";
-                    textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
-                }
+                toolStripStatusLabel1.Text = "You need to connect to the server first.";
+                return;
             }
-            catch
-            {
 
+            toolStripStatusLabel1.Text = "";
+
+            LicenceCheck();
+
+            if (Program.Snapshot.Licenced)
+            {
+                label3.Text = "Licenced version";
+                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
+            }
+            else
+            {
+                label3.Text = "Demo version";
+                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
             }
         }
 
@@ -188,7 +277,7 @@ namespace SnapShot
             }
             catch
             {
-                error = "Licence check could not be performed. Contact nbadzak1@etf.unsa.ba for help.";
+                toolStripStatusLabel1.Text = "Licence check could not be performed. Contact nbadzak1@etf.unsa.ba for help.";
             }
         }
 
@@ -198,29 +287,27 @@ namespace SnapShot
 
         private void button2_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = "";
+
             try
             {
                 HttpWebRequest webRequest;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + Configuration.GetMACAddress());
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/ConnectionCheck");
 
                 webRequest.Method = "GET";
 
-                using (WebResponse response = webRequest.GetResponse())
-                {
-                    using (Stream responseStream = response.GetResponseStream())
-                    {
-                        StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
-                        string Json = rdr.ReadToEnd();
-                        if (Json != "OK")
-                            throw new Exception("Bad response!");
-                    }
-                }
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Disconnected!");
 
                 label7.Text = "Connected";
                 label7.ForeColor = System.Drawing.Color.Green;
 
                 Program.Snapshot.Connected = true;
+
+                // get terminal ID and debug log from server
+                GetInformationFromServer();
             }
             catch
             {
