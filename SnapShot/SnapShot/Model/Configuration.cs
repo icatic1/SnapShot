@@ -7,6 +7,8 @@ using System.Drawing;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace SnapShot
 {
@@ -30,11 +32,13 @@ namespace SnapShot
         bool motionDetection = false;
 
         // network configuration - not a part of this sprint
-        string savingPath = "",
-               serverIP = "";
+        string serverIP = "",
+               mediaPath = "",
+               JSONconfigurationPath = "";
         int serverPort;
         bool connectionStatus = false;
-        int synchronizationPeriod = 0;
+        int synchronizationPeriod = 0,
+            latestSynchronizationTicks = 0;
 
         // capture configuration
         bool imageCapture = true,
@@ -68,14 +72,18 @@ namespace SnapShot
         
         public bool MotionDetection { get => motionDetection; set => motionDetection = value; }
         
-        public string SavingPath { get => savingPath; set => savingPath = value; }
-        
         public string ServerIP { get => serverIP; set => serverIP = value; }
-        
+
+        public string MediaPath { get => mediaPath; set => mediaPath = value; }
+
+        public string JSONConfigPath { get => JSONconfigurationPath; set => JSONconfigurationPath = value; }
+
         public int ServerPort { get => serverPort; set => serverPort = value; }
 
         public int SynchronizationPeriod { get => synchronizationPeriod; set => synchronizationPeriod = value; }
         
+        public int LatestSynchronizationTicks { get => latestSynchronizationTicks; set => latestSynchronizationTicks = value; }
+
         public bool ConnectionStatus { get => connectionStatus; set => connectionStatus = value; }
         
         public bool ImageCapture { get => imageCapture; set => imageCapture = value; }
@@ -126,16 +134,18 @@ namespace SnapShot
                 EXPORT += "\t\t\t{\n";
                 EXPORT += "\t\t\t\t\"resolution\": \"" + config.Resolution + "\",\n";
                 EXPORT += "\t\t\t\t\"contrast_level\": \"" + config.ContrastLevel + "\",\n";
-                EXPORT += "\t\t\t\t\"image_color\": \"" + config.ImageColor.Name.ToString() + "\",\n";
+                EXPORT += "\t\t\t\t\"image_color\": \"" + config.ImageColor.ToArgb() + "\",\n";
                 EXPORT += "\t\t\t\t\"motion_detection\": \"" + config.MotionDetection + "\"\n";
                 EXPORT += "\t\t\t},\n";
 
                 EXPORT += "\t\t\t\"network_configuration\":\n";
                 EXPORT += "\t\t\t{\n";
-                EXPORT += "\t\t\t\t\"saving_path\": \"" + config.SavingPath + "\",\n";
                 EXPORT += "\t\t\t\t\"server_IP_address\": \"" + config.ServerIP + "\",\n";
+                EXPORT += "\t\t\t\t\"server_media_path\": \"" + config.MediaPath + "\",\n";
+                EXPORT += "\t\t\t\t\"server_JSON_configuration_path\": \"" + config.JSONConfigPath + "\",\n";
                 EXPORT += "\t\t\t\t\"server_port\": \"" + config.ServerPort + "\",\n";
                 EXPORT += "\t\t\t\t\"synchronization_period\": \"" + config.SynchronizationPeriod + "\",\n";
+                EXPORT += "\t\t\t\t\"latest_synchronization_ticks\": \"" + config.LatestSynchronizationTicks + "\",\n";
                 EXPORT += "\t\t\t\t\"connection_status\": \"" + config.ConnectionStatus + "\"\n";
                 EXPORT += "\t\t\t},\n";
 
@@ -166,36 +176,93 @@ namespace SnapShot
             {
                 // local export
                 if (!path.StartsWith("http"))
+                {
                     File.WriteAllText(path, EXPORT);
+                    return true;
+                }
 
                 // export to server
                 else
                 {
-                    HttpWebRequest webRequest;
-                    string requestParams = "MACAddress=" + GetMACAddress();
+                    // create JSON file for upload
+                    File.WriteAllText("configuration.json", EXPORT);
 
-                    webRequest = (HttpWebRequest)WebRequest.Create(path);
-
-                    webRequest.Method = "POST";
-                    webRequest.ContentType = "application/json";
-
-                    using (StreamWriter sw = new StreamWriter(webRequest.GetRequestStream()))
-                    {
-                        sw.Write(EXPORT);
-                    }
-
-                    using (WebResponse response = webRequest.GetResponse())
-                    {
-                        using (Stream responseStream = response.GetResponseStream())
-                        {
-                            StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
-                            string Json = rdr.ReadToEnd();
-                            return Json == "true";
-                        }
-                    }
+                    // upload file to specified server
+                    bool result = UploadFile(path, "configuration.json", "");
+                    return result;
                 }
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-                return true;
+        public static bool UploadFile(string endpointUrl, string filePath, string nativeFolder)
+        {
+            FileStream fs;
+            Stream rs;
+            try
+            {
+                string uploadFileName = Path.GetFileName(filePath);
+                string path = filePath.Replace(uploadFileName, "").TrimEnd('\\');
+
+                if (nativeFolder.Length > 0)
+                    fs = new FileStream(nativeFolder + "\\" + filePath, FileMode.Open, FileAccess.Read);
+                else
+                    fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+                var request = (HttpWebRequest)WebRequest.Create(endpointUrl);
+                request.Method = WebRequestMethods.Http.Post;
+                request.AllowWriteStreamBuffering = false;
+                request.SendChunked = true;
+                String CRLF = "\r\n";        
+                long timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                string boundary = timestamp.ToString("x");
+                request.ContentType = "multipart/form-data; boundary=" + boundary;
+
+                long bytesAvailable = fs.Length;
+                long maxBufferSize = 1 * 1024 * 1024;
+
+
+                rs = request.GetRequestStream();
+                byte[] buffer = new byte[50];
+                int read = 0;
+
+                byte[] buf = Encoding.UTF8.GetBytes("--" + boundary + CRLF);
+                rs.Write(buf, 0, buf.Length);
+
+                if (nativeFolder.Length > 0)
+                    buf = Encoding.UTF8.GetBytes("Content-Disposition: form-data; name=\"" + Configuration.GetMACAddress() + "\\" + path + "\"; filename=\"" + uploadFileName + "\"" + CRLF);
+                else
+                    buf = Encoding.UTF8.GetBytes("Content-Disposition: form-data; name=\"" + Configuration.GetMACAddress() + "\"; filename=\"" + uploadFileName + "\"" + CRLF);
+
+                rs.Write(buf, 0, buf.Length);
+
+                buf = Encoding.UTF8.GetBytes("Content-Type: application/octet-stream;" + CRLF);
+                rs.Write(buf, 0, buf.Length);
+
+                buf = Encoding.UTF8.GetBytes(CRLF);
+                rs.Write(buf, 0, buf.Length);
+                rs.Flush();
+
+
+                long bufferSize = Math.Min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+                while ((read = fs.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    rs.Write(buffer, 0, read);
+                }
+                buf = Encoding.UTF8.GetBytes(CRLF);
+                rs.Write(buf, 0, buf.Length);
+                rs.Flush();
+
+                buffer = Encoding.UTF8.GetBytes("--" + boundary + "--" + CRLF);
+                rs.Write(buffer, 0, buffer.Length);
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                return response.StatusCode == HttpStatusCode.OK;
             }
             catch
             {
@@ -278,7 +345,7 @@ namespace SnapShot
 
                     config.Resolution = (Resolution)Enum.Parse(typeof(Resolution), resolution[1]);
                     config.ContrastLevel = Int32.Parse(contrast_level[1]);
-                    config.ImageColor = Color.FromName(image_color[1]);
+                    config.ImageColor = Color.FromArgb(Int32.Parse(image_color[1]));
                     config.MotionDetection = Convert.ToBoolean(motion_detection[1]);
                 }
 
@@ -287,12 +354,16 @@ namespace SnapShot
                 {
                     i += 2;
 
-                    string[] saving_path = rows[i].Split(new[] { ' ' }, 2);
-                    saving_path[1] = saving_path[1].Replace("\"", "").Replace(",", "");
-                    i++;
-
                     string[] server_IP_address = rows[i].Split(new[] { ' ' }, 2);
                     server_IP_address[1] = server_IP_address[1].Replace("\"", "").Replace(",", "");
+                    i++;
+
+                    string[] server_media_path = rows[i].Split(new[] { ' ' }, 2);
+                    server_media_path[1] = server_media_path[1].Replace("\"", "").Replace(",", "");
+                    i++;
+
+                    string[] server_JSON_configuration_path = rows[i].Split(new[] { ' ' }, 2);
+                    server_JSON_configuration_path[1] = server_JSON_configuration_path[1].Replace("\"", "").Replace(",", "");
                     i++;
 
                     string[] server_port = rows[i].Split(new[] { ' ' }, 2);
@@ -303,13 +374,19 @@ namespace SnapShot
                     synchronization_period[1] = synchronization_period[1].Replace("\"", "").Replace(",", "");
                     i++;
 
+                    string[] latest_synchronization_ticks = rows[i].Split(new[] { ' ' }, 2);
+                    latest_synchronization_ticks[1] = latest_synchronization_ticks[1].Replace("\"", "").Replace(",", "");
+                    i++;
+
                     string[] connection_status = rows[i].Split(new[] { ' ' }, 2);
                     connection_status[1] = connection_status[1].Replace("\"", "").Replace(",", "");
 
-                    config.SavingPath = saving_path[1];
                     config.ServerIP = server_IP_address[1];
+                    config.MediaPath = server_media_path[1];
+                    config.JSONConfigPath = server_JSON_configuration_path[1];
                     config.ServerPort = Int32.Parse(server_port[1]);
                     config.SynchronizationPeriod = Int32.Parse(synchronization_period[1]);
+                    config.LatestSynchronizationTicks = Int32.Parse(latest_synchronization_ticks[1]);
                     config.ConnectionStatus = Convert.ToBoolean(connection_status[1]);
                 }
 
@@ -359,21 +436,8 @@ namespace SnapShot
                 // import from server
                 else
                 {
-                    HttpWebRequest webRequest;
-
-                    webRequest = (HttpWebRequest)WebRequest.Create(path);
-
-                    webRequest.Method = "GET";
-
-                    using (WebResponse response = webRequest.GetResponse())
-                    {
-                        using (Stream responseStream = response.GetResponseStream())
-                        {
-                            StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
-                            string Json = rdr.ReadToEnd();
-                            IMPORT = Json;
-                        }
-                    }
+                    // upload file to specified server
+                    IMPORT = DownloadFile(path);
                 }
 
                 Snapshot newSnapshot = CreateConfiguration(IMPORT);
@@ -385,6 +449,24 @@ namespace SnapShot
             catch
             {
                 return false;
+            }
+        }
+
+        public static string DownloadFile(string endpointUrl)
+        {
+            HttpWebRequest webRequest;
+
+            webRequest = (HttpWebRequest)WebRequest.Create(endpointUrl + "/" + GetMACAddress());
+            webRequest.Method = "GET";
+            
+            using (WebResponse response = webRequest.GetResponse())
+            {
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                    string Json = rdr.ReadToEnd();
+                    return Json;
+                }
             }
         }
 
