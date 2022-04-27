@@ -11,7 +11,7 @@ using System.Threading;
 namespace GUI_Tests
 {
     [TestClass]
-    public class LocalStorageTest : TestSession
+    public class ExportJSONTest : TestSession
     {
         public const string TESTING_DIRECTORY = @"C:\SnapShotTestingGround";
 
@@ -94,7 +94,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void CheckDeviceConfigurationAllCamerasDifferent()
+        public void Test1_CheckDeviceConfigurationAllCamerasDifferent()
         {
 
             //Click on configuration
@@ -119,6 +119,12 @@ namespace GUI_Tests
             Camera1KeepCapture.SendKeys(Keys.Delete);
             Camera1KeepCapture.SendKeys(Camera1KeepCaptureLength);
 
+            //Click configure 
+            var button6 = desktopSession.FindElementByAccessibilityId("button6");
+            button6.Click();
+
+       //     configuration.Click();
+
             //Select Camera 2
             var secondCameraRadioBtn = desktopSession.FindElementByAccessibilityId("radioButton6");
             secondCameraRadioBtn.Click();
@@ -138,6 +144,11 @@ namespace GUI_Tests
             Camera2textBox2.SendKeys(Camera2storagePath);
             Camera2KeepCapture.SendKeys(Keys.Delete);
             Camera2KeepCapture.SendKeys(Camera2KeepCaptureLength);
+
+            //Click configure 
+            button6.Click();
+
+         //   configuration.Click();
 
             //Select Camera 3
             var thirdCameraRadioBtn = desktopSession.FindElementByAccessibilityId("radioButton7");
@@ -160,10 +171,9 @@ namespace GUI_Tests
             Camera3KeepCapture.SendKeys(Camera3KeepCaptureLength);
 
             //Click configure 
-            var button6 = desktopSession.FindElementByAccessibilityId("button6");
             button6.Click();
 
-            configuration.Click();
+       //     configuration.Click();
 
 
             // LeftClick on MenuItem "Export to JSON" at (54,19)
@@ -237,12 +247,12 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void CheckCameraConfiguration()
+        public void Test2_CheckCameraConfiguration()
         {
 
             //Click on configuration
-            var configuration = session.FindElementByName("Configuration");
-            configuration.Click();
+           // var configuration = session.FindElementByName("Configuration");
+           // configuration.Click();
             Thread.Sleep(1000);
 
             //Enter data for Camera 1
@@ -288,7 +298,7 @@ namespace GUI_Tests
             var button6 = desktopSession.FindElementByAccessibilityId("button6");
             button6.Click();
 
-            configuration.Click();
+        //    configuration.Click();
 
 
             // LeftClick on MenuItem "Export to JSON" at (54,19)

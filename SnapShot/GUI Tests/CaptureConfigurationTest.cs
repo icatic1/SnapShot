@@ -52,8 +52,8 @@ namespace GUI_Tests
         [TestMethod]
         public void Test2_radioButtonCheck2()
         {
-            var configuration = session.FindElementByName("Configuration");
-            configuration.Click();
+           // var configuration = session.FindElementByName("Configuration");
+          //  configuration.Click();
             Thread.Sleep(1000);
 
             var radioButton3 = desktopSession.FindElementByAccessibilityId("radioButton3");
@@ -66,8 +66,8 @@ namespace GUI_Tests
         [TestMethod]
         public void Test3_radioButtonCheck3()
         {
-            var configuration = session.FindElementByName("Configuration");
-            configuration.Click();
+           // var configuration = session.FindElementByName("Configuration");
+         //   configuration.Click();
             Thread.Sleep(1000);
 
             var radioButton1 = desktopSession.FindElementByAccessibilityId("radioButton1");
@@ -80,14 +80,14 @@ namespace GUI_Tests
         [TestMethod]
         public void Test4_radioButtonCheck4()
         {
-            var configuration = session.FindElementByName("Configuration");
-            configuration.Click();
+         //   var configuration = session.FindElementByName("Configuration");
+        //    configuration.Click();
             Thread.Sleep(1000);
 
             var radioButton2 = desktopSession.FindElementByAccessibilityId("radioButton2");
 
             radioButton2.Click();
-            Assert.IsTrue(radioButton2.Selected);
+            Assert.IsFalse(radioButton2.Selected);
 
 
         }
@@ -590,7 +590,7 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test10_BurstPeriod()
+        public void Test_BurstPeriod()
         {
             // LeftClick on MenuItem "Configuration" at (67,11)
             Console.WriteLine("LeftClick on MenuItem \"Configuration\" at (67,11)");
