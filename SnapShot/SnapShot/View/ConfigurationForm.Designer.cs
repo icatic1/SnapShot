@@ -55,6 +55,11 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.textBox7 = new System.Windows.Forms.TextBox();
+            this.domainUpDown3 = new System.Windows.Forms.DomainUpDown();
+            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
+            this.label21 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
@@ -98,9 +103,6 @@
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.panel3 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.domainUpDown3 = new System.Windows.Forms.DomainUpDown();
-            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
-            this.label21 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -109,6 +111,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -117,7 +120,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.panel3.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -197,9 +199,9 @@
             // 
             this.button6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.tableLayoutPanel1.SetColumnSpan(this.button6, 2);
-            this.button6.Location = new System.Drawing.Point(448, 779);
+            this.button6.Location = new System.Drawing.Point(448, 778);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(160, 45);
+            this.button6.Size = new System.Drawing.Size(160, 46);
             this.button6.TabIndex = 24;
             this.button6.Text = "Save configuration";
             this.button6.UseVisualStyleBackColor = true;
@@ -221,10 +223,10 @@
             this.groupBox4.Controls.Add(this.label14);
             this.groupBox4.Controls.Add(this.label13);
             this.groupBox4.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.groupBox4.Location = new System.Drawing.Point(543, 527);
+            this.groupBox4.Location = new System.Drawing.Point(543, 460);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(15, 15, 15, 5);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(499, 244);
+            this.groupBox4.Size = new System.Drawing.Size(499, 310);
             this.groupBox4.TabIndex = 23;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Capture configuration";
@@ -233,7 +235,7 @@
             // 
             this.panel2.Controls.Add(this.radioButton1);
             this.panel2.Controls.Add(this.radioButton2);
-            this.panel2.Location = new System.Drawing.Point(160, 95);
+            this.panel2.Location = new System.Drawing.Point(208, 104);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(250, 37);
             this.panel2.TabIndex = 31;
@@ -268,7 +270,7 @@
             // 
             this.panel1.Controls.Add(this.radioButton3);
             this.panel1.Controls.Add(this.radioButton4);
-            this.panel1.Location = new System.Drawing.Point(160, 42);
+            this.panel1.Location = new System.Drawing.Point(206, 39);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(250, 37);
             this.panel1.TabIndex = 30;
@@ -305,7 +307,7 @@
             this.domainUpDown2.Items.Add("hours");
             this.domainUpDown2.Items.Add("minutes");
             this.domainUpDown2.Items.Add("seconds");
-            this.domainUpDown2.Location = new System.Drawing.Point(299, 189);
+            this.domainUpDown2.Location = new System.Drawing.Point(317, 236);
             this.domainUpDown2.Name = "domainUpDown2";
             this.domainUpDown2.ReadOnly = true;
             this.domainUpDown2.Size = new System.Drawing.Size(150, 27);
@@ -315,7 +317,7 @@
             // numericUpDown3
             // 
             this.numericUpDown3.Enabled = false;
-            this.numericUpDown3.Location = new System.Drawing.Point(160, 190);
+            this.numericUpDown3.Location = new System.Drawing.Point(178, 237);
             this.numericUpDown3.Minimum = new decimal(new int[] {
             1,
             0,
@@ -335,7 +337,7 @@
             // 
             this.label18.AutoSize = true;
             this.label18.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label18.Location = new System.Drawing.Point(23, 190);
+            this.label18.Location = new System.Drawing.Point(41, 237);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(93, 20);
             this.label18.TabIndex = 25;
@@ -347,7 +349,7 @@
             this.domainUpDown1.Items.Add("hours");
             this.domainUpDown1.Items.Add("minutes");
             this.domainUpDown1.Items.Add("seconds");
-            this.domainUpDown1.Location = new System.Drawing.Point(299, 143);
+            this.domainUpDown1.Location = new System.Drawing.Point(317, 174);
             this.domainUpDown1.Name = "domainUpDown1";
             this.domainUpDown1.ReadOnly = true;
             this.domainUpDown1.Size = new System.Drawing.Size(150, 27);
@@ -358,7 +360,7 @@
             // 
             this.label15.AutoSize = true;
             this.label15.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label15.Location = new System.Drawing.Point(23, 99);
+            this.label15.Location = new System.Drawing.Point(71, 108);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(123, 20);
             this.label15.TabIndex = 23;
@@ -367,7 +369,7 @@
             // numericUpDown2
             // 
             this.numericUpDown2.Enabled = false;
-            this.numericUpDown2.Location = new System.Drawing.Point(160, 145);
+            this.numericUpDown2.Location = new System.Drawing.Point(178, 176);
             this.numericUpDown2.Minimum = new decimal(new int[] {
             1,
             0,
@@ -387,7 +389,7 @@
             // 
             this.label14.AutoSize = true;
             this.label14.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label14.Location = new System.Drawing.Point(23, 145);
+            this.label14.Location = new System.Drawing.Point(41, 176);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(70, 20);
             this.label14.TabIndex = 19;
@@ -397,7 +399,7 @@
             // 
             this.label13.AutoSize = true;
             this.label13.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label13.Location = new System.Drawing.Point(22, 48);
+            this.label13.Location = new System.Drawing.Point(68, 45);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(115, 20);
             this.label13.TabIndex = 16;
@@ -408,6 +410,8 @@
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.label22);
+            this.groupBox3.Controls.Add(this.textBox7);
             this.groupBox3.Controls.Add(this.domainUpDown3);
             this.groupBox3.Controls.Add(this.numericUpDown4);
             this.groupBox3.Controls.Add(this.label21);
@@ -421,30 +425,93 @@
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.textBox3);
             this.groupBox3.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.groupBox3.Location = new System.Drawing.Point(15, 527);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(15, 15, 15, 5);
+            this.groupBox3.Location = new System.Drawing.Point(15, 460);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(15, 15, 5, 5);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(498, 244);
+            this.groupBox3.Size = new System.Drawing.Size(508, 310);
             this.groupBox3.TabIndex = 22;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Server configuration";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label22.Location = new System.Drawing.Point(14, 121);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(88, 20);
+            this.label22.TabIndex = 33;
+            this.label22.Text = "Media path:";
+            // 
+            // textBox7
+            // 
+            this.textBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox7.Location = new System.Drawing.Point(200, 118);
+            this.textBox7.Name = "textBox7";
+            this.textBox7.Size = new System.Drawing.Size(305, 27);
+            this.textBox7.TabIndex = 34;
+            // 
+            // domainUpDown3
+            // 
+            this.domainUpDown3.Enabled = false;
+            this.domainUpDown3.Items.Add("days");
+            this.domainUpDown3.Items.Add("hours");
+            this.domainUpDown3.Items.Add("minutes");
+            this.domainUpDown3.Items.Add("seconds");
+            this.domainUpDown3.Location = new System.Drawing.Point(356, 211);
+            this.domainUpDown3.Name = "domainUpDown3";
+            this.domainUpDown3.ReadOnly = true;
+            this.domainUpDown3.Size = new System.Drawing.Size(149, 27);
+            this.domainUpDown3.TabIndex = 32;
+            this.domainUpDown3.Text = "seconds";
+            // 
+            // numericUpDown4
+            // 
+            this.numericUpDown4.Enabled = false;
+            this.numericUpDown4.Location = new System.Drawing.Point(197, 211);
+            this.numericUpDown4.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown4.Name = "numericUpDown4";
+            this.numericUpDown4.ReadOnly = true;
+            this.numericUpDown4.Size = new System.Drawing.Size(138, 27);
+            this.numericUpDown4.TabIndex = 31;
+            this.numericUpDown4.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label21.Location = new System.Drawing.Point(15, 211);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(165, 20);
+            this.label21.TabIndex = 30;
+            this.label21.Text = "Synchronization period:";
             // 
             // label17
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label17.ForeColor = System.Drawing.Color.Red;
-            this.label17.Location = new System.Drawing.Point(359, 204);
+            this.label17.Location = new System.Drawing.Point(356, 245);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(136, 28);
+            this.label17.Size = new System.Drawing.Size(130, 28);
             this.label17.TabIndex = 18;
-            this.label17.Text = "Disconnected!";
+            this.label17.Text = "Disconnected";
             // 
             // label16
             // 
             this.label16.AutoSize = true;
             this.label16.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label16.Location = new System.Drawing.Point(215, 211);
+            this.label16.Location = new System.Drawing.Point(212, 252);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(129, 20);
             this.label16.TabIndex = 17;
@@ -453,7 +520,7 @@
             // button2
             // 
             this.button2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button2.Location = new System.Drawing.Point(45, 204);
+            this.button2.Location = new System.Drawing.Point(42, 245);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(143, 36);
             this.button2.TabIndex = 16;
@@ -465,20 +532,20 @@
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label10.Location = new System.Drawing.Point(15, 41);
+            this.label10.Location = new System.Drawing.Point(15, 163);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(140, 20);
+            this.label10.Size = new System.Drawing.Size(174, 20);
             this.label10.TabIndex = 14;
-            this.label10.Text = "Path for saving files:";
+            this.label10.Text = "JSON configuration path:";
             // 
             // textBox5
             // 
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox5.Location = new System.Drawing.Point(200, 41);
+            this.textBox5.Location = new System.Drawing.Point(200, 160);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(295, 27);
+            this.textBox5.Size = new System.Drawing.Size(305, 27);
             this.textBox5.TabIndex = 15;
             // 
             // textBox4
@@ -486,16 +553,16 @@
             this.textBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox4.Location = new System.Drawing.Point(200, 129);
+            this.textBox4.Location = new System.Drawing.Point(200, 81);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(295, 27);
+            this.textBox4.Size = new System.Drawing.Size(305, 27);
             this.textBox4.TabIndex = 13;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label9.Location = new System.Drawing.Point(17, 129);
+            this.label9.Location = new System.Drawing.Point(15, 81);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(85, 20);
             this.label9.TabIndex = 12;
@@ -505,7 +572,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label4.Location = new System.Drawing.Point(15, 83);
+            this.label4.Location = new System.Drawing.Point(15, 42);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(124, 20);
             this.label4.TabIndex = 10;
@@ -516,9 +583,9 @@
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(200, 83);
+            this.textBox3.Location = new System.Drawing.Point(200, 42);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(295, 27);
+            this.textBox3.Size = new System.Drawing.Size(305, 27);
             this.textBox3.TabIndex = 11;
             // 
             // groupBox2
@@ -537,9 +604,9 @@
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.groupBox2.Location = new System.Drawing.Point(543, 87);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(15, 5, 15, 15);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(15, 5, 15, 5);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(499, 410);
+            this.groupBox2.Size = new System.Drawing.Size(499, 353);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Video configuration";
@@ -547,6 +614,7 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(138, 163);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(146, 77);
@@ -556,7 +624,7 @@
             // button5
             // 
             this.button5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button5.Location = new System.Drawing.Point(178, 331);
+            this.button5.Location = new System.Drawing.Point(178, 299);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(160, 39);
             this.button5.TabIndex = 18;
@@ -568,7 +636,7 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBox1.Location = new System.Drawing.Point(38, 269);
+            this.checkBox1.Location = new System.Drawing.Point(37, 260);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(146, 24);
             this.checkBox1.TabIndex = 18;
@@ -668,9 +736,9 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.groupBox1.Location = new System.Drawing.Point(15, 87);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(15, 5, 5, 15);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(15, 5, 5, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(508, 410);
+            this.groupBox1.Size = new System.Drawing.Size(508, 353);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Device configuration";
@@ -679,7 +747,7 @@
             // 
             this.label20.AutoSize = true;
             this.label20.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label20.Location = new System.Drawing.Point(14, 220);
+            this.label20.Location = new System.Drawing.Point(14, 203);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(100, 20);
             this.label20.TabIndex = 19;
@@ -690,7 +758,7 @@
             this.textBox6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox6.Location = new System.Drawing.Point(148, 216);
+            this.textBox6.Location = new System.Drawing.Point(148, 199);
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(349, 27);
             this.textBox6.TabIndex = 20;
@@ -699,7 +767,7 @@
             // 
             this.label12.AutoSize = true;
             this.label12.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label12.Location = new System.Drawing.Point(293, 352);
+            this.label12.Location = new System.Drawing.Point(296, 315);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(39, 20);
             this.label12.TabIndex = 18;
@@ -707,7 +775,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(148, 350);
+            this.numericUpDown1.Location = new System.Drawing.Point(151, 313);
             this.numericUpDown1.Minimum = new decimal(new int[] {
             1,
             0,
@@ -726,7 +794,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label11.Location = new System.Drawing.Point(17, 350);
+            this.label11.Location = new System.Drawing.Point(20, 313);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(123, 20);
             this.label11.TabIndex = 16;
@@ -737,7 +805,7 @@
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(148, 270);
+            this.textBox2.Location = new System.Drawing.Point(148, 244);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(349, 27);
             this.textBox2.TabIndex = 14;
@@ -745,7 +813,7 @@
             // button3
             // 
             this.button3.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button3.Location = new System.Drawing.Point(148, 303);
+            this.button3.Location = new System.Drawing.Point(148, 277);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(39, 29);
             this.button3.TabIndex = 15;
@@ -805,7 +873,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label2.Location = new System.Drawing.Point(17, 142);
+            this.label2.Location = new System.Drawing.Point(17, 132);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(118, 20);
             this.label2.TabIndex = 3;
@@ -816,7 +884,7 @@
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(148, 138);
+            this.textBox1.Location = new System.Drawing.Point(148, 128);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(349, 27);
             this.textBox1.TabIndex = 4;
@@ -824,7 +892,7 @@
             // button1
             // 
             this.button1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button1.Location = new System.Drawing.Point(148, 174);
+            this.button1.Location = new System.Drawing.Point(148, 164);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(39, 29);
             this.button1.TabIndex = 5;
@@ -836,7 +904,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label3.Location = new System.Drawing.Point(14, 270);
+            this.label3.Location = new System.Drawing.Point(14, 244);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(113, 40);
             this.label3.TabIndex = 6;
@@ -927,55 +995,11 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 52F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 32F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 44F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1057, 827);
             this.tableLayoutPanel1.TabIndex = 32;
-            // 
-            // domainUpDown3
-            // 
-            this.domainUpDown3.Enabled = false;
-            this.domainUpDown3.Items.Add("days");
-            this.domainUpDown3.Items.Add("hours");
-            this.domainUpDown3.Items.Add("minutes");
-            this.domainUpDown3.Items.Add("seconds");
-            this.domainUpDown3.Location = new System.Drawing.Point(336, 170);
-            this.domainUpDown3.Name = "domainUpDown3";
-            this.domainUpDown3.ReadOnly = true;
-            this.domainUpDown3.Size = new System.Drawing.Size(124, 27);
-            this.domainUpDown3.TabIndex = 32;
-            this.domainUpDown3.Text = "seconds";
-            // 
-            // numericUpDown4
-            // 
-            this.numericUpDown4.Enabled = false;
-            this.numericUpDown4.Location = new System.Drawing.Point(200, 170);
-            this.numericUpDown4.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.ReadOnly = true;
-            this.numericUpDown4.Size = new System.Drawing.Size(109, 27);
-            this.numericUpDown4.TabIndex = 31;
-            this.numericUpDown4.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label21.Location = new System.Drawing.Point(17, 170);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(165, 20);
-            this.label21.TabIndex = 30;
-            this.label21.Text = "Synchronization period:";
             // 
             // ConfigurationForm
             // 
@@ -990,6 +1014,7 @@
             this.Name = "ConfigurationForm";
             this.Text = "SnapShot";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigurationForm_FormClosing);
+            this.Load += new System.EventHandler(this.ConfigurationForm_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -1004,6 +1029,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -1015,7 +1041,6 @@
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1094,5 +1119,7 @@
         private System.Windows.Forms.DomainUpDown domainUpDown3;
         private System.Windows.Forms.NumericUpDown numericUpDown4;
         private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TextBox textBox7;
     }
 }

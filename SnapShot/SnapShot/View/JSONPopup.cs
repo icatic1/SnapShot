@@ -101,7 +101,12 @@ namespace SnapShot.View
 
             foreach (var camera in Program.Snapshot.Camera)
             {
-                comboBox2.Items.Add("http://" + camera.ServerIP + ":" + camera.ServerPort + "/" + camera.SavingPath);
+                string path = "http://" + camera.ServerIP;
+                if (camera.ServerPort != 0)
+                    path += ":" + camera.ServerPort;
+                if (camera.JSONConfigPath != "")
+                    path += "/" + camera.JSONConfigPath;
+                comboBox2.Items.Add(path);
             }
 
             if (additionalLocation.Length > 0)
