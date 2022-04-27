@@ -376,6 +376,7 @@ namespace SnapShot
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     textBox1.Text = openFileDialog.FileName;
+                    textBox1.Text = textBox1.Text.Replace("\\", "/");
                     errorProvider1.SetError(textBox1, null);
                     textBox1.BackColor = Color.White;
                 }
@@ -395,6 +396,7 @@ namespace SnapShot
             if (result == DialogResult.OK)
             {
                 textBox2.Text = folderBrowserDialog1.SelectedPath;
+                textBox2.Text = textBox2.Text.Replace("\\", "/");
                 errorProvider1.SetError(textBox2, null);
                 textBox2.BackColor = Color.White;
             }
