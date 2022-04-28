@@ -254,7 +254,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label6.Location = new System.Drawing.Point(23, 23);
+            this.label6.Location = new System.Drawing.Point(23, 39);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(129, 20);
             this.label6.TabIndex = 11;
@@ -265,7 +265,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label7.ForeColor = System.Drawing.Color.Red;
-            this.label7.Location = new System.Drawing.Point(176, 23);
+            this.label7.Location = new System.Drawing.Point(176, 39);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(119, 25);
             this.label7.TabIndex = 5;

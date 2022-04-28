@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -184,6 +186,11 @@ namespace SnapShot
 
                 capture.Open(snapshot.Camera[index].CameraNumber);
 
+                string path = "http://" + snapshot.Camera[index].ServerIP;
+                if (snapshot.Camera[index].ServerPort != 0)
+                    path += ":" + snapshot.Camera[index].ServerPort;
+                string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
+
                 // take a picture
                 if (snapshot.Camera[index].ImageCapture)
                 {
@@ -204,7 +211,12 @@ namespace SnapShot
                                 g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
                             }
 
+                        // save image locally
                         image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/IMG" + timestamp + ".png");
+                        
+                        // save image to server
+                        if (snapshot.Camera[index].ConnectionStatus)
+                            Configuration.UploadFile(mediaPath, folderName + "/IMG" + timestamp + ".png", snapshot.Camera[index].OutputFolderPath);
 
                         capture.Release();
 
@@ -215,7 +227,7 @@ namespace SnapShot
                         #region Burst images
 
                         // create burst directory
-                        string burstFolderName = "BURST-" + DateTime.Now.Day.ToString("00") + DateTime.Now.Month.ToString("00") + DateTime.Now.Year.ToString("0000") + "-" +DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
+                        string burstFolderName = "BURST-" + DateTime.Now.Day.ToString("00") + DateTime.Now.Month.ToString("00") + DateTime.Now.Year.ToString("0000") + "-" + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
                         Directory.CreateDirectory(snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/" + burstFolderName);
 
                         int noOfImages = (int)(snapshot.Camera[index].Duration / snapshot.Camera[index].Period);
@@ -234,7 +246,12 @@ namespace SnapShot
                                     g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
                                 }
 
+                            // save image locally
                             image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/" + burstFolderName + "/IMG" + (i + 1) + ".png");
+
+                            // save image to server
+                            if (snapshot.Camera[index].ConnectionStatus)
+                                Configuration.UploadFile(mediaPath, folderName + "/" + burstFolderName + "/IMG" + (i + 1) + ".png", snapshot.Camera[index].OutputFolderPath);
 
                             // wait for next burst
                             Thread.Sleep(snapshot.Camera[index].Period * 1000);
@@ -253,9 +270,8 @@ namespace SnapShot
                     using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1]))))
                     {
                         Mat frame = new Mat();
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000 + 1000)
+                        int frames = 0;
+                        while (frames < snapshot.Camera[index].Duration * capture.Fps)
                         {
                             capture.Read(frame);
 
@@ -264,10 +280,15 @@ namespace SnapShot
                                 frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
 
                             writer.Write(frame);
+                            frames++;
                         }
                     }
 
                     capture.Release();
+
+                    // save video to server
+                    if (snapshot.Camera[index].ConnectionStatus)
+                        Configuration.UploadFile(mediaPath, folderName + "/VID" + timestamp + ".mp4", snapshot.Camera[index].OutputFolderPath);
 
                     #endregion
                 }
@@ -276,7 +297,7 @@ namespace SnapShot
 
         #endregion
 
-        #region Server Configuration
+        #region Server Synchronization
 
         static void RunServerSynchronizations()
         {
@@ -298,14 +319,101 @@ namespace SnapShot
         {
             while (1 == 1)
             {
-                // synchronize data with server
+                try
+                {
+                    // camera is connected to the specified server
+                    if (snapshot.Camera[index].ConnectionStatus)
+                    {
+                        // get all locally created images and videos
+                        string[] localEntries = Directory.GetFileSystemEntries(snapshot.Camera[index].OutputFolderPath, "*", SearchOption.AllDirectories);
 
+                        for (int i = 0; i < localEntries.Length; i++)
+                            localEntries[i] = localEntries[i].Replace(snapshot.Camera[index].OutputFolderPath, "").TrimStart('\\');
+
+                        // get all images and videos located on the server
+                        string[] serverEntries = GetEntriesFromServer(snapshot.Camera[index].ServerIP, snapshot.Camera[index].ServerPort.ToString(), snapshot.Camera[index].MediaPath);
+
+                        // find all local entries which are not present among server entries
+                        List<string> newEntries = FindNewEntries(localEntries, serverEntries);
+
+                        // upload every new local file to server
+
+                        string path = "http://" + snapshot.Camera[index].ServerIP;
+                        if (snapshot.Camera[index].ServerPort != 0)
+                            path += ":" + snapshot.Camera[index].ServerPort;
+                        string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
+                        string JSONPath = path + "/" + snapshot.Camera[index].JSONConfigPath;
+
+                        foreach (var newEntry in newEntries)
+                            Configuration.UploadFile(mediaPath, newEntry, snapshot.Camera[index].OutputFolderPath);
+
+                        // synchronize JSON configuration with server
+                        Configuration.ImportFromJSON(JSONPath);
+                        ConfigurationForm.RefreshNeeded = true;
+
+                        // wait for next synchronization
+                        snapshot.Camera[index].LatestSynchronizationTicks = (int)DateTime.Now.Ticks;
+                    }
+                }
+                catch
+                {
+
+                }
 
                 // wait for next synchronization
                 Thread.Sleep(snapshot.Camera[index].SynchronizationPeriod * 1000);
             }
         }
 
+        static string[] GetEntriesFromServer(string ipAddress, string port, string mediaPath)
+        {
+            HttpWebRequest webRequest;
+            string url = "http://" + ipAddress;
+            if (port.Length > 0 && port != "0")
+                url += ":" + port;
+            url += "/" + mediaPath;
+            webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
+            webRequest.Method = "GET";
+
+            WebResponse response = webRequest.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+            string Json = rdr.ReadToEnd();
+            Json = Json.Replace("[", "").Replace("]", "").Replace("\"", "");
+
+            string[] files = Json.Split(",");
+            for (int i = 0; i < files.Length; i++)
+            {
+                string MAC = Configuration.GetMACAddress() ?? "";
+                int value = files[i].IndexOf(MAC);
+                files[i] = files[i].Substring(value + MAC.Length);
+                files[i] = files[i].TrimStart('\\').TrimEnd('\"');
+                files[i] = files[i].Replace("\\\\", "\\");
+            }
+
+            return files;
+        }
+
+        static List<string> FindNewEntries(string[] localEntries, string[] serverEntries)
+        {
+            List<string> newEntries = new List<string>();
+            foreach (var localEntry in localEntries)
+            {
+                // entry is a folder - skip
+                if (!localEntry.Contains("."))
+                    continue;
+
+                // entry is JSON configuration - skip
+                if (localEntry.Contains("configuration.json"))
+                    continue;
+
+                // entry not on server - add to list of new entries
+                if (!serverEntries.Contains(localEntry))
+                    newEntries.Add(localEntry);
+            }
+
+            return newEntries;
+        }
 
         #endregion
     }

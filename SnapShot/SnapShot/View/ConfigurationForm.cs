@@ -10,16 +10,21 @@ using System.Windows.Forms;
 using System.Management;
 using System.IO;
 using SnapShot.View;
+using System.Net.NetworkInformation;
 
 namespace SnapShot
 {
     public partial class ConfigurationForm : Form
     {
-        #region Properties
+        #region Attributes and properties
 
         static string JSONlocation = "";
 
+        static bool refreshNeeded = false;
+
         public static string JSONLocation { get => JSONlocation; set => JSONlocation = value; }
+
+        public static bool RefreshNeeded { get => refreshNeeded; set => refreshNeeded = value; }
 
         #endregion
 
@@ -118,6 +123,7 @@ namespace SnapShot
             }
             else
             {
+                textBox1.Text = textBox1.Text.Replace("\\", "/");
                 textBox1.BackColor = Color.White;
                 errorProvider1.SetError(textBox1, null);
             }
@@ -142,6 +148,7 @@ namespace SnapShot
             }
             else
             {
+                textBox2.Text = textBox2.Text.Replace("\\", "/");
                 textBox2.BackColor = Color.White;
                 errorProvider1.SetError(textBox2, null);
             }
@@ -169,9 +176,10 @@ namespace SnapShot
             Color color = pictureBox1.BackColor;
             bool motionDetection = checkBox1.Checked;
 
-            string savingPath = textBox5.Text,
-                       ip = textBox3.Text,
-                       statusText = label17.Text;
+            string ip = textBox3.Text,
+                   mediaPath = textBox7.Text,
+                   JSONconfigPath = textBox5.Text,
+                   statusText = label17.Text;
 
             int syncPeriod = (int)numericUpDown4.Value;
             if (domainUpDown3.Text == "minutes")
@@ -181,38 +189,64 @@ namespace SnapShot
             else if (domainUpDown3.Text == "days")
                 syncPeriod *= 86400;
 
-            bool status = statusText == "Connected!" ? true : false;
+            bool status = statusText == "Connected" ? true : false;
+
+            int ticks = Program.Snapshot.Camera[cameraNo].LatestSynchronizationTicks;
 
             int port = 0;
 
-            // IP camera server configuration
-            try
+            // server configuration
+            if (ip.Length > 0 || mediaPath.Length > 0 || JSONconfigPath.Length > 0 || textBox4.Text.Length > 0)
             {
-                if (type == DeviceType.IPCamera)
+                try
                 {
-                    port = Int32.Parse(textBox4.Text);
+                    if (textBox4.Text.Length > 0)
+                        port = Int32.Parse(textBox4.Text);
+                    textBox4.BackColor = Color.White;
+                    errorProvider1.SetError(textBox4, null);
                 }
-                textBox4.BackColor = Color.White;
-                errorProvider1.SetError(textBox4, null);
-            }
-            catch
-            {
-                errorText = "Server port must be a valid number!";
-                errorProvider1.SetError(textBox4, errorText);
-                textBox4.BackColor = Color.Red;
-            }
+                catch
+                {
+                    errorText = "Server port must be a valid number!";
+                    errorProvider1.SetError(textBox4, errorText);
+                    textBox4.BackColor = Color.Red;
+                }
 
-            // check whether all fields that must have values have been filled
-            if (type == DeviceType.IPCamera && ip.Length < 1)
-            {
-                errorText = "IP camera server configurations need to be specified!";
-                errorProvider1.SetError(textBox3, errorText);
-                textBox3.BackColor = Color.Red;
-            }
-            else
-            {
-                textBox3.BackColor = Color.White;
-                errorProvider1.SetError(textBox3, null);
+                if (ip.Length < 1)
+                {
+                    errorText = "Server configuration IP address needs to be specified!";
+                    errorProvider1.SetError(textBox3, errorText);
+                    textBox3.BackColor = Color.Red;
+                }
+                else
+                {
+                    textBox3.BackColor = Color.White;
+                    errorProvider1.SetError(textBox3, null);
+                }
+
+                if (mediaPath.Length < 1)
+                {
+                    errorText = "Server media path needs to be specified!";
+                    errorProvider1.SetError(textBox7, errorText);
+                    textBox7.BackColor = Color.Red;
+                }
+                else
+                {
+                    textBox7.BackColor = Color.White;
+                    errorProvider1.SetError(textBox7, null);
+                }
+
+                if (ip.Length < 1)
+                {
+                    errorText = "Server JSON configuration path needs to be specified!";
+                    errorProvider1.SetError(textBox5, errorText);
+                    textBox5.BackColor = Color.Red;
+                }
+                else
+                {
+                    textBox5.BackColor = Color.White;
+                    errorProvider1.SetError(textBox5, null);
+                }
             }
 
             // capture configuration
@@ -261,10 +295,12 @@ namespace SnapShot
                 ContrastLevel = contrast,
                 ImageColor = color,
                 MotionDetection = motionDetection,
-                SavingPath = savingPath,
                 ServerIP = ip,
+                MediaPath = mediaPath,
+                JSONConfigPath = JSONconfigPath,
                 ServerPort = port,
                 SynchronizationPeriod = syncPeriod,
+                LatestSynchronizationTicks = ticks,
                 ConnectionStatus = status,
                 ImageCapture = image,
                 SingleMode = single,
@@ -610,12 +646,63 @@ namespace SnapShot
             pictureBox1.BackColor = config.ImageColor;
             checkBox1.Checked = config.MotionDetection;
 
-            textBox5.Text = config.SavingPath;
             textBox3.Text = config.ServerIP;
-            if (config.ServerIP.Length > 0)
+            textBox7.Text = config.MediaPath;
+            textBox5.Text = config.JSONConfigPath;
+            if (config.ServerIP.Length > 0 && config.ServerPort != 0)
                 textBox4.Text = config.ServerPort.ToString();
             else
                 textBox4.Text = "";
+
+            string unit = "seconds";
+            double time = config.SynchronizationPeriod;
+            while (unit != "days" && (int)(time / 60) > 0)
+            {
+                if (unit == "seconds")
+                {
+                    unit = "minutes";
+                    time = time / 60;
+                }
+                else if (unit == "minutes")
+                {
+                    unit = "hours";
+                    time = time / 60;
+                }
+                else if (unit == "hours")
+                {
+                    unit = "days";
+                    time = time / 24;
+                }
+            }
+            if (time > 0)
+            {
+                numericUpDown4.Value = (int)time;
+                domainUpDown3.Text = unit;
+            }
+            else
+            {
+                numericUpDown4.Value = 1;
+                domainUpDown3.Text = "seconds";
+            }
+
+            if (config.ConnectionStatus)
+            {
+                numericUpDown4.Enabled = true;
+                numericUpDown4.ReadOnly = false;
+                domainUpDown3.Enabled = true;
+                domainUpDown3.ReadOnly = false;
+                label17.Text = "Connected";
+                label17.ForeColor = Color.Green;
+            }
+            else
+            {
+                numericUpDown4.Enabled = false;
+                numericUpDown4.ReadOnly = true;
+                domainUpDown3.Enabled = false;
+                domainUpDown3.ReadOnly = true;
+                label17.Text = "Disconnected";
+                label17.ForeColor = Color.Red;
+            }
 
             radioButton4.Checked = config.ImageCapture;
             radioButton3.Checked = !config.ImageCapture;
@@ -627,8 +714,8 @@ namespace SnapShot
             domainUpDown2.Enabled = !config.SingleMode;
             domainUpDown2.ReadOnly = config.SingleMode;
 
-            string unit = "seconds";
-            double time = config.Duration;
+            unit = "seconds";
+            time = config.Duration;
             while (unit != "hours" && (int)(time / 60) > 0)
             {
                 time = time / 60;
@@ -680,7 +767,11 @@ namespace SnapShot
         {
             try
             {
-                // try to connect to server
+                string url = textBox3.Text;
+                if (textBox4.Text.Length > 0)
+                    url += ":" + textBox4.Text;
+                var ping = new Ping();
+                var reply = ping.Send(url, 1000);
 
                 label17.Text = "Connected";
                 label17.ForeColor = System.Drawing.Color.Green;
@@ -699,6 +790,27 @@ namespace SnapShot
                 numericUpDown4.Enabled = false;
                 domainUpDown3.ReadOnly = true;
                 domainUpDown3.Enabled = false;
+            }
+        }
+
+        #endregion
+
+        #region Synchronization
+
+        private void ConfigurationForm_Load(object sender, EventArgs e)
+        {
+            Timer timer = new Timer();
+            timer.Interval = 1000;
+            timer.Tick += new EventHandler(timer_Tick);
+            timer.Start();
+        }
+
+        private void timer_Tick(object? sender, EventArgs e)
+        {
+            if (RefreshNeeded)
+            {
+                RefreshNeeded = false;
+                UpdateConfigurationWindow(0);
             }
         }
 
