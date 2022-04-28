@@ -24,11 +24,15 @@ namespace SnapShot
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
 
+            // if terminal ID is empty, put placeholder
+            if (String.IsNullOrWhiteSpace(Program.Snapshot.TerminalName) || String.IsNullOrEmpty(Program.Snapshot.TerminalName))
+                Program.Snapshot.TerminalName = Environment.MachineName;
+
             // we are disconnected - use local config file
             if (!Program.Snapshot.Connected)
             {
                 if (!File.Exists("config.txt"))
-                    File.WriteAllText(" \n ", "config.txt");
+                    File.WriteAllText("config.txt", Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog);
 
                 string IMPORT = File.ReadAllText("config.txt");
                 string[] rows = IMPORT.Split('\n');
@@ -98,7 +102,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress();
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -111,9 +115,9 @@ namespace SnapShot
                     StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
                     string Json = rdr.ReadToEnd();
                     var obj = JObject.Parse(Json);
-                    string terminalID = (string)obj["terminalID"] ?? "";
-                    bool debugLog = (bool)obj["debugLog"];
-
+                    string terminalID = obj.Value<string>("terminalID") ?? "";
+                    bool debugLog = obj.Value<bool>("debugLog");
+                    
                     // server information and local config not synchronized - ask the user whether they want to keep the server or local info
                     if (terminalID != Program.Snapshot.TerminalName || debugLog != Program.Snapshot.DebugLog)
 
@@ -150,7 +154,7 @@ namespace SnapShot
                                        + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                        + "DebugLog=" + Program.Snapshot.DebugLog;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
 
                 webRequest.Method = "POST";
 
@@ -176,7 +180,7 @@ namespace SnapShot
                                    + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                    + "DebugLog=" + Program.Snapshot.DebugLog;
 
-            webRequest = (HttpWebRequest)WebRequest.Create("http://sitest2-001-site1.btempurl.com/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
+            webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
 
             webRequest.Method = "POST";
 
@@ -260,8 +264,9 @@ namespace SnapShot
             try
             {
                 HttpWebRequest webRequest;
+                string requestParams = Configuration.GetMACAddress() ?? "";
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + Configuration.GetMACAddress());
+                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -277,7 +282,8 @@ namespace SnapShot
             }
             catch
             {
-                toolStripStatusLabel1.Text = "Licence check could not be performed. Contact nbadzak1@etf.unsa.ba for help.";
+                // user not licenced
+                Program.Snapshot.Licenced = false;
             }
         }
 

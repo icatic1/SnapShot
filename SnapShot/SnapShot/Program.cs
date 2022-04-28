@@ -270,9 +270,8 @@ namespace SnapShot
                     using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1]))))
                     {
                         Mat frame = new Mat();
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        while (sw.ElapsedMilliseconds < snapshot.Camera[index].Duration * 1000 + 1000)
+                        int frames = 0;
+                        while (frames < snapshot.Camera[index].Duration * capture.Fps)
                         {
                             capture.Read(frame);
 
@@ -281,6 +280,7 @@ namespace SnapShot
                                 frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
 
                             writer.Write(frame);
+                            frames++;
                         }
                     }
 
