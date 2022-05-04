@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace SnapShot
 {
@@ -167,7 +169,7 @@ namespace SnapShot
                 var dimensions = resolution.Split("x");
 
                 // set video source - USB camera
-                VideoCapture capture = new VideoCapture(snapshot.Camera[index].CameraNumber);
+                OpenCvSharp.VideoCapture capture = new OpenCvSharp.VideoCapture(snapshot.Camera[index].CameraNumber);
 
                 // set desired resolution
                 capture.FrameHeight = Int32.Parse(dimensions[0]);
@@ -198,7 +200,7 @@ namespace SnapShot
                     {
                         #region Single image
 
-                        Mat frame = new Mat();
+                        OpenCvSharp.Mat frame = new OpenCvSharp.Mat();
                         capture.Read(frame);
 
                         Bitmap image = BitmapConverter.ToBitmap(frame);
@@ -233,7 +235,7 @@ namespace SnapShot
                         int noOfImages = (int)(snapshot.Camera[index].Duration / snapshot.Camera[index].Period);
                         for (int i = 0; i < noOfImages; i++)
                         {
-                            Mat frame = new Mat();
+                            OpenCvSharp.Mat frame = new OpenCvSharp.Mat();
                             capture.Read(frame);
 
                             Bitmap image = BitmapConverter.ToBitmap(frame);
@@ -267,23 +269,25 @@ namespace SnapShot
                 {
                     #region Video
 
-                    using (VideoWriter writer = new VideoWriter(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4", FourCC.MPG4, capture.Fps, new OpenCvSharp.Size(Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1]))))
+                    string filename = @snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4";
+                    filename = filename.Replace("\\", "/");
+                    int width = Int32.Parse(dimensions[0]), height = Int32.Parse(dimensions[1]), fps = (int)capture.Fps;
+                    VideoWriter videoWriter = new VideoWriter(filename, FourCC.MPG4, fps, new OpenCvSharp.Size(width, height)); 
+                    Mat frame = new Mat();
+                    int frames = 0;
+                    while (frames < snapshot.Camera[index].Duration * capture.Fps)
                     {
-                        Mat frame = new Mat();
-                        int frames = 0;
-                        while (frames < snapshot.Camera[index].Duration * capture.Fps)
-                        {
-                            capture.Read(frame);
+                        capture.Read(frame);
 
-                            //put demo watermark to frame if not licenced
-                            if (!Program.Snapshot.Licenced)
-                                frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
+                        //put demo watermark to frame if not licenced
+                        if (!Program.Snapshot.Licenced)
+                            frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
 
-                            writer.Write(frame);
-                            frames++;
-                        }
+                        videoWriter.Write(frame);
+                        frames++;
                     }
 
+                    videoWriter.Release();
                     capture.Release();
 
                     // save video to server
@@ -322,13 +326,15 @@ namespace SnapShot
                 try
                 {
                     // camera is connected to the specified server
-                    if (snapshot.Camera[index].ConnectionStatus)
+                    if (snapshot.Camera[index].ConnectionStatus && snapshot.Camera[index].OutputFolderPath.Length > 0)
                     {
                         // get all locally created images and videos
                         string[] localEntries = Directory.GetFileSystemEntries(snapshot.Camera[index].OutputFolderPath, "*", SearchOption.AllDirectories);
 
                         for (int i = 0; i < localEntries.Length; i++)
                             localEntries[i] = localEntries[i].Replace(snapshot.Camera[index].OutputFolderPath, "").TrimStart('\\');
+
+                        ConfigurationForm.FirstCheck = true;
 
                         // get all images and videos located on the server
                         string[] serverEntries = GetEntriesFromServer(snapshot.Camera[index].ServerIP, snapshot.Camera[index].ServerPort.ToString(), snapshot.Camera[index].MediaPath);
@@ -349,7 +355,10 @@ namespace SnapShot
 
                         // synchronize JSON configuration with server
                         Configuration.ImportFromJSON(JSONPath);
+
+                        ConfigurationForm.SyncStatus = true;
                         ConfigurationForm.RefreshNeeded = true;
+                        ConfigurationForm.UpdateLabel = true;
 
                         // wait for next synchronization
                         snapshot.Camera[index].LatestSynchronizationTicks = (int)DateTime.Now.Ticks;
@@ -357,7 +366,8 @@ namespace SnapShot
                 }
                 catch
                 {
-
+                    ConfigurationForm.SyncStatus = false;
+                    ConfigurationForm.UpdateLabel = true;
                 }
 
                 // wait for next synchronization
