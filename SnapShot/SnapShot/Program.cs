@@ -218,7 +218,7 @@ namespace SnapShot
                         
                         // save image to server
                         if (snapshot.Camera[index].ConnectionStatus)
-                            Configuration.UploadFile(mediaPath, folderName + "/IMG" + timestamp + ".png", snapshot.Camera[index].OutputFolderPath);
+                            Configuration.UploadFile(mediaPath, folderName + "\\IMG" + timestamp + ".png", snapshot.Camera[index].OutputFolderPath);
 
                         capture.Release();
 
@@ -253,7 +253,7 @@ namespace SnapShot
 
                             // save image to server
                             if (snapshot.Camera[index].ConnectionStatus)
-                                Configuration.UploadFile(mediaPath, folderName + "/" + burstFolderName + "/IMG" + (i + 1) + ".png", snapshot.Camera[index].OutputFolderPath);
+                                Configuration.UploadFile(mediaPath, folderName + "\\" + burstFolderName + "\\IMG" + (i + 1) + ".png", snapshot.Camera[index].OutputFolderPath);
 
                             // wait for next burst
                             Thread.Sleep(snapshot.Camera[index].Period * 1000);
@@ -292,7 +292,7 @@ namespace SnapShot
 
                     // save video to server
                     if (snapshot.Camera[index].ConnectionStatus)
-                        Configuration.UploadFile(mediaPath, folderName + "/VID" + timestamp + ".mp4", snapshot.Camera[index].OutputFolderPath);
+                        Configuration.UploadFile(mediaPath, folderName + "\\VID" + timestamp + ".mp4", snapshot.Camera[index].OutputFolderPath);
 
                     #endregion
                 }
