@@ -9,6 +9,7 @@ using System.Net.NetworkInformation;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 
 namespace SnapShot
 {
@@ -232,6 +233,55 @@ namespace SnapShot
             return newSnapshot;
         }
 
+        public static Tuple<string, bool> GetTerminalInformation(bool connected)
+        {
+            string terminalID = Environment.MachineName;
+            bool debugLog = false;
+            if (connected)
+            {
+                try
+                {
+                    HttpWebRequest webRequest;
+                    string requestParams = "MacAddress=" + Configuration.GetMACAddress();
+
+                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+
+                    webRequest.Method = "GET";
+
+                    HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                    if (response.StatusCode != HttpStatusCode.OK)
+                        throw new Exception("Bad request!");
+
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                        string Json = rdr.ReadToEnd();
+                        var obj = JObject.Parse(Json);
+                        terminalID = obj.Value<string>("terminalID") ?? "";
+                        debugLog = obj.Value<bool>("debugLog");
+                    }
+                }
+                // information about the terminal is not present at the server - 
+                // create new configuration at the server
+                catch
+                {
+                    HttpWebRequest webRequest;
+                    string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
+                                           + "TerminalID=" + terminalID + "&"
+                                           + "DebugLog=" + debugLog;
+
+                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
+
+                    webRequest.Method = "POST";
+
+                    HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                    if (response.StatusCode != HttpStatusCode.OK)
+                        throw new Exception("Bad request!");
+                }
+            }
+            return new Tuple<string, bool>(terminalID, debugLog);
+        }
+
         public static bool ImportFromJSON(string path)
         {
             try
@@ -249,9 +299,13 @@ namespace SnapShot
                     IMPORT = DownloadFile(path);
                 }
 
+                Tuple<string, bool> terminalInformation = GetTerminalInformation(path.StartsWith("http"));
+                
                 Snapshot newSnapshot = CreateConfiguration(IMPORT);
 
                 newSnapshot.Connected = Program.Snapshot.Connected;
+                newSnapshot.TerminalName = terminalInformation.Item1;
+                newSnapshot.DebugLog = terminalInformation.Item2;
                 Program.Snapshot = newSnapshot;
                 return true;
             }

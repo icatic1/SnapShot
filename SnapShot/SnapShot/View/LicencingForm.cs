@@ -25,7 +25,7 @@ namespace SnapShot
             toolStripStatusLabel1.Text = "";
 
             // if terminal ID is empty, put placeholder
-            if (String.IsNullOrWhiteSpace(Program.Snapshot.TerminalName) || String.IsNullOrEmpty(Program.Snapshot.TerminalName))
+            if (String.IsNullOrWhiteSpace(Program.Snapshot.TerminalName))
                 Program.Snapshot.TerminalName = Environment.MachineName;
 
             // we are disconnected - use local config file
@@ -34,10 +34,13 @@ namespace SnapShot
                 if (!File.Exists("config.txt"))
                     File.WriteAllText("config.txt", Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog);
 
-                string IMPORT = File.ReadAllText("config.txt");
-                string[] rows = IMPORT.Split('\n');
-                Program.Snapshot.TerminalName = rows[0];
-                Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
+                else
+                {
+                    string IMPORT = File.ReadAllText("config.txt");
+                    string[] rows = IMPORT.Split('\n');
+                    Program.Snapshot.TerminalName = rows[0];
+                    Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
+                }
             }
 
             // we are connected - grab information from server
@@ -52,7 +55,7 @@ namespace SnapShot
             textBox2.Text = Program.Snapshot.TerminalName;
             checkBox1.Checked = Program.Snapshot.DebugLog;
         }
-
+        
         private void LicencingForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             UpdateConfigurationFile();

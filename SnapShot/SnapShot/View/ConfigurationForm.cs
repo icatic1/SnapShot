@@ -20,11 +20,17 @@ namespace SnapShot
 
         static string JSONlocation = "";
 
-        static bool refreshNeeded = false;
+        static bool refreshNeeded = false, syncStatus = true, firstCheck = false, updateLabel = false;
 
         public static string JSONLocation { get => JSONlocation; set => JSONlocation = value; }
 
         public static bool RefreshNeeded { get => refreshNeeded; set => refreshNeeded = value; }
+
+        public static bool SyncStatus { get => syncStatus; set => syncStatus = value; }
+
+        public static bool FirstCheck { get => firstCheck; set => firstCheck = value; }
+
+        public static bool UpdateLabel { get => updateLabel; set => updateLabel = value; }
 
         #endregion
 
@@ -33,6 +39,7 @@ namespace SnapShot
         public ConfigurationForm()
         {
             InitializeComponent();
+            label23.Text = "";
             toolStripStatusLabel1.Text = "";
             panel1.BorderStyle = BorderStyle.None;
             panel2.BorderStyle = BorderStyle.None;
@@ -121,6 +128,11 @@ namespace SnapShot
                 errorProvider1.SetError(textBox1, errorText);
                 textBox1.BackColor = Color.Red;
             }
+            else if (!File.Exists(triggerPath)) {
+                errorText = "Trigger file must exist!";
+                errorProvider1.SetError(textBox1, errorText);
+                textBox1.BackColor = Color.Red;
+            }
             else
             {
                 textBox1.Text = textBox1.Text.Replace("\\", "/");
@@ -143,6 +155,11 @@ namespace SnapShot
             if (outputPath == "")
             {
                 errorText = "Output path must not be empty!";
+                errorProvider1.SetError(textBox2, errorText);
+                textBox2.BackColor = Color.Red;
+            }
+            else if (!Directory.Exists(outputPath)) {
+                errorText = "Directory must exist!";
                 errorProvider1.SetError(textBox2, errorText);
                 textBox2.BackColor = Color.Red;
             }
@@ -800,13 +817,23 @@ namespace SnapShot
         private void ConfigurationForm_Load(object sender, EventArgs e)
         {
             Timer timer = new Timer();
-            timer.Interval = 1000;
+            timer.Interval = 2000;
             timer.Tick += new EventHandler(timer_Tick);
             timer.Start();
         }
 
         private void timer_Tick(object? sender, EventArgs e)
         {
+            if (syncStatus && firstCheck && RefreshNeeded && UpdateLabel)
+                label23.Text = "Synchronization successful.";
+            else if (firstCheck && UpdateLabel)
+                label23.Text = "Synchronization failed.";
+            else
+                label23.Text = "";
+
+            if (UpdateLabel)
+                UpdateLabel = false;
+
             if (RefreshNeeded)
             {
                 RefreshNeeded = false;
