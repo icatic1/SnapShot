@@ -785,8 +785,7 @@ namespace SnapShot
             try
             {
                 string url = textBox3.Text;
-                if (textBox4.Text.Length > 0)
-                    url += ":" + textBox4.Text;
+                
                 var ping = new Ping();
                 var reply = ping.Send(url, 1000);
 
