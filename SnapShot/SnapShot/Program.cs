@@ -390,7 +390,7 @@ namespace SnapShot
             StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
             string Json = rdr.ReadToEnd();
             Json = Json.Replace("[", "").Replace("]", "").Replace("\"", "");
-
+            if (String.IsNullOrWhiteSpace(Json)) return new string[1];
             string[] files = Json.Split(",");
             for (int i = 0; i < files.Length; i++)
             {

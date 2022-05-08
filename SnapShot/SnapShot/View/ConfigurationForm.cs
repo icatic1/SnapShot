@@ -11,6 +11,8 @@ using System.Management;
 using System.IO;
 using SnapShot.View;
 using System.Net.NetworkInformation;
+using System.Net;
+using Newtonsoft.Json.Linq;
 
 namespace SnapShot
 {
@@ -785,9 +787,10 @@ namespace SnapShot
             try
             {
                 string url = textBox3.Text;
-                
+                if (textBox4.Text.Length > 0)
+                    url += ":" + textBox4.Text;
                 var ping = new Ping();
-                var reply = ping.Send(url, 1000);
+                var reply = ping.Send(textBox3.Text, 1000);
 
                 label17.Text = "Connected";
                 label17.ForeColor = System.Drawing.Color.Green;
@@ -796,6 +799,8 @@ namespace SnapShot
                 numericUpDown4.Enabled = true;
                 domainUpDown3.ReadOnly = false;
                 domainUpDown3.Enabled = true;
+
+                DeviceCheck(url);
             }
             catch
             {
@@ -837,6 +842,42 @@ namespace SnapShot
             {
                 RefreshNeeded = false;
                 UpdateConfigurationWindow(0);
+            }
+        }
+
+        #endregion
+
+        #region DeviceCheck
+        private void DeviceCheck(String url)
+        {
+            try
+            {
+                HttpWebRequest webRequest;
+                string requestParams = "MacAddress=" + Configuration.GetMACAddress();
+
+                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/GetDevice" + "?" + requestParams);
+
+                webRequest.Method = "GET";
+
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Bad request!");
+            }
+            // information about the terminal is not present at the server - 
+            // create new configuration at the server
+            catch
+            {
+                HttpWebRequest webRequest;
+                string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
+                                       + "TerminalID=" + Program.Snapshot.TerminalName;
+
+                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/AddDevice" + "?" + requestParams);
+
+                webRequest.Method = "POST";
+
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception("Bad request!");
             }
         }
 
