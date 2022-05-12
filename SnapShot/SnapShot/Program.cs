@@ -272,7 +272,7 @@ namespace SnapShot
 
                         // upload every new local file to server
 
-                        string path = "https://" + snapshot.Camera[index].ServerIP;
+                        string path = "http://" + snapshot.Camera[index].ServerIP;
                         if (snapshot.Camera[index].ServerPort != 0)
                             path += ":" + snapshot.Camera[index].ServerPort;
                         string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
@@ -306,7 +306,7 @@ namespace SnapShot
         static string[] GetEntriesFromServer(string ipAddress, string port, string mediaPath)
         {
             HttpWebRequest webRequest;
-            string url = "https://" + ipAddress;
+            string url = "http://" + ipAddress;
             if (port.Length > 0 && port != "0")
                 url += ":" + port;
             url += "/" + mediaPath;
@@ -389,50 +389,40 @@ namespace SnapShot
                 if (Program.Snapshot.Camera[index].ServerPort != 0)
                     url += ":" + Program.Snapshot.Camera[index].ServerPort;
                 url += "/api/FileUpload/GetStreamState";
-               
-                    webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
-                     webRequest.Method = "GET";
+                webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
+                webRequest.Method = "GET";
 
-                     WebResponse response = webRequest.GetResponse();
-                     Stream responseStream = response.GetResponseStream();
-                     StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
-                     string Json = rdr.ReadToEnd();
+                WebResponse response = webRequest.GetResponse();
+                Stream responseStream = response.GetResponseStream();
+                StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                string Json = rdr.ReadToEnd();
 
-                    if (Json == "true" && !streamActive)
-                    {
-                        streamActive = true;
-                        Camera cam = cameras[index];
-                        Thread snapper = new Thread(() => SendSnaps(cam, index));
-                        snapper.IsBackground = true;
-                        snapper.Start();
-                    }
-                    else if (Json == "false" && streamActive)
-                    {
-                        streamActive = false;
-                        cancels[index] = true;
-                    }
+                if (Json == "true" && !streamActive)
+                {
+                    streamActive = true;
+                    Camera cam = cameras[index];
+                    Thread snapper = new Thread(() => SendSnaps(cam, index));
+                    snapper.IsBackground = true;
+                    snapper.Start();
+                }
+                else if (Json == "false" && streamActive)
+                {
+                    streamActive = false;
+                    cancels[index] = true;
+                }
 
-                
-                
                 Thread.Sleep(100);
             }
         }
 
         static void SendSnaps(Camera camera, int index)
         {
-            // fill the buffer first - delay of 2 seconds
+            // fill the first frame
             Stopwatch sw = new Stopwatch();
             sw.Restart();
             buffer[index].Add(camera.SnapBase64(0, true));
-            while (sw.ElapsedMilliseconds < 33) ;
+            while (sw.ElapsedMilliseconds < 100) ;
             sw.Stop();
-            for (int i = 0; i < 30 * 2 - 1; i++)
-            {
-                sw.Restart();
-                buffer[index].Add(camera.SnapBase64(1, true));
-                while (sw.ElapsedMilliseconds < 33) ;
-                sw.Stop();
-            }
 
             // start upload and further snapping at the same time
 
@@ -452,7 +442,7 @@ namespace SnapShot
             {
                 sw.Restart();
                 buffer[index].Add(camera.SnapBase64(1, true));
-                while (sw.ElapsedMilliseconds < 33) ;
+                while (sw.ElapsedMilliseconds < 100) ;
                 sw.Stop();
             }
 
