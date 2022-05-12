@@ -787,11 +787,12 @@ namespace SnapShot
             try
             {
                 string url = textBox3.Text;
+                
                 if (textBox4.Text.Length > 0)
                     url += ":" + textBox4.Text;
                 var ping = new Ping();
                 var reply = ping.Send(textBox3.Text, 1000);
-
+                
                 label17.Text = "Connected";
                 label17.ForeColor = System.Drawing.Color.Green;
 
@@ -802,7 +803,7 @@ namespace SnapShot
 
                 DeviceCheck(url);
             }
-            catch
+            catch(Exception ex)
             {
                 label17.Text = "Disconnected";
                 label17.ForeColor = System.Drawing.Color.Red;

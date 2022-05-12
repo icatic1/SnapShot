@@ -14,18 +14,21 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using SnapShot.Model;
 
 namespace SnapShot
 {
     internal static class Program
     {
-        #region Properties
+        #region Attributes and Properties
 
         static Snapshot snapshot = new Snapshot();
+
         static List<int> previousContent = new List<int>()
         {
             0, 0, 0
         };
+
         static List<FileSystemWatcher> watchers = new List<FileSystemWatcher>()
         {
             new FileSystemWatcher(),
@@ -33,7 +36,25 @@ namespace SnapShot
             new FileSystemWatcher()
         };
 
+        static List<Camera> recorders = new List<Camera>()
+        {
+            new Camera(0),
+            new Camera(1),
+            new Camera(2)
+        };
+
+        static List<bool> cancels = new List<bool>() { false, false, false };
+
+        static List<List<string>> buffer = new List<List<string>>()
+        {
+            new List<string>(),
+            new List<string>(),
+            new List<string>()
+        };
+
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
+
+        public static List<Camera> Recorders { get => recorders; set => recorders = value; }
 
         #endregion
 
@@ -55,6 +76,9 @@ namespace SnapShot
             // start threads which will synchronize configuration with server
             RunServerSynchronizations();
 
+            // start threads which will listen for livestreaming to server
+            RunLivestreamListeners();
+
             Application.Run(new LicencingForm());
         }
 
@@ -64,56 +88,51 @@ namespace SnapShot
 
         static void RunRecordings()
         {
-            List<Thread> cameras = new List<Thread>()
-            {
-                new Thread(() => WatchTrigger(ref snapshot, 0)),
-                new Thread(() => WatchTrigger(ref snapshot, 1)),
-                new Thread(() => WatchTrigger(ref snapshot, 2))
-            };
-
-            foreach (var camera in cameras)
-            {
-                camera.IsBackground = true;
-                camera.Start();
-            }
+            Thread camera = new Thread(() => WatchTrigger(ref snapshot));
+            camera.IsBackground = true;
+            camera.Start();
         }
 
-        static void WatchTrigger(ref Snapshot snapshot, int index)
+        static void WatchTrigger(ref Snapshot snapshot)
         {
-            string oldTriggerFilePath = "";
+            List<string> oldTriggerFilePaths = new List<string>() { "", "", "" };
 
             while (1 == 1)
             {
-                // configuration not set - wait a little bit, then check again
-                if (snapshot.Camera[index].TriggerFilePath.Length < 1)
-                    continue;
 
-                // configuration set - change trigger content
-                else
+                for (int i = 0; i < snapshot.Camera.Count; i++)
                 {
-                    // output trigger file did not change - do not change the file we are watching
-                    if (snapshot.Camera[index].TriggerFilePath == oldTriggerFilePath)
+                    // configuration not set - wait a little bit, then check again
+                    if (snapshot.Camera[i].TriggerFilePath.Length < 1)
                         continue;
 
-                    // output trigger file changed - change the file we are watching
-                    // and save current line count
+                    // configuration set - change trigger content
                     else
                     {
-                        oldTriggerFilePath = snapshot.Camera[index].TriggerFilePath;
-                        try
-                        {
-                            previousContent[index] = File.ReadAllLines(snapshot.Camera[index].TriggerFilePath).Length;
-                            watchers[index].Path = Path.GetDirectoryName(snapshot.Camera[index].TriggerFilePath) ?? "";
-                            watchers[index].Filter = Path.GetFileName(snapshot.Camera[index].TriggerFilePath);
-                            watchers[index].Changed += (sender, EventArgs) =>
-                            {
-                                OnChanged(sender, EventArgs, index);
-                            };
-                            watchers[index].EnableRaisingEvents = true;
-                        }
-                        catch
-                        {
+                        // output trigger file did not change - do not change the file we are watching
+                        if (snapshot.Camera[i].TriggerFilePath == oldTriggerFilePaths[i])
                             continue;
+
+                        // output trigger file changed - change the file we are watching
+                        // and save current line count
+                        else
+                        {
+                            oldTriggerFilePaths[i] = snapshot.Camera[i].TriggerFilePath;
+                            try
+                            {
+                                previousContent[i] = File.ReadAllLines(snapshot.Camera[i].TriggerFilePath).Length;
+                                watchers[i].Path = Path.GetDirectoryName(snapshot.Camera[i].TriggerFilePath) ?? "";
+                                watchers[i].Filter = Path.GetFileName(snapshot.Camera[i].TriggerFilePath);
+                                watchers[i].Changed += (sender, EventArgs) =>
+                                {
+                                    OnChanged(sender, EventArgs, i);
+                                };
+                                watchers[i].EnableRaisingEvents = true;
+                            }
+                            catch
+                            {
+                                continue;
+                            }
                         }
                     }
                 }
@@ -163,138 +182,47 @@ namespace SnapShot
 
                 // new lines found, regex match found - start recording
 
-                // change resolution
-                string resolution = snapshot.Camera[index].Resolution.ToString();
-                resolution = resolution.Replace("Resolution", "");
-                var dimensions = resolution.Split("x");
-
-                // set video source - USB camera
-                OpenCvSharp.VideoCapture capture = new OpenCvSharp.VideoCapture(snapshot.Camera[index].CameraNumber);
-
-                // set desired resolution
-                capture.FrameHeight = Int32.Parse(dimensions[0]);
-                capture.FrameWidth = Int32.Parse(dimensions[1]);
-
-                // change contrast
-
-                // change image color
-
-                // create folder with date if not already available
-                string folderName = DateTime.Now.Day.ToString("00") + DateTime.Now.Month.ToString("00") + DateTime.Now.Year.ToString("0000");
-                Directory.CreateDirectory(snapshot.Camera[index].OutputFolderPath + "/" + folderName);
-
-                // create base image name
-                string timestamp = folderName + "-" + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
-
-                capture.Open(snapshot.Camera[index].CameraNumber);
-
-                string path = "http://" + snapshot.Camera[index].ServerIP;
-                if (snapshot.Camera[index].ServerPort != 0)
-                    path += ":" + snapshot.Camera[index].ServerPort;
-                string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
-
                 // take a picture
                 if (snapshot.Camera[index].ImageCapture)
                 {
                     if (snapshot.Camera[index].SingleMode)
                     {
-                        #region Single image
+                        // create folders with date if not already available
+                        Program.recorders[index].CreateFolders();
 
-                        OpenCvSharp.Mat frame = new OpenCvSharp.Mat();
-                        capture.Read(frame);
+                        Bitmap image = Program.recorders[index].TakeAPicture();
 
-                        Bitmap image = BitmapConverter.ToBitmap(frame);
+                        Program.recorders[index].SavePictureLocally(image, 0);
 
-                        // put demo watermark on image if not licenced
-                        if (!Program.Snapshot.Licenced)
-                            using (Graphics g = Graphics.FromImage(image))
-                            {
-                                Font myFont = new Font("Arial", 14);
-                                g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
-                            }
-
-                        // save image locally
-                        image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/IMG" + timestamp + ".png");
-                        
-                        // save image to server
-                        if (snapshot.Camera[index].ConnectionStatus)
-                            Configuration.UploadFile(mediaPath, folderName + "\\IMG" + timestamp + ".png", snapshot.Camera[index].OutputFolderPath);
-
-                        capture.Release();
-
-                        #endregion
+                        if (Program.Snapshot.Camera[index].ConnectionStatus)
+                            Program.recorders[index].SaveMediaRemotely(0);
                     }
                     else
                     {
-                        #region Burst images
+                        // create folders with date if not already available
+                        Program.recorders[index].CreateFolders(1);
 
-                        // create burst directory
-                        string burstFolderName = "BURST-" + DateTime.Now.Day.ToString("00") + DateTime.Now.Month.ToString("00") + DateTime.Now.Year.ToString("0000") + "-" + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
-                        Directory.CreateDirectory(snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/" + burstFolderName);
+                        List<Bitmap> images = Program.recorders[index].TakeBurstImages();
 
-                        int noOfImages = (int)(snapshot.Camera[index].Duration / snapshot.Camera[index].Period);
-                        for (int i = 0; i < noOfImages; i++)
+                        for (int i = 0; i <images.Count; i++)
                         {
-                            OpenCvSharp.Mat frame = new OpenCvSharp.Mat();
-                            capture.Read(frame);
+                            Program.recorders[index].SavePictureLocally(images[i], 1, i);
 
-                            Bitmap image = BitmapConverter.ToBitmap(frame);
-
-                            // put demo watermark on image if not licenced
-                            if (!Program.Snapshot.Licenced)
-                                using (Graphics g = Graphics.FromImage(image))
-                                {
-                                    Font myFont = new Font("Arial", 14);
-                                    g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
-                                }
-
-                            // save image locally
-                            image.Save(@snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/" + burstFolderName + "/IMG" + (i + 1) + ".png");
-
-                            // save image to server
-                            if (snapshot.Camera[index].ConnectionStatus)
-                                Configuration.UploadFile(mediaPath, folderName + "\\" + burstFolderName + "\\IMG" + (i + 1) + ".png", snapshot.Camera[index].OutputFolderPath);
-
-                            // wait for next burst
-                            Thread.Sleep(snapshot.Camera[index].Period * 1000);
+                            if (Program.Snapshot.Camera[index].ConnectionStatus)
+                                Program.recorders[index].SaveMediaRemotely(1, i);
                         }
-
-                        capture.Release();
-
-                        #endregion
                     }
                 }
                 // take a video
                 else
                 {
-                    #region Video
+                    // create folders with date if not already available
+                    Program.recorders[index].CreateFolders();
 
-                    string filename = @snapshot.Camera[index].OutputFolderPath + "/" + folderName + "/VID" + timestamp + ".mp4";
-                    filename = filename.Replace("\\", "/");
-                    int width = Int32.Parse(dimensions[0]), height = Int32.Parse(dimensions[1]), fps = (int)capture.Fps;
-                    VideoWriter videoWriter = new VideoWriter(filename, FourCC.MPG4, fps, new OpenCvSharp.Size(width, height)); 
-                    Mat frame = new Mat();
-                    int frames = 0;
-                    while (frames < snapshot.Camera[index].Duration * capture.Fps)
-                    {
-                        capture.Read(frame);
+                    Program.recorders[index].TakeAVideo();
 
-                        //put demo watermark to frame if not licenced
-                        if (!Program.Snapshot.Licenced)
-                            frame.PutText("Demo version", new OpenCvSharp.Point(20, 20), HersheyFonts.HersheySimplex, 1.0, new Scalar(0, 0, 0));
-
-                        videoWriter.Write(frame);
-                        frames++;
-                    }
-
-                    videoWriter.Release();
-                    capture.Release();
-
-                    // save video to server
-                    if (snapshot.Camera[index].ConnectionStatus)
-                        Configuration.UploadFile(mediaPath, folderName + "\\VID" + timestamp + ".mp4", snapshot.Camera[index].OutputFolderPath);
-
-                    #endregion
+                    if (Program.Snapshot.Camera[index].ConnectionStatus)
+                        Program.recorders[index].SaveMediaRemotely(2);
                 }
             }
         }
@@ -344,7 +272,7 @@ namespace SnapShot
 
                         // upload every new local file to server
 
-                        string path = "http://" + snapshot.Camera[index].ServerIP;
+                        string path = "https://" + snapshot.Camera[index].ServerIP;
                         if (snapshot.Camera[index].ServerPort != 0)
                             path += ":" + snapshot.Camera[index].ServerPort;
                         string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
@@ -378,7 +306,7 @@ namespace SnapShot
         static string[] GetEntriesFromServer(string ipAddress, string port, string mediaPath)
         {
             HttpWebRequest webRequest;
-            string url = "http://" + ipAddress;
+            string url = "https://" + ipAddress;
             if (port.Length > 0 && port != "0")
                 url += ":" + port;
             url += "/" + mediaPath;
@@ -390,6 +318,7 @@ namespace SnapShot
             StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
             string Json = rdr.ReadToEnd();
             Json = Json.Replace("[", "").Replace("]", "").Replace("\"", "");
+
             if (String.IsNullOrWhiteSpace(Json)) return new string[1];
             string[] files = Json.Split(",");
             for (int i = 0; i < files.Length; i++)
@@ -423,6 +352,137 @@ namespace SnapShot
             }
 
             return newEntries;
+        }
+
+        #endregion
+
+        #region Livestreaming on Server
+
+        static void RunLivestreamListeners()
+        {
+            List<Thread> listeners = new List<Thread>()
+            {
+                new Thread(() => Listen(ref recorders, 0)),
+                new Thread(() => Listen(ref recorders, 1)),
+                new Thread(() => Listen(ref recorders, 2))
+            };
+
+            foreach (var listener in listeners)
+            {
+                listener.IsBackground = true;
+                listener.Start();
+            }
+        }
+
+        static void Listen(ref List<Camera> cameras, int index)
+        {
+            bool streamActive = false;
+
+            // check for livestream necessity every 100 ms
+            while (1 == 1)
+            {
+                if (Program.Snapshot.Camera[index].ServerIP.Length < 1)
+                    continue;
+
+                HttpWebRequest webRequest;
+                string url = "http://" + Program.Snapshot.Camera[index].ServerIP;
+                if (Program.Snapshot.Camera[index].ServerPort != 0)
+                    url += ":" + Program.Snapshot.Camera[index].ServerPort;
+                url += "/api/FileUpload/GetStreamState";
+               
+                    webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
+                     webRequest.Method = "GET";
+
+                     WebResponse response = webRequest.GetResponse();
+                     Stream responseStream = response.GetResponseStream();
+                     StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                     string Json = rdr.ReadToEnd();
+
+                    if (Json == "true" && !streamActive)
+                    {
+                        streamActive = true;
+                        Camera cam = cameras[index];
+                        Thread snapper = new Thread(() => SendSnaps(cam, index));
+                        snapper.IsBackground = true;
+                        snapper.Start();
+                    }
+                    else if (Json == "false" && streamActive)
+                    {
+                        streamActive = false;
+                        cancels[index] = true;
+                    }
+
+                
+                
+                Thread.Sleep(100);
+            }
+        }
+
+        static void SendSnaps(Camera camera, int index)
+        {
+            // fill the buffer first - delay of 2 seconds
+            Stopwatch sw = new Stopwatch();
+            sw.Restart();
+            buffer[index].Add(camera.SnapBase64(0, true));
+            while (sw.ElapsedMilliseconds < 33) ;
+            sw.Stop();
+            for (int i = 0; i < 30 * 2 - 1; i++)
+            {
+                sw.Restart();
+                buffer[index].Add(camera.SnapBase64(1, true));
+                while (sw.ElapsedMilliseconds < 33) ;
+                sw.Stop();
+            }
+
+            // start upload and further snapping at the same time
+
+            Thread snapper = new Thread(() => KeepSnapping(camera, index));
+            snapper.IsBackground = true;
+            snapper.Start();
+
+            Thread saver = new Thread(() => KeepSaving(index));
+            saver.IsBackground = true;
+            saver.Start();
+        }
+
+        public static void KeepSnapping(Camera camera, int index)
+        {
+            Stopwatch sw = new Stopwatch();
+            while (!cancels[index])
+            {
+                sw.Restart();
+                buffer[index].Add(camera.SnapBase64(1, true));
+                while (sw.ElapsedMilliseconds < 33) ;
+                sw.Stop();
+            }
+
+            buffer[index].Add(camera.SnapBase64(2, true));
+            cancels[index] = false;
+        }
+
+        public static void KeepSaving(int index)
+        {
+            // send request for sending bitmap to server
+            string url = "http://" + Program.Snapshot.Camera[index].ServerIP;
+            if (Program.Snapshot.Camera[index].ServerPort != 0)
+                url += ":" + Program.Snapshot.Camera[index].ServerPort;
+            url += "/api/FileUpload/StreamBase64";
+
+            Stopwatch sw = new Stopwatch();
+            while (!cancels[index])
+            {
+                sw.Restart();
+                // nothing to upload - we are faster than snap
+                if (buffer[index].Count < 30)
+                    continue;
+
+                Configuration.UploadBase64(url, buffer[index].GetRange(0, 30));
+                buffer[index].RemoveRange(0, 30);
+                var x = sw.ElapsedMilliseconds;
+            }
+
+            cancels[index] = false;
+            buffer[index].Clear();
         }
 
         #endregion

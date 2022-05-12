@@ -10,6 +10,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using System.Drawing.Imaging;
+using Newtonsoft.Json;
 
 namespace SnapShot
 {
@@ -199,6 +201,9 @@ namespace SnapShot
                 {
                     rs.Write(buffer, 0, read);
                 }
+
+                fs.Close();
+
                 buf = Encoding.UTF8.GetBytes(CRLF);
                 rs.Write(buf, 0, buf.Length);
                 rs.Flush();
@@ -213,6 +218,92 @@ namespace SnapShot
             {
                 return false;
             }
+        }
+
+        public static bool UploadImage(string endpointUrl, string filePath, Bitmap image)
+        {
+            Stream rs;
+            try
+            {
+                MemoryStream ms = new MemoryStream();
+                image.Save(ms, ImageFormat.Png);
+                byte[] fs = ms.ToArray();
+
+                string uploadFileName = Path.GetFileName(filePath);
+                string path = filePath.Replace(uploadFileName, "").TrimEnd('\\');
+
+                var request = (HttpWebRequest)WebRequest.Create(endpointUrl);
+                request.Method = WebRequestMethods.Http.Post;
+                request.AllowWriteStreamBuffering = false;
+                request.SendChunked = true;
+                String CRLF = "\r\n";
+                long timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                string boundary = timestamp.ToString("x");
+                request.ContentType = "multipart/form-data; boundary=" + boundary;
+
+                long bytesAvailable = fs.Length;
+                long maxBufferSize = 1 * 1024 * 1024;
+
+
+                rs = request.GetRequestStream();
+                byte[] buffer = new byte[50];
+
+                byte[] buf = Encoding.UTF8.GetBytes("--" + boundary + CRLF);
+                rs.Write(buf, 0, buf.Length);
+
+                buf = Encoding.UTF8.GetBytes("Content-Disposition: form-data; name=\"" + Configuration.GetMACAddress() + "\"; filename=\"" + uploadFileName + "\"" + CRLF);
+
+                rs.Write(buf, 0, buf.Length);
+
+                buf = Encoding.UTF8.GetBytes("Content-Type: application/octet-stream;" + CRLF);
+                rs.Write(buf, 0, buf.Length);
+
+                buf = Encoding.UTF8.GetBytes(CRLF);
+                rs.Write(buf, 0, buf.Length);
+                rs.Flush();
+
+
+                long bufferSize = Math.Min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+                int i = 0;
+                while (i < fs.Length)
+                {
+                    buffer = fs.Skip(i).Take((int)bufferSize).ToArray();
+                    rs.Write(buffer, 0, (int)bufferSize);
+                    i += (int)bufferSize;
+                }
+
+                buf = Encoding.UTF8.GetBytes(CRLF);
+                rs.Write(buf, 0, buf.Length);
+                rs.Flush();
+
+                buffer = Encoding.UTF8.GetBytes("--" + boundary + "--" + CRLF);
+                rs.Write(buffer, 0, buffer.Length);
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                return response.StatusCode == HttpStatusCode.OK;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        public static bool UploadBase64(string endpointUrl, List<string> base64)
+        {
+            string json = JsonConvert.SerializeObject(base64);
+
+            HttpWebRequest webRequest;
+            webRequest = (HttpWebRequest)WebRequest.Create(endpointUrl + "?MACAddress=" + Configuration.GetMACAddress());
+            webRequest.Method = "POST";
+            webRequest.ContentType = "application/json";
+            using (var streamWriter = new StreamWriter(webRequest.GetRequestStream()))
+                streamWriter.Write(json);
+
+            HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+            return (response.StatusCode == HttpStatusCode.OK);
         }
 
         #endregion
