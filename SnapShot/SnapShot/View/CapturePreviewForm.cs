@@ -19,9 +19,7 @@ namespace SnapShot
         #region Attributes
 
         Bitmap? image;
-        Mat? frame;
         Thread? camera;
-        VideoCapture? capture;
         static bool cancel;
         int cameraNumber;
         string deviceType;
@@ -62,25 +60,16 @@ namespace SnapShot
         private void CaptureCameraCallback()
         {
 
-            frame = new Mat();
-            capture = new VideoCapture(cameraNumber);
-            capture.Open(cameraNumber);
-
-            if (capture.IsOpened())
+            Program.Recorders[cameraNumber].Snap(0, true);
+            while (1 == 1)
             {
-                while (1 == 1)
-                {
-                    capture.Read(frame);
-                    image = BitmapConverter.ToBitmap(frame);
-                    SetPicture(image);
+                image = Program.Recorders[cameraNumber].Snap(1, true);
+                SetPicture(image);
 
-                    if (cancel)
-                    {
-                        capture.Release();
-                        break;
-                    }
-                }
+                if (cancel)
+                    break;
             }
+            Program.Recorders[cameraNumber].Snap(2, true);
         }
 
         private void SetPicture(Image img)

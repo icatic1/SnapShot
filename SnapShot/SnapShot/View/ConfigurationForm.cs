@@ -12,7 +12,6 @@ using System.IO;
 using SnapShot.View;
 using System.Net.NetworkInformation;
 using System.Net;
-using Newtonsoft.Json.Linq;
 
 namespace SnapShot
 {
@@ -130,7 +129,8 @@ namespace SnapShot
                 errorProvider1.SetError(textBox1, errorText);
                 textBox1.BackColor = Color.Red;
             }
-            else if (!File.Exists(triggerPath)) {
+            else if (!File.Exists(triggerPath))
+            {
                 errorText = "Trigger file must exist!";
                 errorProvider1.SetError(textBox1, errorText);
                 textBox1.BackColor = Color.Red;
@@ -160,7 +160,8 @@ namespace SnapShot
                 errorProvider1.SetError(textBox2, errorText);
                 textBox2.BackColor = Color.Red;
             }
-            else if (!Directory.Exists(outputPath)) {
+            else if (!Directory.Exists(outputPath))
+            {
                 errorText = "Directory must exist!";
                 errorProvider1.SetError(textBox2, errorText);
                 textBox2.BackColor = Color.Red;
@@ -327,6 +328,8 @@ namespace SnapShot
                 Period = period
             };
 
+            Program.Recorders[camera].Reconfigure();
+
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
         }
 
@@ -368,6 +371,7 @@ namespace SnapShot
                 if (res)
                 {
                     radioButton5.Checked = true;
+                    Program.Recorders.ForEach(r => r.Reconfigure());
                     UpdateConfigurationWindow(0);
                     toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
@@ -649,6 +653,7 @@ namespace SnapShot
         public void UpdateConfigurationWindow(int cameraNumber)
         {
             var config = Program.Snapshot.Camera[cameraNumber];
+            Program.Recorders[cameraNumber].Reconfigure();
 
             comboBox2.Text = config.Type.ToString();
             comboBox1.Text = config.Id;
@@ -786,13 +791,9 @@ namespace SnapShot
         {
             try
             {
-                string url = textBox3.Text;
-                
-                if (textBox4.Text.Length > 0)
-                    url += ":" + textBox4.Text;
                 var ping = new Ping();
                 var reply = ping.Send(textBox3.Text, 1000);
-                
+
                 label17.Text = "Connected";
                 label17.ForeColor = System.Drawing.Color.Green;
 
@@ -801,9 +802,14 @@ namespace SnapShot
                 domainUpDown3.ReadOnly = false;
                 domainUpDown3.Enabled = true;
 
+                string url = textBox3.Text;
+
+                if (textBox4.Text.Length > 0)
+                    url += ":" + textBox4.Text;
+
                 DeviceCheck(url);
             }
-            catch(Exception ex)
+            catch
             {
                 label17.Text = "Disconnected";
                 label17.ForeColor = System.Drawing.Color.Red;
@@ -842,13 +848,15 @@ namespace SnapShot
             if (RefreshNeeded)
             {
                 RefreshNeeded = false;
+                Program.Recorders.ForEach(r => r.Reconfigure());
                 UpdateConfigurationWindow(0);
             }
         }
 
         #endregion
 
-        #region DeviceCheck
+        #region Device Check
+
         private void DeviceCheck(String url)
         {
             try
@@ -856,7 +864,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress();
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/GetDevice" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/GetDeviceByMAC" + "?" + requestParams);
 
                 webRequest.Method = "GET";
 
