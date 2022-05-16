@@ -73,8 +73,17 @@ namespace SnapShot
             // start threads which will change triggers when the configurations change
             RunRecordings();
 
-            // start threads which will synchronize configuration with server
-            RunServerSynchronizations();
+            // start thread which will synchronize configuration with server
+            Thread JSONSynchronization = new Thread(() => SynchronizeJSON(ref snapshot));
+
+            JSONSynchronization.IsBackground = true;
+            JSONSynchronization.Start();
+
+            // start thread which will synchronize media with server
+            Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot));
+
+            mediaSynchronization.IsBackground = true;
+            mediaSynchronization.Start();
 
             // start threads which will listen for livestreaming to server
             RunLivestreamListeners();
@@ -231,79 +240,167 @@ namespace SnapShot
 
         #region Server Synchronization
 
-        static void RunServerSynchronizations()
-        {
-            List<Thread> cameras = new List<Thread>()
-            {
-                new Thread(() => Synchronize(ref snapshot, 0)),
-                new Thread(() => Synchronize(ref snapshot, 1)),
-                new Thread(() => Synchronize(ref snapshot, 2))
-            };
-
-            foreach (var camera in cameras)
-            {
-                camera.IsBackground = true;
-                camera.Start();
-            }
-        }
-
-        static void Synchronize(ref Snapshot snapshot, int index)
+        /// <summary>
+        /// Method for synchronizing JSON configuration with server
+        /// Two scenarios - every X ticks and at the designated time every day
+        /// </summary>
+        /// <param name="snapshot"></param>
+        static void SynchronizeJSON(ref Snapshot snapshot)
         {
             while (1 == 1)
             {
                 try
                 {
-                    // camera is connected to the specified server
+                    // check if camera is connected to the specified server
                     if (snapshot.Configuration.ConnectionStatus && snapshot.Configuration.OutputFolderPath.Length > 0)
                     {
-                        // get all locally created images and videos
-                        string[] localEntries = Directory.GetFileSystemEntries(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
-
-                        for (int i = 0; i < localEntries.Length; i++)
-                            localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
-
-                        GeneralSettingsForm.FirstCheck = true;
-
-                        // get all images and videos located on the server
-                        string[] serverEntries = GetEntriesFromServer(snapshot.Configuration.ServerIP, snapshot.Configuration.ServerPort.ToString(), snapshot.Configuration.MediaPath);
-
-                        // find all local entries which are not present among server entries
-                        List<string> newEntries = FindNewEntries(localEntries, serverEntries);
-
-                        // upload every new local file to server
-
+                        // formulate the path for importing JSON configuration from server
                         string path = "http://" + snapshot.Configuration.ServerIP;
                         if (snapshot.Configuration.ServerPort != 0)
                             path += ":" + snapshot.Configuration.ServerPort;
-                        string mediaPath = path + "/" + snapshot.Configuration.MediaPath;
                         string JSONPath = path + "/" + snapshot.Configuration.JSONImportLocation;
 
-                        foreach (var newEntry in newEntries)
-                            Configuration.UploadFile(mediaPath, newEntry, snapshot.Configuration.OutputFolderPath);
+                        // no synchronization is possible before first connection to server
+                        GeneralSettingsForm.FirstCheck[0] = true;
 
-                        // synchronize JSON configuration with server
-                        Configuration.ImportFromJSON(JSONPath);
+                        // two possible scenarios
+                        // scenario 1 - we synchronize at the designated time
+                        if (snapshot.Configuration.JSONSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.JSONTime.Hours && DateTime.Now.Minute == snapshot.Configuration.JSONTime.Minutes)
+                        {
+                            Configuration.ImportFromJSON(JSONPath);
 
-                        GeneralSettingsForm.SyncStatus = true;
-                        GeneralSettingsForm.RefreshNeeded = true;
-                        GeneralSettingsForm.UpdateLabel = true;
+                            // send update signal to general settings form
+                            GeneralSettingsForm.SyncStatus[0] = true;
+                            GeneralSettingsForm.RefreshNeeded[0] = true;
+                            GeneralSettingsForm.UpdateLabel[0] = true;
 
-                        // wait for next synchronization
-                        snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
+                            // denote that the synchronization has occured
+                            snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
+                        }
+
+                        // scenario 2 - we synchronize every X ticks
+                        else if (snapshot.Configuration.JSONSyncPeriod != 0)
+                        {
+                            Configuration.ImportFromJSON(JSONPath);
+
+                            // send update signal to general settings form
+                            GeneralSettingsForm.SyncStatus[0] = true;
+                            GeneralSettingsForm.RefreshNeeded[0] = true;
+                            GeneralSettingsForm.UpdateLabel[0] = true;
+
+                            // denote that the synchronization has occured
+                            snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
+
+                            // wait for next synchronization
+                            Thread.Sleep(snapshot.Configuration.JSONSyncPeriod * 1000);
+                        }
                     }
                 }
                 catch
                 {
-                    GeneralSettingsForm.SyncStatus = false;
-                    GeneralSettingsForm.UpdateLabel = true;
+                    // send failed signal to general settings form
+                    GeneralSettingsForm.SyncStatus[0] = false;
+                    GeneralSettingsForm.UpdateLabel[0] = true;
                 }
-
-                // wait for next synchronization
-                Thread.Sleep(snapshot.Configuration.JSONSyncPeriod * 1000);
             }
         }
 
-        static string[] GetEntriesFromServer(string ipAddress, string port, string mediaPath)
+        /// <summary>
+        /// Method for synchronizing media with server
+        /// Two scenarios - every X ticks and at the designated time every day
+        /// </summary>
+        /// <param name="snapshot"></param>
+        static void SynchronizeMedia(ref Snapshot snapshot)
+        {
+            while (1 == 1)
+            {
+                try
+                {
+                    // check if camera is connected to the specified server
+                    if (snapshot.Configuration.ConnectionStatus && snapshot.Configuration.OutputFolderPath.Length > 0)
+                    {
+                        // formulate the path for exporting files to server
+                        string path = "http://" + snapshot.Configuration.ServerIP;
+                        if (snapshot.Configuration.ServerPort != 0)
+                            path += ":" + snapshot.Configuration.ServerPort;
+                        string mediaPath = path + "/" + snapshot.Configuration.MediaPath;
+
+                        // two possible scenarios
+                        // scenario 1 - we synchronize at the designated time
+                        if (snapshot.Configuration.MediaSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.MediaTime.Hours && DateTime.Now.Minute == snapshot.Configuration.MediaTime.Minutes)
+                        {
+                            // get all locally created images and videos
+                            string[] localEntries = Directory.GetFileSystemEntries(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+
+                            for (int i = 0; i < localEntries.Length; i++)
+                                localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+
+                            GeneralSettingsForm.FirstCheck[1] = true;
+
+                            // get all images and videos located on the server
+                            string[] serverEntries = GetEntriesFromServer(snapshot.Configuration.ServerIP, snapshot.Configuration.ServerPort.ToString(), snapshot.Configuration.MediaPath);
+
+                            // find all local entries which are not present among server entries
+                            List<string> newEntries = FindNewEntries(localEntries, serverEntries);
+
+                            // upload every new local file to server
+                            foreach (var newEntry in newEntries)
+                                Configuration.UploadFile(mediaPath, newEntry, snapshot.Configuration.OutputFolderPath);
+
+                            // send update signal to general settings form
+                            GeneralSettingsForm.SyncStatus[1] = true;
+                            GeneralSettingsForm.RefreshNeeded[1] = true;
+                            GeneralSettingsForm.UpdateLabel[1] = true;
+                        }
+
+                        // scenario 2 - we synchronize every X ticks
+                        else if (snapshot.Configuration.MediaSyncPeriod != 0)
+                        {
+                            // get all locally created images and videos
+                            string[] localEntries = Directory.GetFileSystemEntries(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+
+                            for (int i = 0; i < localEntries.Length; i++)
+                                localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+
+                            GeneralSettingsForm.FirstCheck[1] = true;
+
+                            // get all images and videos located on the server
+                            string[] serverEntries = GetEntriesFromServer(snapshot.Configuration.ServerIP, snapshot.Configuration.ServerPort.ToString(), snapshot.Configuration.MediaPath);
+
+                            // find all local entries which are not present among server entries
+                            List<string> newEntries = FindNewEntries(localEntries, serverEntries);
+
+                            // upload every new local file to server
+                            foreach (var newEntry in newEntries)
+                                Configuration.UploadFile(mediaPath, newEntry, snapshot.Configuration.OutputFolderPath);
+
+                            // send update signal to general settings form
+                            GeneralSettingsForm.SyncStatus[1] = true;
+                            GeneralSettingsForm.RefreshNeeded[1] = true;
+                            GeneralSettingsForm.UpdateLabel[1] = true;
+
+                            // wait for next synchronization
+                            Thread.Sleep(snapshot.Configuration.MediaSyncPeriod * 1000);
+                        }
+                    }
+                }
+                catch
+                {
+                    // send failed signal to general settings form
+                    GeneralSettingsForm.SyncStatus[1] = false;
+                    GeneralSettingsForm.UpdateLabel[1] = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method for checking which files have been uploaded to the server
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <param name="mediaPath"></param>
+        /// <returns></returns>
+        public static string[] GetEntriesFromServer(string ipAddress, string port, string mediaPath)
         {
             HttpWebRequest webRequest;
             string url = "http://" + ipAddress;
@@ -333,7 +430,13 @@ namespace SnapShot
             return files;
         }
 
-        static List<string> FindNewEntries(string[] localEntries, string[] serverEntries)
+        /// <summary>
+        /// Method for determining which local entries are not present at the server
+        /// </summary>
+        /// <param name="localEntries"></param>
+        /// <param name="serverEntries"></param>
+        /// <returns></returns>
+        public static List<string> FindNewEntries(string[] localEntries, string[] serverEntries)
         {
             List<string> newEntries = new List<string>();
             foreach (var localEntry in localEntries)
@@ -358,6 +461,9 @@ namespace SnapShot
 
         #region Livestreaming on Server
 
+        /// <summary>
+        /// Method for starting threads for camera recorders
+        /// </summary>
         static void RunLivestreamListeners()
         {
             List<Thread> listeners = new List<Thread>()
@@ -374,6 +480,11 @@ namespace SnapShot
             }
         }
 
+        /// <summary>
+        /// Method which listens for server signal that begins the recording
+        /// </summary>
+        /// <param name="cameras"></param>
+        /// <param name="index"></param>
         static void Listen(ref List<Recorder> cameras, int index)
         {
             bool streamActive = false;
@@ -384,37 +495,55 @@ namespace SnapShot
                 if (Program.Snapshot.Configuration.ServerIP.Length < 1)
                     continue;
 
-                HttpWebRequest webRequest;
-                string url = "http://" + Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    url += ":" + Program.Snapshot.Configuration.ServerPort;
-                url += "/api/FileUpload/GetStreamState";
-                webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
-                webRequest.Method = "GET";
-
-                WebResponse response = webRequest.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
-                string Json = rdr.ReadToEnd();
-
-                if (Json == "true" && !streamActive)
+                try
                 {
-                    streamActive = true;
-                    Recorder cam = cameras[index];
-                    Thread snapper = new Thread(() => SendSnaps(cam, index));
-                    snapper.IsBackground = true;
-                    snapper.Start();
+                    // send web request to check whether the server wants to stream
+                    HttpWebRequest webRequest;
+                    string url = "http://" + Program.Snapshot.Configuration.ServerIP;
+                    if (Program.Snapshot.Configuration.ServerPort != 0)
+                        url += ":" + Program.Snapshot.Configuration.ServerPort;
+                    url += "/api/FileUpload/GetStreamState";
+                    webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
+                    webRequest.Method = "GET";
+
+                    // read the server response
+                    WebResponse response = webRequest.GetResponse();
+                    Stream responseStream = response.GetResponseStream();
+                    StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                    string Json = rdr.ReadToEnd();
+
+                    // the server started the stream - start the thread for streaming
+                    if (Json == "true" && !streamActive)
+                    {
+                        streamActive = true;
+                        Recorder cam = cameras[index];
+                        Thread snapper = new Thread(() => SendSnaps(cam, index));
+                        snapper.IsBackground = true;
+                        snapper.Start();
+                    }
+
+                    // the server stopped the stream or the buffer is overloaded - stop streaming
+                    else if (streamActive && (Json == "false" || buffer[index].Count > 1000))
+                    {
+                        streamActive = false;
+                        cancels[index] = true;
+                        buffer[index].Clear();
+                    }
                 }
-                else if (Json == "false" && streamActive)
+                catch
                 {
-                    streamActive = false;
-                    cancels[index] = true;
+                    // ignore any errors
                 }
 
                 Thread.Sleep(100);
             }
         }
 
+        /// <summary>
+        /// Method which initializes threads for sending livestream media to server
+        /// </summary>
+        /// <param name="camera"></param>
+        /// <param name="index"></param>
         static void SendSnaps(Recorder camera, int index)
         {
             // fill the first frame
@@ -435,6 +564,11 @@ namespace SnapShot
             saver.Start();
         }
 
+        /// <summary>
+        /// Method which takes snaps for livestreaming on server
+        /// </summary>
+        /// <param name="camera"></param>
+        /// <param name="index"></param>
         public static void KeepSnapping(Recorder camera, int index)
         {
             Stopwatch sw = new Stopwatch();
@@ -450,6 +584,10 @@ namespace SnapShot
             cancels[index] = false;
         }
 
+        /// <summary>
+        /// Method which sends snaps for livestreaming to server
+        /// </summary>
+        /// <param name="index"></param>
         public static void KeepSaving(int index)
         {
             // send request for sending bitmap to server
