@@ -46,6 +46,9 @@ namespace SnapShot
             mediaSynchronizationPeriod = 0,
             mediaLatestSynchronizationTicks = 0;
 
+        TimeSpan JSONSyncTime = new TimeSpan(0, 0, 0),
+                 mediaSyncTime = new TimeSpan(0, 0, 0);
+
         // capture configuration
         bool imageCapture = true,
              singleMode = true;
@@ -83,6 +86,10 @@ namespace SnapShot
         public int MediaSyncPeriod { get => mediaSynchronizationPeriod; set => mediaSynchronizationPeriod = value; }
 
         public int MediaTicks { get => mediaLatestSynchronizationTicks; set => mediaLatestSynchronizationTicks = value; }
+
+        public TimeSpan JSONTime { get => JSONSyncTime; set => JSONSyncTime = value; }
+
+        public TimeSpan MediaTime { get => mediaSyncTime; set => mediaSyncTime = value; }
 
         public bool ConnectionStatus { get => connectionStatus; set => connectionStatus = value; }
         

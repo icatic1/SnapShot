@@ -22,17 +22,20 @@ namespace SnapShot
 
         static string JSONlocation = "";
 
-        static bool refreshNeeded = false, syncStatus = true, firstCheck = false, updateLabel = false;
+        static List<bool> refreshNeeded = new List<bool> { false, false },
+                          syncStatus = new List<bool> { true, true },
+                          firstCheck = new List<bool> { false, false },
+                          updateLabel = new List<bool> { false, false };
 
         public static string JSONLocation { get => JSONlocation; set => JSONlocation = value; }
 
-        public static bool RefreshNeeded { get => refreshNeeded; set => refreshNeeded = value; }
+        public static List<bool> RefreshNeeded { get => refreshNeeded; set => refreshNeeded = value; }
 
-        public static bool SyncStatus { get => syncStatus; set => syncStatus = value; }
+        public static List<bool> SyncStatus { get => syncStatus; set => syncStatus = value; }
 
-        public static bool FirstCheck { get => firstCheck; set => firstCheck = value; }
+        public static List<bool> FirstCheck { get => firstCheck; set => firstCheck = value; }
 
-        public static bool UpdateLabel { get => updateLabel; set => updateLabel = value; }
+        public static List<bool> UpdateLabel { get => updateLabel; set => updateLabel = value; }
 
         #endregion
 
@@ -42,8 +45,14 @@ namespace SnapShot
         {
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
+
+            panel1.BorderStyle = BorderStyle.None;
+            panel2.BorderStyle = BorderStyle.None;
             panel3.BorderStyle = BorderStyle.None;
             panel4.BorderStyle = BorderStyle.None;
+            
+            dateTimePicker1.CustomFormat = "HH:mm";
+            dateTimePicker2.CustomFormat = "HH:mm";
 
             // show information from existing configuration
             UpdateConfigurationWindow();
@@ -348,23 +357,41 @@ namespace SnapShot
                 period *= 3600;
 
             // synchronization configuration
-            int JSONSyncPeriod = (int)numericUpDown1.Value;
-            if (domainUpDown4.Text == "minutes")
-                JSONSyncPeriod *= 60;
-            else if (domainUpDown4.Text == "hours")
-                JSONSyncPeriod *= 3600;
-            else if (domainUpDown4.Text == "days")
-                JSONSyncPeriod *= 86400;
-            int JSONTicks = Program.Snapshot.Configuration.JSONSyncPeriod;
 
-            int mediaSyncPeriod = (int)numericUpDown2.Value;
-            if (domainUpDown2.Text == "minutes")
-                mediaSyncPeriod *= 60;
-            else if (domainUpDown2.Text == "hours")
-                mediaSyncPeriod *= 3600;
-            else if (domainUpDown2.Text == "days")
-                mediaSyncPeriod *= 86400;
-            int mediaTicks = Program.Snapshot.Configuration.MediaSyncPeriod;
+            int JSONSyncPeriod = 0,
+                JSONTicks = Program.Snapshot.Configuration.JSONSyncPeriod;
+            TimeSpan JSONSync = new TimeSpan(0, 0, 0);
+
+            if (radioButton1.Checked)
+            {
+                JSONSyncPeriod = (int)numericUpDown1.Value;
+                if (domainUpDown4.Text == "minutes")
+                    JSONSyncPeriod *= 60;
+                else if (domainUpDown4.Text == "hours")
+                    JSONSyncPeriod *= 3600;
+                else if (domainUpDown4.Text == "days")
+                    JSONSyncPeriod *= 86400;
+                
+            }
+            else
+                JSONSync = dateTimePicker1.Value.TimeOfDay;
+
+            int mediaSyncPeriod = 0,
+                mediaTicks = Program.Snapshot.Configuration.MediaSyncPeriod;
+            TimeSpan mediaSync = new TimeSpan(0, 0, 0);
+
+            if (radioButton4.Checked)
+            {
+                mediaSyncPeriod = (int)numericUpDown2.Value;
+                if (domainUpDown2.Text == "minutes")
+                    mediaSyncPeriod *= 60;
+                else if (domainUpDown2.Text == "hours")
+                    mediaSyncPeriod *= 3600;
+                else if (domainUpDown2.Text == "days")
+                    mediaSyncPeriod *= 86400;
+            }
+            else
+                mediaSync = dateTimePicker2.Value.TimeOfDay;
 
             // something was not correct - do not allow configuration to be created
             if (errorText.Length > 0)
@@ -395,8 +422,10 @@ namespace SnapShot
                 ConnectionStatus = status,
                 JSONSyncPeriod = JSONSyncPeriod,
                 JSONTicks = JSONTicks,
+                JSONTime = JSONSync,
                 MediaSyncPeriod = mediaSyncPeriod,
                 MediaTicks = mediaTicks,
+                MediaTime = mediaSync,
                 ImageCapture = image,
                 SingleMode = single,
                 Duration = duration,
@@ -457,9 +486,7 @@ namespace SnapShot
             radioButton6.Checked = !config.SingleMode;
 
             numericUpDown6.Enabled = !config.SingleMode;
-            numericUpDown6.ReadOnly = config.SingleMode;
             domainUpDown6.Enabled = !config.SingleMode;
-            domainUpDown6.ReadOnly = config.SingleMode;
 
             string unit = "seconds";
             int time = config.Duration;
@@ -506,6 +533,7 @@ namespace SnapShot
             // synchronization configuration
             unit = "seconds";
             time = config.JSONSyncPeriod;
+
             while (unit != "days" && (int)(time / 60) > 0)
             {
                 if (unit == "seconds")
@@ -528,14 +556,19 @@ namespace SnapShot
             {
                 numericUpDown1.Value = (int)time;
                 domainUpDown4.Text = unit;
+                radioButton1.Checked = true;
             }
             else
             {
                 numericUpDown1.Value = 1;
                 domainUpDown4.Text = "seconds";
+                radioButton2.Checked = true;
+                dateTimePicker1.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, config.JSONTime.Hours, config.JSONTime.Minutes, config.JSONTime.Seconds);
             }
+
             unit = "seconds";
             time = config.MediaSyncPeriod;
+
             while (unit != "days" && (int)(time / 60) > 0)
             {
                 if (unit == "seconds")
@@ -554,15 +587,19 @@ namespace SnapShot
                     time = time / 24;
                 }
             }
+
             if (time > 0)
             {
                 numericUpDown2.Value = (int)time;
                 domainUpDown2.Text = unit;
+                radioButton4.Checked = true;
             }
             else
             {
                 numericUpDown2.Value = 1;
                 domainUpDown2.Text = "seconds";
+                radioButton3.Checked = true;
+                dateTimePicker2.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, config.MediaTime.Hours, config.MediaTime.Minutes, config.MediaTime.Seconds);
             }
 
             // clear any previous output
@@ -628,29 +665,16 @@ namespace SnapShot
         private void radioButton6_CheckedChanged(object sender, EventArgs e)
         {
             // burst selected - allow for burst duration and period to be selected
+
+            // enable/disable burst period
+            numericUpDown5.Enabled = radioButton6.Checked;
+            domainUpDown5.Enabled = radioButton6.Checked;
+
             if (radioButton6.Checked)
             {
                 // enable duration
                 numericUpDown6.Enabled = true;
-                numericUpDown6.ReadOnly = false;
                 domainUpDown6.Enabled = true;
-                domainUpDown6.ReadOnly = false;
-
-                // enable burst period
-                numericUpDown5.Enabled = true;
-                numericUpDown5.ReadOnly = false;
-                domainUpDown5.Enabled = true;
-                domainUpDown5.ReadOnly = false;
-            }
-
-            // burst not selected - do not allow burst period to be selected
-            else
-            {
-                // disable burst period
-                numericUpDown5.Enabled = false;
-                numericUpDown5.ReadOnly = true;
-                domainUpDown5.Enabled = false;
-                domainUpDown5.ReadOnly = true;
             }
         }
 
@@ -662,39 +686,25 @@ namespace SnapShot
         private void radioButton7_CheckedChanged(object sender, EventArgs e)
         {
             // video is selected - burst not available, duration is available
+
+            // disable burst button
+            radioButton6.Enabled = !radioButton7.Checked;
+
+            // disable burst period
+            numericUpDown5.Enabled = !radioButton7.Checked;
+            domainUpDown5.Enabled = !radioButton7.Checked;
+
             if (radioButton7.Checked)
             {
                 // automatically select single
                 radioButton5.Checked = true;
 
-                // disable burst button
-                radioButton6.Enabled = false;
-                radioButton6.Checked = false;
-
-                // disable burst period
-                numericUpDown5.Enabled = false;
-                numericUpDown5.ReadOnly = true;
-                domainUpDown5.Enabled = false;
-                domainUpDown5.ReadOnly = true;
+                // unselect burst button
+                radioButton6.Checked = false; 
 
                 // enable duration
                 numericUpDown6.Enabled = true;
-                numericUpDown6.ReadOnly = false;
                 domainUpDown6.Enabled = true;
-                domainUpDown6.ReadOnly = false;
-            }
-
-            // video is not selected - enable burst to be selected
-            else
-            {
-                // enable burst button
-                radioButton6.Enabled = true;
-
-                // enable burst period
-                numericUpDown5.Enabled = true;
-                numericUpDown5.ReadOnly = false;
-                domainUpDown5.Enabled = true;
-                domainUpDown5.ReadOnly = false;
             }
         }
 
@@ -713,15 +723,11 @@ namespace SnapShot
 
                 // disable burst period
                 numericUpDown5.Enabled = false;
-                numericUpDown5.ReadOnly = true;
                 domainUpDown5.Enabled = false;
-                domainUpDown5.ReadOnly = true;
 
                 // disable duration
                 numericUpDown6.Enabled = false;
-                numericUpDown6.ReadOnly = true;
                 domainUpDown6.Enabled = false;
-                domainUpDown6.ReadOnly = true;
             }
         }
 
@@ -733,21 +739,60 @@ namespace SnapShot
         private void radioButton5_CheckedChanged(object sender, EventArgs e)
         {
             // single image selected - disable duration
-            if (radioButton8.Checked && radioButton5.Checked)
-            {
-                numericUpDown6.Enabled = false;
-                numericUpDown6.ReadOnly = true;
-                domainUpDown6.Enabled = false;
-                domainUpDown6.ReadOnly = true;
-            }
-            // any other combination - enable duration
-            else
-            {
-                numericUpDown6.Enabled = true;
-                numericUpDown6.ReadOnly = false;
-                domainUpDown6.Enabled = true;
-                domainUpDown6.ReadOnly = false;
-            }
+            numericUpDown6.Enabled = !(radioButton8.Checked && radioButton5.Checked);
+            domainUpDown6.Enabled = !(radioButton8.Checked && radioButton5.Checked);
+        }
+
+        /// <summary>
+        /// Disable selecting date when JSON sync period is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            numericUpDown1.Enabled = radioButton1.Checked;
+            domainUpDown4.Enabled = radioButton1.Checked;
+
+            dateTimePicker1.Enabled = !radioButton1.Checked;
+        }
+
+        /// <summary>
+        /// Disable selecting period when JSON sync date is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTimePicker1.Enabled = radioButton2.Checked;
+
+            numericUpDown1.Enabled = !radioButton2.Checked;
+            domainUpDown4.Enabled = !radioButton2.Checked;
+        }
+
+        /// <summary>
+        /// Disable selecting date when media sync period is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            numericUpDown2.Enabled = radioButton4.Checked;
+            domainUpDown2.Enabled = radioButton4.Checked;
+
+            dateTimePicker2.Enabled = !radioButton4.Checked;
+        }
+
+        /// <summary>
+        /// Disable selecting period when media sync date is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTimePicker2.Enabled = radioButton3.Checked;
+
+            numericUpDown2.Enabled = !radioButton3.Checked;
+            domainUpDown2.Enabled = !radioButton3.Checked;
         }
 
         #endregion
@@ -775,7 +820,8 @@ namespace SnapShot
                 if (textBox4.Text.Length > 0)
                     url += ":" + textBox4.Text;
 
-                Configuration.DeviceCheck(url);
+                // uncomment this if it is necessary - prolongs the connection time
+                //Configuration.DeviceCheck(url);
             }
             catch
             {
@@ -788,31 +834,161 @@ namespace SnapShot
 
         #region Synchronization
 
+        /// <summary>
+        /// Initialize timers which will update the synchronization status
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConfigurationForm_Load(object sender, EventArgs e)
         {
-            Timer timer = new Timer();
-            timer.Interval = 2000;
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Start();
+            Timer timerJSON = new Timer();
+            Timer timerMedia = new Timer();
+
+            // minimum possible sync time is 1000 ms (1 s) - check for updates every 1 s
+            timerJSON.Interval = 1000;
+            timerJSON.Tick += new EventHandler(UpdateJSONSynchronization);
+            timerJSON.Start();
+
+            // minimum possible sync time is 1000 ms (1 s) - check for updates every 1 s
+            timerMedia.Interval = 1000;
+            timerMedia.Tick += new EventHandler(UpdateMediaSynchronization);
+            timerMedia.Start();
         }
 
-        private void timer_Tick(object? sender, EventArgs e)
+        /// <summary>
+        /// Method which updates the labels to show current synchronization status for JSON config
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateJSONSynchronization(object? sender, EventArgs e)
         {
-            if (syncStatus && firstCheck && RefreshNeeded && UpdateLabel)
+            if (syncStatus[0] && firstCheck[0] && refreshNeeded[0] && updateLabel[0])
                 label3.Text = "Synchronization successful.";
-            else if (firstCheck && UpdateLabel)
+            else if (firstCheck[0] && updateLabel[0])
                 label3.Text = "Synchronization failed.";
             else
-                label3.Text = "";
+                label3.Text = "Waiting.";
 
-            if (UpdateLabel)
-                UpdateLabel = false;
+            // we updated the form - reset the update
+            if (updateLabel[0])
+                updateLabel[0] = false;
 
-            if (RefreshNeeded)
+            // when the JSON config is synchronized, camera recorders need to be reset
+            if (refreshNeeded[0])
             {
-                RefreshNeeded = false;
+                refreshNeeded[0] = false;
                 Program.Recorders.ForEach(r => r.Reconfigure());
                 UpdateConfigurationWindow();
+            }
+        }
+        
+        /// <summary>
+        /// Method which updates the labels to show current synchronization status for media files
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateMediaSynchronization(object? sender, EventArgs e)
+        {
+            if (syncStatus[1] && firstCheck[1] && refreshNeeded[1] && updateLabel[1])
+                label14.Text = "Synchronization successful.";
+            else if (firstCheck[1] && updateLabel[1])
+                label14.Text = "Synchronization failed.";
+            else
+                label14.Text = "Waiting.";
+
+            // we updated the form - reset the update
+            if (updateLabel[1])
+                updateLabel[1] = false;
+        }
+
+        /// <summary>
+        /// Method for manual synchronization of JSON configuration
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // formulate the path for importing JSON configuration from server
+                string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                string JSONPath = path + "/" + Program.Snapshot.Configuration.JSONImportLocation;
+
+                Configuration.ImportFromJSON(JSONPath);
+
+                // send update signal to keep the label active
+                firstCheck[0] = true;
+                syncStatus[0] = true;
+                refreshNeeded[0] = true;
+                updateLabel[0] = true;
+
+                label3.Text = "Synchronization successful.";
+
+                // denote that the synchronization has occured
+                Program.Snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
+
+                // when the JSON config is synchronized, camera recorders need to be reset
+                Program.Recorders.ForEach(r => r.Reconfigure());
+                UpdateConfigurationWindow();
+            }
+            catch
+            {
+                // send failed signal to keep the label active
+                syncStatus[0] = false;
+                updateLabel[0] = true;
+
+                label3.Text = "Synchronization failed.";
+            }
+        }
+
+        /// <summary>
+        /// Method for manual synchronization of media files
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // formulate the path for exporting files to server
+                string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                string mediaPath = path + "/" + Program.Snapshot.Configuration.MediaPath;
+
+                // get all locally created images and videos
+                string[] localEntries = Directory.GetFileSystemEntries(Program.Snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+
+                for (int i = 0; i < localEntries.Length; i++)
+                    localEntries[i] = localEntries[i].Replace(Program.Snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+
+                // get all images and videos located on the server
+                string[] serverEntries = Program.GetEntriesFromServer(Program.Snapshot.Configuration.ServerIP, Program.Snapshot.Configuration.ServerPort.ToString(), Program.Snapshot.Configuration.MediaPath);
+
+                // find all local entries which are not present among server entries
+                List<string> newEntries = Program.FindNewEntries(localEntries, serverEntries);
+
+                // upload every new local file to server
+                foreach (var newEntry in newEntries)
+                    Configuration.UploadFile(mediaPath, newEntry, Program.Snapshot.Configuration.OutputFolderPath);
+
+                // send update signal to keep the label active
+                firstCheck[1] = true;
+                syncStatus[1] = true;
+                refreshNeeded[1] = true;
+                updateLabel[1] = true;
+
+                label14.Text = "Synchronization successful.";
+            }
+            catch
+            {
+                // send failed signal to keep the label active
+                syncStatus[1] = false;
+                updateLabel[1] = true;
+
+                label14.Text = "Synchronization failed.";
             }
         }
 

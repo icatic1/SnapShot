@@ -79,16 +79,24 @@
             this.label30 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button5 = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.domainUpDown2 = new System.Windows.Forms.DomainUpDown();
-            this.label8 = new System.Windows.Forms.Label();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.button5 = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.domainUpDown4 = new System.Windows.Forms.DomainUpDown();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.button3 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -122,8 +130,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.groupBox2.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -187,7 +197,7 @@
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 26);
             this.toolStripMenuItem2.Text = "General settings";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -198,7 +208,7 @@
             this.toolStripMenuItem5,
             this.toolStripMenuItem6});
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(198, 26);
             this.toolStripMenuItem3.Text = "Camera settings";
             // 
             // toolStripMenuItem4
@@ -496,8 +506,8 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 45F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1624, 676);
             this.tableLayoutPanel1.TabIndex = 32;
             // 
@@ -586,9 +596,9 @@
             this.textBox10.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox10.Enabled = false;
             this.textBox10.Location = new System.Drawing.Point(148, 193);
             this.textBox10.Name = "textBox10";
-            this.textBox10.ReadOnly = true;
             this.textBox10.Size = new System.Drawing.Size(322, 27);
             this.textBox10.TabIndex = 14;
             // 
@@ -618,9 +628,9 @@
             this.textBox11.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox11.Enabled = false;
             this.textBox11.Location = new System.Drawing.Point(148, 44);
             this.textBox11.Name = "textBox11";
-            this.textBox11.ReadOnly = true;
             this.textBox11.Size = new System.Drawing.Size(319, 27);
             this.textBox11.TabIndex = 4;
             // 
@@ -662,36 +672,71 @@
             this.groupBox1.Location = new System.Drawing.Point(15, 353);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(15);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1594, 240);
+            this.groupBox1.Size = new System.Drawing.Size(1594, 274);
             this.groupBox1.TabIndex = 39;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Synchronization settings";
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.panel2);
             this.groupBox5.Controls.Add(this.button5);
-            this.groupBox5.Controls.Add(this.domainUpDown2);
             this.groupBox5.Controls.Add(this.label8);
-            this.groupBox5.Controls.Add(this.numericUpDown2);
             this.groupBox5.Controls.Add(this.label15);
             this.groupBox5.Controls.Add(this.label14);
             this.groupBox5.Location = new System.Drawing.Point(844, 26);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(539, 194);
+            this.groupBox5.Size = new System.Drawing.Size(600, 242);
             this.groupBox5.TabIndex = 34;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Media synchronization";
             // 
-            // button5
+            // panel2
             // 
-            this.button5.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button5.Location = new System.Drawing.Point(201, 150);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(160, 29);
-            this.button5.TabIndex = 44;
-            this.button5.Text = "Synchronize now";
-            this.button5.UseVisualStyleBackColor = true;
+            this.panel2.Controls.Add(this.dateTimePicker2);
+            this.panel2.Controls.Add(this.radioButton3);
+            this.panel2.Controls.Add(this.radioButton4);
+            this.panel2.Controls.Add(this.domainUpDown2);
+            this.panel2.Controls.Add(this.numericUpDown2);
+            this.panel2.Location = new System.Drawing.Point(226, 81);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(354, 90);
+            this.panel2.TabIndex = 45;
+            // 
+            // dateTimePicker2
+            // 
+            this.dateTimePicker2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker2.Location = new System.Drawing.Point(139, 49);
+            this.dateTimePicker2.Name = "dateTimePicker2";
+            this.dateTimePicker2.ShowUpDown = true;
+            this.dateTimePicker2.Size = new System.Drawing.Size(198, 27);
+            this.dateTimePicker2.TabIndex = 43;
+            // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioButton3.Location = new System.Drawing.Point(23, 51);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(110, 24);
+            this.radioButton3.TabIndex = 42;
+            this.radioButton3.TabStop = true;
+            this.radioButton3.Text = "every day at";
+            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            // 
+            // radioButton4
+            // 
+            this.radioButton4.AutoSize = true;
+            this.radioButton4.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioButton4.Location = new System.Drawing.Point(23, 12);
+            this.radioButton4.Name = "radioButton4";
+            this.radioButton4.Size = new System.Drawing.Size(65, 24);
+            this.radioButton4.TabIndex = 0;
+            this.radioButton4.TabStop = true;
+            this.radioButton4.Text = "every";
+            this.radioButton4.UseVisualStyleBackColor = true;
+            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
             // 
             // domainUpDown2
             // 
@@ -699,11 +744,40 @@
             this.domainUpDown2.Items.Add("hours");
             this.domainUpDown2.Items.Add("minutes");
             this.domainUpDown2.Items.Add("seconds");
-            this.domainUpDown2.Location = new System.Drawing.Point(356, 106);
+            this.domainUpDown2.Location = new System.Drawing.Point(224, 12);
             this.domainUpDown2.Name = "domainUpDown2";
-            this.domainUpDown2.Size = new System.Drawing.Size(102, 27);
-            this.domainUpDown2.TabIndex = 44;
+            this.domainUpDown2.Size = new System.Drawing.Size(113, 27);
+            this.domainUpDown2.TabIndex = 41;
             this.domainUpDown2.Text = "seconds";
+            // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.Location = new System.Drawing.Point(95, 12);
+            this.numericUpDown2.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(102, 27);
+            this.numericUpDown2.TabIndex = 22;
+            this.numericUpDown2.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // button5
+            // 
+            this.button5.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button5.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button5.Location = new System.Drawing.Point(246, 191);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(160, 29);
+            this.button5.TabIndex = 44;
+            this.button5.Text = "Synchronize now";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // label8
             // 
@@ -714,23 +788,6 @@
             this.label8.Size = new System.Drawing.Size(159, 20);
             this.label8.TabIndex = 43;
             this.label8.Text = "Synchronization status:";
-            // 
-            // numericUpDown2
-            // 
-            this.numericUpDown2.Location = new System.Drawing.Point(244, 106);
-            this.numericUpDown2.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(88, 27);
-            this.numericUpDown2.TabIndex = 43;
-            this.numericUpDown2.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label15
             // 
@@ -749,35 +806,70 @@
             this.label14.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.label14.Location = new System.Drawing.Point(250, 43);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(134, 25);
+            this.label14.Size = new System.Drawing.Size(76, 25);
             this.label14.TabIndex = 42;
-            this.label14.Text = "Synchronizing...";
+            this.label14.Text = "Waiting.";
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.panel1);
             this.groupBox2.Controls.Add(this.button3);
-            this.groupBox2.Controls.Add(this.domainUpDown4);
-            this.groupBox2.Controls.Add(this.numericUpDown1);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Location = new System.Drawing.Point(218, 26);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(581, 194);
+            this.groupBox2.Size = new System.Drawing.Size(581, 242);
             this.groupBox2.TabIndex = 33;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Configuration synchronization";
             // 
-            // button3
+            // panel1
             // 
-            this.button3.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button3.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button3.Location = new System.Drawing.Point(222, 150);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(160, 29);
-            this.button3.TabIndex = 43;
-            this.button3.Text = "Synchronize now";
-            this.button3.UseVisualStyleBackColor = true;
+            this.panel1.Controls.Add(this.dateTimePicker1);
+            this.panel1.Controls.Add(this.radioButton2);
+            this.panel1.Controls.Add(this.radioButton1);
+            this.panel1.Controls.Add(this.domainUpDown4);
+            this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Location = new System.Drawing.Point(209, 81);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(354, 90);
+            this.panel1.TabIndex = 44;
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker1.Location = new System.Drawing.Point(139, 49);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.ShowUpDown = true;
+            this.dateTimePicker1.Size = new System.Drawing.Size(198, 27);
+            this.dateTimePicker1.TabIndex = 43;
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioButton2.Location = new System.Drawing.Point(23, 51);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(110, 24);
+            this.radioButton2.TabIndex = 42;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "every day at";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioButton1.Location = new System.Drawing.Point(23, 12);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(65, 24);
+            this.radioButton1.TabIndex = 0;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "every";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
             // domainUpDown4
             // 
@@ -785,28 +877,40 @@
             this.domainUpDown4.Items.Add("hours");
             this.domainUpDown4.Items.Add("minutes");
             this.domainUpDown4.Items.Add("seconds");
-            this.domainUpDown4.Location = new System.Drawing.Point(335, 106);
+            this.domainUpDown4.Location = new System.Drawing.Point(224, 12);
             this.domainUpDown4.Name = "domainUpDown4";
-            this.domainUpDown4.Size = new System.Drawing.Size(102, 27);
+            this.domainUpDown4.Size = new System.Drawing.Size(113, 27);
             this.domainUpDown4.TabIndex = 41;
             this.domainUpDown4.Text = "seconds";
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(223, 106);
+            this.numericUpDown1.Location = new System.Drawing.Point(95, 12);
             this.numericUpDown1.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(88, 27);
+            this.numericUpDown1.Size = new System.Drawing.Size(102, 27);
             this.numericUpDown1.TabIndex = 22;
             this.numericUpDown1.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
+            // 
+            // button3
+            // 
+            this.button3.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button3.Location = new System.Drawing.Point(222, 191);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(160, 29);
+            this.button3.TabIndex = 43;
+            this.button3.Text = "Synchronize now";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label2
             // 
@@ -835,9 +939,9 @@
             this.label3.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.label3.Location = new System.Drawing.Point(228, 42);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 25);
+            this.label3.Size = new System.Drawing.Size(76, 25);
             this.label3.TabIndex = 39;
-            this.label3.Text = "Synchronizing...";
+            this.label3.Text = "Waiting.";
             // 
             // domainUpDown1
             // 
@@ -1095,9 +1199,9 @@
             // button6
             // 
             this.button6.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button6.Location = new System.Drawing.Point(772, 627);
+            this.button6.Location = new System.Drawing.Point(772, 645);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(160, 29);
+            this.button6.Size = new System.Drawing.Size(160, 28);
             this.button6.TabIndex = 24;
             this.button6.Text = "Save configuration";
             this.button6.UseVisualStyleBackColor = true;
@@ -1131,9 +1235,13 @@
             this.groupBox1.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
@@ -1209,9 +1317,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DomainUpDown domainUpDown2;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.DomainUpDown domainUpDown4;
@@ -1233,5 +1339,15 @@
         private System.Windows.Forms.NumericUpDown numericUpDown6;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.DateTimePicker dateTimePicker2;
+        private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.DomainUpDown domainUpDown2;
+        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton radioButton1;
     }
 }
