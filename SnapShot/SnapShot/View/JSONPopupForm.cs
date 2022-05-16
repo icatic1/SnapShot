@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace SnapShot.View
 {
-    public partial class JSONPopup : Form
+    public partial class JSONPopupForm : Form
     {
         #region Constructor
 
-        public JSONPopup()
+        public JSONPopupForm()
         {
             InitializeComponent();
 
@@ -32,7 +32,7 @@ namespace SnapShot.View
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            ConfigurationForm.JSONLocation = comboBox2.Text;
+            GeneralSettingsForm.JSONLocation = comboBox2.Text;
             this.Close();
         }
 
@@ -99,16 +99,23 @@ namespace SnapShot.View
         {
             comboBox2.Items.Clear();
 
-            foreach (var camera in Program.Snapshot.Camera)
-            {
-                string path = "http://" + camera.ServerIP;
-                if (camera.ServerPort != 0)
-                    path += ":" + camera.ServerPort;
-                if (camera.JSONConfigPath != "")
-                    path += "/" + camera.JSONConfigPath;
-                comboBox2.Items.Add(path);
-            }
+            // add the JSON export path of the server to the list of items
+            string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+            if (Program.Snapshot.Configuration.ServerPort != 0)
+                path += ":" + Program.Snapshot.Configuration.ServerPort;
+            if (Program.Snapshot.Configuration.JSONExportLocation != "")
+                path += "/" + Program.Snapshot.Configuration.JSONExportLocation;
+            comboBox2.Items.Add(path);
 
+            // add the JSON import path of the server to the list of items
+            path = "http://" + Program.Snapshot.Configuration.ServerIP;
+            if (Program.Snapshot.Configuration.ServerPort != 0)
+                path += ":" + Program.Snapshot.Configuration.ServerPort;
+            if (Program.Snapshot.Configuration.JSONImportLocation != "")
+                path += "/" + Program.Snapshot.Configuration.JSONImportLocation;
+            comboBox2.Items.Add(path);
+
+            // add any other local path the user has selected to the list of items
             if (additionalLocation.Length > 0)
                 comboBox2.Items.Add(additionalLocation);
         }

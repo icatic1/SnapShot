@@ -1,6 +1,6 @@
 ﻿namespace SnapShot.View
 {
-    partial class JSONPopup
+    partial class JSONPopupForm
     {
         /// <summary>
         /// Required designer variable.
