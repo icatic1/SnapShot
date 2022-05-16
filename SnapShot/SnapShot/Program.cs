@@ -36,11 +36,11 @@ namespace SnapShot
             new FileSystemWatcher()
         };
 
-        static List<Camera> recorders = new List<Camera>()
+        static List<Recorder> recorders = new List<Recorder>()
         {
-            new Camera(0),
-            new Camera(1),
-            new Camera(2)
+            new Recorder(0),
+            new Recorder(1),
+            new Recorder(2)
         };
 
         static List<bool> cancels = new List<bool>() { false, false, false };
@@ -54,7 +54,7 @@ namespace SnapShot
 
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
 
-        public static List<Camera> Recorders { get => recorders; set => recorders = value; }
+        public static List<Recorder> Recorders { get => recorders; set => recorders = value; }
 
         #endregion
 
@@ -100,29 +100,29 @@ namespace SnapShot
             while (1 == 1)
             {
 
-                for (int i = 0; i < snapshot.Camera.Count; i++)
+                for (int i = 0; i < snapshot.Configuration.Cameras.Count; i++)
                 {
                     // configuration not set - wait a little bit, then check again
-                    if (snapshot.Camera[i].TriggerFilePath.Length < 1)
+                    if (snapshot.Configuration.TriggerFilePath.Length < 1)
                         continue;
 
                     // configuration set - change trigger content
                     else
                     {
                         // output trigger file did not change - do not change the file we are watching
-                        if (snapshot.Camera[i].TriggerFilePath == oldTriggerFilePaths[i])
+                        if (snapshot.Configuration.TriggerFilePath == oldTriggerFilePaths[i])
                             continue;
 
                         // output trigger file changed - change the file we are watching
                         // and save current line count
                         else
                         {
-                            oldTriggerFilePaths[i] = snapshot.Camera[i].TriggerFilePath;
+                            oldTriggerFilePaths[i] = snapshot.Configuration.TriggerFilePath;
                             try
                             {
-                                previousContent[i] = File.ReadAllLines(snapshot.Camera[i].TriggerFilePath).Length;
-                                watchers[i].Path = Path.GetDirectoryName(snapshot.Camera[i].TriggerFilePath) ?? "";
-                                watchers[i].Filter = Path.GetFileName(snapshot.Camera[i].TriggerFilePath);
+                                previousContent[i] = File.ReadAllLines(snapshot.Configuration.TriggerFilePath).Length;
+                                watchers[i].Path = Path.GetDirectoryName(snapshot.Configuration.TriggerFilePath) ?? "";
+                                watchers[i].Filter = Path.GetFileName(snapshot.Configuration.TriggerFilePath);
                                 watchers[i].Changed += (sender, EventArgs) =>
                                 {
                                     OnChanged(sender, EventArgs, i);
@@ -167,7 +167,7 @@ namespace SnapShot
                     entireText += content[i];
 
                 // check whether regex matches the new content
-                Regex regex = new Regex(@snapshot.Camera[index].Regex);
+                Regex regex = new Regex(@snapshot.Configuration.Regex);
                 bool matchFound = false;
 
                 if (regex.IsMatch(entireText))
@@ -183,9 +183,9 @@ namespace SnapShot
                 // new lines found, regex match found - start recording
 
                 // take a picture
-                if (snapshot.Camera[index].ImageCapture)
+                if (snapshot.Configuration.ImageCapture)
                 {
-                    if (snapshot.Camera[index].SingleMode)
+                    if (snapshot.Configuration.SingleMode)
                     {
                         // create folders with date if not already available
                         Program.recorders[index].CreateFolders();
@@ -194,7 +194,7 @@ namespace SnapShot
 
                         Program.recorders[index].SavePictureLocally(image, 0);
 
-                        if (Program.Snapshot.Camera[index].ConnectionStatus)
+                        if (Program.Snapshot.Configuration.ConnectionStatus)
                             Program.recorders[index].SaveMediaRemotely(0);
                     }
                     else
@@ -208,7 +208,7 @@ namespace SnapShot
                         {
                             Program.recorders[index].SavePictureLocally(images[i], 1, i);
 
-                            if (Program.Snapshot.Camera[index].ConnectionStatus)
+                            if (Program.Snapshot.Configuration.ConnectionStatus)
                                 Program.recorders[index].SaveMediaRemotely(1, i);
                         }
                     }
@@ -221,7 +221,7 @@ namespace SnapShot
 
                     Program.recorders[index].TakeAVideo();
 
-                    if (Program.Snapshot.Camera[index].ConnectionStatus)
+                    if (Program.Snapshot.Configuration.ConnectionStatus)
                         Program.recorders[index].SaveMediaRemotely(2);
                 }
             }
@@ -254,52 +254,52 @@ namespace SnapShot
                 try
                 {
                     // camera is connected to the specified server
-                    if (snapshot.Camera[index].ConnectionStatus && snapshot.Camera[index].OutputFolderPath.Length > 0)
+                    if (snapshot.Configuration.ConnectionStatus && snapshot.Configuration.OutputFolderPath.Length > 0)
                     {
                         // get all locally created images and videos
-                        string[] localEntries = Directory.GetFileSystemEntries(snapshot.Camera[index].OutputFolderPath, "*", SearchOption.AllDirectories);
+                        string[] localEntries = Directory.GetFileSystemEntries(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
 
                         for (int i = 0; i < localEntries.Length; i++)
-                            localEntries[i] = localEntries[i].Replace(snapshot.Camera[index].OutputFolderPath, "").TrimStart('\\');
+                            localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
 
-                        ConfigurationForm.FirstCheck = true;
+                        GeneralSettingsForm.FirstCheck = true;
 
                         // get all images and videos located on the server
-                        string[] serverEntries = GetEntriesFromServer(snapshot.Camera[index].ServerIP, snapshot.Camera[index].ServerPort.ToString(), snapshot.Camera[index].MediaPath);
+                        string[] serverEntries = GetEntriesFromServer(snapshot.Configuration.ServerIP, snapshot.Configuration.ServerPort.ToString(), snapshot.Configuration.MediaPath);
 
                         // find all local entries which are not present among server entries
                         List<string> newEntries = FindNewEntries(localEntries, serverEntries);
 
                         // upload every new local file to server
 
-                        string path = "http://" + snapshot.Camera[index].ServerIP;
-                        if (snapshot.Camera[index].ServerPort != 0)
-                            path += ":" + snapshot.Camera[index].ServerPort;
-                        string mediaPath = path + "/" + snapshot.Camera[index].MediaPath;
-                        string JSONPath = path + "/" + snapshot.Camera[index].JSONConfigPath;
+                        string path = "http://" + snapshot.Configuration.ServerIP;
+                        if (snapshot.Configuration.ServerPort != 0)
+                            path += ":" + snapshot.Configuration.ServerPort;
+                        string mediaPath = path + "/" + snapshot.Configuration.MediaPath;
+                        string JSONPath = path + "/" + snapshot.Configuration.JSONImportLocation;
 
                         foreach (var newEntry in newEntries)
-                            Configuration.UploadFile(mediaPath, newEntry, snapshot.Camera[index].OutputFolderPath);
+                            Configuration.UploadFile(mediaPath, newEntry, snapshot.Configuration.OutputFolderPath);
 
                         // synchronize JSON configuration with server
                         Configuration.ImportFromJSON(JSONPath);
 
-                        ConfigurationForm.SyncStatus = true;
-                        ConfigurationForm.RefreshNeeded = true;
-                        ConfigurationForm.UpdateLabel = true;
+                        GeneralSettingsForm.SyncStatus = true;
+                        GeneralSettingsForm.RefreshNeeded = true;
+                        GeneralSettingsForm.UpdateLabel = true;
 
                         // wait for next synchronization
-                        snapshot.Camera[index].LatestSynchronizationTicks = (int)DateTime.Now.Ticks;
+                        snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
                     }
                 }
                 catch
                 {
-                    ConfigurationForm.SyncStatus = false;
-                    ConfigurationForm.UpdateLabel = true;
+                    GeneralSettingsForm.SyncStatus = false;
+                    GeneralSettingsForm.UpdateLabel = true;
                 }
 
                 // wait for next synchronization
-                Thread.Sleep(snapshot.Camera[index].SynchronizationPeriod * 1000);
+                Thread.Sleep(snapshot.Configuration.JSONSyncPeriod * 1000);
             }
         }
 
@@ -374,20 +374,20 @@ namespace SnapShot
             }
         }
 
-        static void Listen(ref List<Camera> cameras, int index)
+        static void Listen(ref List<Recorder> cameras, int index)
         {
             bool streamActive = false;
 
             // check for livestream necessity every 100 ms
             while (1 == 1)
             {
-                if (Program.Snapshot.Camera[index].ServerIP.Length < 1)
+                if (Program.Snapshot.Configuration.ServerIP.Length < 1)
                     continue;
 
                 HttpWebRequest webRequest;
-                string url = "http://" + Program.Snapshot.Camera[index].ServerIP;
-                if (Program.Snapshot.Camera[index].ServerPort != 0)
-                    url += ":" + Program.Snapshot.Camera[index].ServerPort;
+                string url = "http://" + Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    url += ":" + Program.Snapshot.Configuration.ServerPort;
                 url += "/api/FileUpload/GetStreamState";
                 webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
                 webRequest.Method = "GET";
@@ -400,7 +400,7 @@ namespace SnapShot
                 if (Json == "true" && !streamActive)
                 {
                     streamActive = true;
-                    Camera cam = cameras[index];
+                    Recorder cam = cameras[index];
                     Thread snapper = new Thread(() => SendSnaps(cam, index));
                     snapper.IsBackground = true;
                     snapper.Start();
@@ -415,7 +415,7 @@ namespace SnapShot
             }
         }
 
-        static void SendSnaps(Camera camera, int index)
+        static void SendSnaps(Recorder camera, int index)
         {
             // fill the first frame
             Stopwatch sw = new Stopwatch();
@@ -435,7 +435,7 @@ namespace SnapShot
             saver.Start();
         }
 
-        public static void KeepSnapping(Camera camera, int index)
+        public static void KeepSnapping(Recorder camera, int index)
         {
             Stopwatch sw = new Stopwatch();
             while (!cancels[index])
@@ -453,9 +453,9 @@ namespace SnapShot
         public static void KeepSaving(int index)
         {
             // send request for sending bitmap to server
-            string url = "http://" + Program.Snapshot.Camera[index].ServerIP;
-            if (Program.Snapshot.Camera[index].ServerPort != 0)
-                url += ":" + Program.Snapshot.Camera[index].ServerPort;
+            string url = "http://" + Program.Snapshot.Configuration.ServerIP;
+            if (Program.Snapshot.Configuration.ServerPort != 0)
+                url += ":" + Program.Snapshot.Configuration.ServerPort;
             url += "/api/FileUpload/StreamBase64";
 
             Stopwatch sw = new Stopwatch();

@@ -15,18 +15,13 @@ namespace SnapShot
             licenced = false,
             connected = false;
 
-        List<Configuration> camera = new List<Configuration>()
-        {
-            new Configuration(),
-            new Configuration(),
-            new Configuration()
-        };
+        Configuration configuration = new Configuration();
 
         #endregion
 
         #region Properties
 
-        public List<Configuration> Camera { get => camera; set => camera = value; }
+        public Configuration Configuration { get => configuration; set => configuration = value; }
         public bool DebugLog { get => debugLog; set => debugLog = value; }
         public string TerminalName { get => terminalName; set => terminalName = value; }
         public bool Licenced { get => licenced; set => licenced = value; }
