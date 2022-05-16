@@ -33,8 +33,16 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importFromJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -77,30 +85,23 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(221, 28);
             this.label2.TabIndex = 6;
-            this.label2.Text = "SnapShot, version: 2.3";
+            this.label2.Text = "SnapShot, version: 7.1";
             // 
             // menuStrip1
             // 
             this.menuStrip1.BackColor = System.Drawing.SystemColors.Highlight;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.postavkeToolStripMenuItem,
             this.registracijaToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.postavkeToolStripMenuItem,
             this.pomoćToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 3, 0, 3);
             this.menuStrip1.Size = new System.Drawing.Size(662, 30);
-            this.menuStrip1.TabIndex = 8;
+            this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
-            // 
-            // postavkeToolStripMenuItem
-            // 
-            this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
-            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(114, 24);
-            this.postavkeToolStripMenuItem.Text = "Configuration";
-            this.postavkeToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // registracijaToolStripMenuItem
             // 
@@ -110,12 +111,85 @@
             this.registracijaToolStripMenuItem.Text = "Licence";
             this.registracijaToolStripMenuItem.Click += new System.EventHandler(this.registracijaToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3});
+            this.toolStripMenuItem1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(114, 24);
+            this.toolStripMenuItem1.Text = "Configuration";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem2.Text = "General settings";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem4,
+            this.toolStripMenuItem5,
+            this.toolStripMenuItem6});
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem3.Text = "Camera settings";
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem4.Text = "Camera 1";
+            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem5.Text = "Camera 2";
+            this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem6.Text = "Camera 3";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
+            // 
+            // postavkeToolStripMenuItem
+            // 
+            this.postavkeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportToJSONToolStripMenuItem,
+            this.importFromJSONToolStripMenuItem});
+            this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
+            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
+            this.postavkeToolStripMenuItem.Text = "JSON Import/Export";
+            // 
+            // exportToJSONToolStripMenuItem
+            // 
+            this.exportToJSONToolStripMenuItem.Name = "exportToJSONToolStripMenuItem";
+            this.exportToJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            this.exportToJSONToolStripMenuItem.Text = "Export to JSON";
+            this.exportToJSONToolStripMenuItem.Click += new System.EventHandler(this.exportToJSONToolStripMenuItem_Click);
+            // 
+            // importFromJSONToolStripMenuItem
+            // 
+            this.importFromJSONToolStripMenuItem.Name = "importFromJSONToolStripMenuItem";
+            this.importFromJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            this.importFromJSONToolStripMenuItem.Text = "Import from JSON";
+            this.importFromJSONToolStripMenuItem.Click += new System.EventHandler(this.importFromJSONToolStripMenuItem_Click);
+            // 
             // pomoćToolStripMenuItem
             // 
             this.pomoćToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.pomoćToolStripMenuItem.Name = "pomoćToolStripMenuItem";
             this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.pomoćToolStripMenuItem.Text = "Help";
+            this.pomoćToolStripMenuItem.Click += new System.EventHandler(this.pomoćToolStripMenuItem_Click);
             // 
             // InformationForm
             // 
@@ -148,8 +222,16 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem postavkeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem registracijaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem postavkeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportToJSONToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importFromJSONToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pomoćToolStripMenuItem;
     }
 }
