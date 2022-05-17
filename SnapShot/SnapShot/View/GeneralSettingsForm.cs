@@ -601,9 +601,6 @@ namespace SnapShot
                 radioButton3.Checked = true;
                 dateTimePicker2.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, config.MediaTime.Hours, config.MediaTime.Minutes, config.MediaTime.Seconds);
             }
-
-            // clear any previous output
-            toolStripStatusLabel1.Text = "";
         }
 
         #endregion

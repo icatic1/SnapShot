@@ -162,36 +162,34 @@ namespace SnapShot.Model
 
             // determine how many images need to be taken
             int noOfImages = (int)(Program.Snapshot.Configuration.Duration / Program.Snapshot.Configuration.Period);
-            bool burstLocked = false;
+
+            if (locked)
+                return images;
+            else
+                locked = true;
             
             // snap the necessary images
             for (int i = 0; i < noOfImages; i++)
             {
-                if (!locked)
-                {
-                    // lock the recorder so nobody else can use it
-                    locked = true;
-                    burstLocked = true;
+                // open the camera only the first time
+                if (i == 0)
+                    capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
 
-                    // open the camera only the first time
-                    if (i == 0)
-                        capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+                // take a snapshot
+                Mat frame = new Mat();
+                capture.Read(frame);
 
-                    // take a snapshot
-                    Mat frame = new Mat();
-                    capture.Read(frame);
+                // convert the snapshot to an image
+                image = BitmapConverter.ToBitmap(frame);
 
-                    // convert the snapshot to an image
-                    image = BitmapConverter.ToBitmap(frame);
+                // put demo watermark on image if not licenced
+                if (!Program.Snapshot.Licenced)
+                    using (Graphics g = Graphics.FromImage(image))
+                    {
+                        Font myFont = new Font("Arial", 14);
+                        g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
+                    }
 
-                    // put demo watermark on image if not licenced
-                    if (!Program.Snapshot.Licenced)
-                        using (Graphics g = Graphics.FromImage(image))
-                        {
-                            Font myFont = new Font("Arial", 14);
-                            g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
-                        }
-                }
                 // if the recorder is locked, instead of taking a new picture just return the latest snapshot
                 else
                     image = newestImage;
@@ -203,11 +201,8 @@ namespace SnapShot.Model
             }
 
             // unlock the recorder so others can use it
-            if (burstLocked)
-            {
-                locked = false;
-                capture.Release();
-            }
+            locked = false;
+            capture.Release();
 
             return images;
         }

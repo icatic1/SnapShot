@@ -24,17 +24,9 @@ namespace SnapShot
 
         static Snapshot snapshot = new Snapshot();
 
-        static List<int> previousContent = new List<int>()
-        {
-            0, 0, 0
-        };
+        static int previousContent = 0;
 
-        static List<FileSystemWatcher> watchers = new List<FileSystemWatcher>()
-        {
-            new FileSystemWatcher(),
-            new FileSystemWatcher(),
-            new FileSystemWatcher()
-        };
+        static FileSystemWatcher watcher = new FileSystemWatcher();
 
         static List<Recorder> recorders = new List<Recorder>()
         {
@@ -88,6 +80,11 @@ namespace SnapShot
             // start threads which will listen for livestreaming to server
             RunLivestreamListeners();
 
+            // start thread which will listen for user file synchronization from the web
+            Thread fileSyncListener = new Thread(() => ListenForFileSync(ref snapshot));
+            fileSyncListener.IsBackground = true;
+            fileSyncListener.Start();
+
             Application.Run(new LicencingForm());
         }
 
@@ -104,51 +101,48 @@ namespace SnapShot
 
         static void WatchTrigger(ref Snapshot snapshot)
         {
-            List<string> oldTriggerFilePaths = new List<string>() { "", "", "" };
+            string oldTriggerFilePath = "";
 
             while (1 == 1)
             {
 
-                for (int i = 0; i < snapshot.Configuration.Cameras.Count; i++)
+                // configuration not set - wait a little bit, then check again
+                if (snapshot.Configuration.TriggerFilePath.Length < 1)
+                    continue;
+
+                // configuration set - change trigger content
+                else
                 {
-                    // configuration not set - wait a little bit, then check again
-                    if (snapshot.Configuration.TriggerFilePath.Length < 1)
+                    // output trigger file did not change - do not change the file we are watching
+                    if (snapshot.Configuration.TriggerFilePath == oldTriggerFilePath)
                         continue;
 
-                    // configuration set - change trigger content
+                    // output trigger file changed - change the file we are watching
+                    // and save current line count
                     else
                     {
-                        // output trigger file did not change - do not change the file we are watching
-                        if (snapshot.Configuration.TriggerFilePath == oldTriggerFilePaths[i])
-                            continue;
-
-                        // output trigger file changed - change the file we are watching
-                        // and save current line count
-                        else
+                        oldTriggerFilePath = snapshot.Configuration.TriggerFilePath;
+                        try
                         {
-                            oldTriggerFilePaths[i] = snapshot.Configuration.TriggerFilePath;
-                            try
+                            previousContent = File.ReadAllLines(snapshot.Configuration.TriggerFilePath).Length;
+                            watcher.Path = Path.GetDirectoryName(snapshot.Configuration.TriggerFilePath) ?? "";
+                            watcher.Filter = Path.GetFileName(snapshot.Configuration.TriggerFilePath);
+                            watcher.Changed += (sender, EventArgs) =>
                             {
-                                previousContent[i] = File.ReadAllLines(snapshot.Configuration.TriggerFilePath).Length;
-                                watchers[i].Path = Path.GetDirectoryName(snapshot.Configuration.TriggerFilePath) ?? "";
-                                watchers[i].Filter = Path.GetFileName(snapshot.Configuration.TriggerFilePath);
-                                watchers[i].Changed += (sender, EventArgs) =>
-                                {
-                                    OnChanged(sender, EventArgs, i);
-                                };
-                                watchers[i].EnableRaisingEvents = true;
-                            }
-                            catch
-                            {
-                                continue;
-                            }
+                                OnChanged(sender, EventArgs);
+                            };
+                            watcher.EnableRaisingEvents = true;
+                        }
+                        catch
+                        {
+                            continue;
                         }
                     }
                 }
             }
         }
 
-        private static void OnChanged(object sender, FileSystemEventArgs e, int index)
+        private static void OnChanged(object sender, FileSystemEventArgs e)
         {
             // ignore anything except changes in file (create, delete, etc.)
             if (e.ChangeType != WatcherChangeTypes.Changed)
@@ -168,11 +162,11 @@ namespace SnapShot
             }
 
             // new content detected in file - check whether trigger regex is present
-            if (noOfLines > previousContent[index])
+            if (noOfLines > previousContent)
             {
                 // get everything that was added
                 string entireText = "";
-                for (int i = previousContent[index]; i < noOfLines; i++)
+                for (int i = previousContent; i < noOfLines; i++)
                     entireText += content[i];
 
                 // check whether regex matches the new content
@@ -183,7 +177,7 @@ namespace SnapShot
                     matchFound = true;
 
                 // register change for next check
-                previousContent[index] = noOfLines;
+                previousContent = noOfLines;
 
                 // regex match not found - end event
                 if (!matchFound)
@@ -196,42 +190,60 @@ namespace SnapShot
                 {
                     if (snapshot.Configuration.SingleMode)
                     {
-                        // create folders with date if not already available
-                        Program.recorders[index].CreateFolders();
+                        for (int i = 0; i < Program.recorders.Count; i++)
+                        {
+                            // skip cameras which have not been configured
+                            if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
+                                continue;
 
-                        Bitmap image = Program.recorders[index].TakeAPicture();
+                            Program.recorders[i].CreateFolders();
 
-                        Program.recorders[index].SavePictureLocally(image, 0);
+                            Bitmap image = Program.recorders[i].TakeAPicture();
 
-                        if (Program.Snapshot.Configuration.ConnectionStatus)
-                            Program.recorders[index].SaveMediaRemotely(0);
+                            Program.recorders[i].SavePictureLocally(image, 0);
+
+                            if (Program.Snapshot.Configuration.ConnectionStatus)
+                                Program.recorders[i].SaveMediaRemotely(0);
+                        }
                     }
                     else
                     {
-                        // create folders with date if not already available
-                        Program.recorders[index].CreateFolders(1);
-
-                        List<Bitmap> images = Program.recorders[index].TakeBurstImages();
-
-                        for (int i = 0; i <images.Count; i++)
+                        for (int i = 0; i < Program.recorders.Count; i++)
                         {
-                            Program.recorders[index].SavePictureLocally(images[i], 1, i);
+                            // skip cameras which have not been configured
+                            if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
+                                continue;
 
-                            if (Program.Snapshot.Configuration.ConnectionStatus)
-                                Program.recorders[index].SaveMediaRemotely(1, i);
+                            Program.recorders[i].CreateFolders(1);
+
+                            List<Bitmap> images = Program.recorders[i].TakeBurstImages();
+
+                            for (int j = 0; j < images.Count; j++)
+                            {
+                                Program.recorders[i].SavePictureLocally(images[j], 1, j);
+
+                                if (Program.Snapshot.Configuration.ConnectionStatus)
+                                    Program.recorders[i].SaveMediaRemotely(1, j);
+                            }
                         }
                     }
                 }
                 // take a video
                 else
                 {
-                    // create folders with date if not already available
-                    Program.recorders[index].CreateFolders();
+                    for (int i = 0; i < Program.recorders.Count; i++)
+                    {
+                        // skip cameras which have not been configured
+                        if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
+                            continue;
 
-                    Program.recorders[index].TakeAVideo();
+                        Program.recorders[i].CreateFolders();
 
-                    if (Program.Snapshot.Configuration.ConnectionStatus)
-                        Program.recorders[index].SaveMediaRemotely(2);
+                        Program.recorders[i].TakeAVideo();
+
+                        if (Program.Snapshot.Configuration.ConnectionStatus)
+                            Program.recorders[i].SaveMediaRemotely(2);
+                    }
                 }
             }
         }
@@ -611,6 +623,78 @@ namespace SnapShot
 
             cancels[index] = false;
             buffer[index].Clear();
+        }
+
+        #endregion
+
+        #region Remote Synchronization
+
+        static void ListenForFileSync(ref Snapshot snapshot)
+        {
+            // check for file sync necessity every 100 ms
+            while (1 == 1)
+            {
+                try
+                {
+                    if (Program.Snapshot.Configuration.ServerIP.Length < 1)
+                        continue;
+
+                    // send web request to check whether the server wants to stream
+                    HttpWebRequest webRequest;
+                    string url = "http://" + Program.Snapshot.Configuration.ServerIP;
+                    if (Program.Snapshot.Configuration.ServerPort != 0)
+                        url += ":" + Program.Snapshot.Configuration.ServerPort;
+                    url += "/api/FileUpload/GetFileSyncState";
+                    webRequest = (HttpWebRequest)WebRequest.Create(url + "/" + Configuration.GetMACAddress());
+                    webRequest.Method = "GET";
+
+                    // read the server response
+                    WebResponse response = webRequest.GetResponse();
+                    Stream responseStream = response.GetResponseStream();
+                    StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                    string Json = rdr.ReadToEnd();
+
+                    // the server wants to sync files - start file sync
+                    if (Json == "true")
+                    {
+                        // formulate the path for exporting files to server
+                        string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+                        if (Program.Snapshot.Configuration.ServerPort != 0)
+                            path += ":" + Program.Snapshot.Configuration.ServerPort;
+                        string mediaPath = path + "/" + Program.Snapshot.Configuration.MediaPath;
+
+                        // get all locally created images and videos
+                        string[] localEntries = Directory.GetFileSystemEntries(Program.Snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+
+                        for (int i = 0; i < localEntries.Length; i++)
+                            localEntries[i] = localEntries[i].Replace(Program.Snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+
+                        // get all images and videos located on the server
+                        string[] serverEntries = Program.GetEntriesFromServer(Program.Snapshot.Configuration.ServerIP, Program.Snapshot.Configuration.ServerPort.ToString(), Program.Snapshot.Configuration.MediaPath);
+
+                        // find all local entries which are not present among server entries
+                        List<string> newEntries = Program.FindNewEntries(localEntries, serverEntries);
+
+                        // upload every new local file to server
+                        foreach (var newEntry in newEntries)
+                            Configuration.UploadFile(mediaPath, newEntry, Program.Snapshot.Configuration.OutputFolderPath);
+
+                        // send update signal to keep the label active
+                        GeneralSettingsForm.FirstCheck[1] = true;
+                        GeneralSettingsForm.SyncStatus[1] = true;
+                        GeneralSettingsForm.RefreshNeeded[1] = true;
+                        GeneralSettingsForm.UpdateLabel[1] = true;
+                    }
+                }
+                catch
+                {
+                    // ignore any errors
+                    GeneralSettingsForm.SyncStatus[1] = false;
+                    GeneralSettingsForm.UpdateLabel[1] = true;
+                }
+
+                Thread.Sleep(100);
+            }
         }
 
         #endregion
