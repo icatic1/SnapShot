@@ -202,7 +202,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress();
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -254,7 +254,7 @@ namespace SnapShot
                                        + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                        + "DebugLog=" + Program.Snapshot.DebugLog;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/InitialAddDevice" + "?" + requestParams);
 
                 webRequest.Method = "POST";
 
@@ -280,7 +280,7 @@ namespace SnapShot
                                    + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                    + "DebugLog=" + Program.Snapshot.DebugLog;
 
-            webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
+            webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
 
             webRequest.Method = "POST";
 
@@ -366,7 +366,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = Configuration.GetMACAddress() ?? "";
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -399,7 +399,7 @@ namespace SnapShot
             {
                 HttpWebRequest webRequest;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/ConnectionCheck");
+                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/ConnectionCheck");
 
                 webRequest.Method = "GET";
 

@@ -139,7 +139,7 @@ namespace SnapShot
                     // create web-request for getting device information
                     HttpWebRequest webRequest;
                     string requestParams = "MacAddress=" + Configuration.GetMACAddress();
-                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+                    webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
                     webRequest.Method = "GET";
 
                     // send the web-request and check whether it returns a valid response
@@ -167,7 +167,7 @@ namespace SnapShot
                     string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
                                            + "TerminalID=" + terminalID + "&"
                                            + "DebugLog=" + debugLog;
-                    webRequest = (HttpWebRequest)WebRequest.Create("http://sigrupa4-001-site1.ctempurl.com/api/Licence/InitialAddDevice" + "?" + requestParams);
+                    webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/InitialAddDevice" + "?" + requestParams);
                     webRequest.Method = "POST";
 
                     // send the web-request and check whether it returns a valid response
