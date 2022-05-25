@@ -50,11 +50,16 @@ namespace SnapShot
         static List<bool> streamsActive = new List<bool>()
         { false, false, false };
 
+        static List<bool> stopFaceDetection = new List<bool>()
+        { false, false, false };
+
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
 
         public static List<Recorder> Recorders { get => recorders; set => recorders = value; }
 
         public static string LicencingURL { get => licencingURL; set => licencingURL = value; }
+
+        public static List<bool> StopFaceDetection { get => stopFaceDetection; set => stopFaceDetection = value; }
 
         #endregion
 
@@ -74,6 +79,11 @@ namespace SnapShot
             Thread listener = new Thread(() => ListenFromServer());
             listener.IsBackground = true;
             listener.Start();
+
+            // start thread which will constantly check if faces are present
+            Thread faceChecker = new Thread(() => FaceDetectionTrigger());
+            faceChecker.IsBackground = true;
+            faceChecker.Start();
 
             Application.Run(new LicencingForm());
         }
@@ -151,45 +161,26 @@ namespace SnapShot
                 if (!matchFound)
                     return;
 
+                for (int i = 0; i < stopFaceDetection.Count; i++)
+                    stopFaceDetection[i] = true;
+
                 // new lines found, regex match found - start recording
+                Record();
 
-                // take a picture
-                if (snapshot.Configuration.ImageCapture)
-                {
-                    if (snapshot.Configuration.SingleMode)
-                    {
-                        for (int i = 0; i < Program.recorders.Count; i++)
-                        {
-                            // skip cameras which have not been configured
-                            if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
-                                continue;
+                for (int i = 0; i < stopFaceDetection.Count; i++)
+                    stopFaceDetection[i] = false;
+            }
+        }
 
-                            Program.recorders[i].CreateFolders();
-
-                            Bitmap image = Program.recorders[i].TakeAPicture();
-
-                            Program.recorders[i].SavePictureLocally(image, 0);
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < Program.recorders.Count; i++)
-                        {
-                            // skip cameras which have not been configured
-                            if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
-                                continue;
-
-                            Program.recorders[i].CreateFolders(1);
-
-                            List<Bitmap> images = Program.recorders[i].TakeBurstImages();
-
-                            for (int j = 0; j < images.Count; j++)
-                                Program.recorders[i].SavePictureLocally(images[j], 1, j);
-                        }
-                    }
-                }
-                // take a video
-                else
+        /// <summary>
+        /// Record single image, burst images or video
+        /// </summary>
+        public static void Record()
+        { 
+            // take a picture
+            if (snapshot.Configuration.ImageCapture)
+            {
+                if (snapshot.Configuration.SingleMode)
                 {
                     for (int i = 0; i < Program.recorders.Count; i++)
                     {
@@ -199,8 +190,40 @@ namespace SnapShot
 
                         Program.recorders[i].CreateFolders();
 
-                        Program.recorders[i].TakeAVideo();
+                        Bitmap image = Program.recorders[i].TakeAPicture();
+
+                        Program.recorders[i].SavePictureLocally(image, 0);
                     }
+                }
+                else
+                {
+                    for (int i = 0; i < Program.recorders.Count; i++)
+                    {
+                        // skip cameras which have not been configured
+                        if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
+                            continue;
+
+                        Program.recorders[i].CreateFolders(1);
+
+                        List<Bitmap> images = Program.recorders[i].TakeBurstImages();
+
+                        for (int j = 0; j < images.Count; j++)
+                            Program.recorders[i].SavePictureLocally(images[j], 1, j);
+                    }
+                }
+            }
+            // take a video
+            else
+            {
+                for (int i = 0; i < Program.recorders.Count; i++)
+                {
+                    // skip cameras which have not been configured
+                    if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
+                        continue;
+
+                    Program.recorders[i].CreateFolders();
+
+                    Program.recorders[i].TakeAVideo();
                 }
             }
         }
@@ -284,6 +307,7 @@ namespace SnapShot
                         if (cameraLivestreams[i] && !streamsActive[i])
                         {
                             streamsActive[i] = true;
+                            stopFaceDetection[i] = true;
                             Recorder cam = recorders[i];
                             Thread snapper = new Thread(() => SendSnaps(cam, index));
                             snapper.IsBackground = true;
@@ -294,6 +318,7 @@ namespace SnapShot
                         else if (streamsActive[i] && (!cameraLivestreams[i] || buffer[i].Count > 1000))
                         {
                             streamsActive[i] = false;
+                            stopFaceDetection[i] = false;
                             cancels[i] = true;
                             buffer[i].Add(recorders[i].SnapBase64(2, true));
                             buffer[i].Clear();
@@ -570,6 +595,59 @@ namespace SnapShot
                 // tell recorder to stop snapping and clean up
                 cancels[index] = true;
                 buffer[index].Clear();
+            }
+        }
+
+        #endregion
+
+        #region Face Detection Trigger
+
+        /// <summary>
+        /// Constantly check if there are faces on the camera and start recording if it is true
+        /// </summary>
+        public static void FaceDetectionTrigger()
+        {
+            try
+            {
+                while (1 == 1)
+                {
+                    List<int> initializeStream = new List<int>() { 0, 0, 0 };
+                    for (int i = 0; i < recorders.Count; i++)
+                    {
+                        // face detection stopped - do not attempt to allocate stream again
+                        if (stopFaceDetection[i] && initializeStream[i] == 0)
+                            continue;
+
+                        // camera has not been setup - skip it
+                        if (snapshot.Configuration.Cameras[i].Id.Length < 1)
+                            continue;
+
+                        // someone else needs to use the camera - release it
+                        if (stopFaceDetection[i])
+                        {
+                            recorders[i].FaceDetection(2);
+                            break;
+                        }
+
+                        // configure camera for opening stream
+                        recorders[i].Reconfigure();
+
+                        // check if face is present on the camera
+                        bool facePresent = recorders[i].FaceDetection(initializeStream[i]);
+
+                        // if initialization has been done, stop the stream from closing
+                        if (initializeStream[i] == 0)
+                            initializeStream[i]++;
+
+                        // face is present on the camera - start recording
+                        if (facePresent)
+                            Record();
+                    }
+                }
+            }
+            catch
+            {
+                // ignore any errors
             }
         }
 

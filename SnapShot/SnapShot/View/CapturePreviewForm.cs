@@ -31,6 +31,7 @@ namespace SnapShot
         public CapturePreviewForm(string device, int camNo, string type)
         {
             InitializeComponent();
+            Program.StopFaceDetection[camNo] = true;
             cancel = false;
             textBox1.Text = device;
             cameraNumber = camNo;
@@ -49,6 +50,7 @@ namespace SnapShot
         private void CapturePreviewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             cancel = true;
+            Program.StopFaceDetection[cameraNumber] = false;
         }
 
         #endregion
@@ -75,21 +77,28 @@ namespace SnapShot
 
             while (1 == 1)
             {
-                // snap picture
-                image = Program.Recorders[cameraNumber].Snap(1, true);
+                try
+                {
+                    // snap picture
+                    image = Program.Recorders[cameraNumber].Snap(1, true);
 
-                // frame face if face detection is selected
-                List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles =
-                    new List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>>();
-                if (faceDetection)
-                    rectangles = FrameFace(image);
+                    // frame face if face detection is selected
+                    List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles =
+                        new List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>>();
+                    if (faceDetection)
+                        rectangles = FrameFace(image);
 
-                // set the pictureBox value
-                SetPicture(image, rectangles);
+                    // set the pictureBox value
+                    SetPicture(image, rectangles);
 
-                // stop the livestream
-                if (cancel)
-                    break;
+                    // stop the livestream
+                    if (cancel)
+                        break;
+                }
+                catch
+                {
+                    // ignore any errors
+                }
             }
 
             // stop the camera recorder

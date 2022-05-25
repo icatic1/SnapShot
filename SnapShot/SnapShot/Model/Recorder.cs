@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace SnapShot.Model
 {
@@ -337,7 +338,7 @@ namespace SnapShot.Model
 
         #endregion
 
-        #region Saving output
+        #region Saving Output
 
         /// <summary>
         /// Save picture to the local path
@@ -382,6 +383,62 @@ namespace SnapShot.Model
             // video
             else
                 Configuration.UploadFile(mediaPath, folderName + "\\VID" + timestamp + ".mp4", Program.Snapshot.Configuration.OutputFolderPath);
+        }
+
+        #endregion
+
+        #region Face Detection
+
+        public bool FaceDetection(int state)
+        {
+            // camera has not been configured - return
+            if (capture == null)
+                throw new Exception("Camera has not been configured!");
+
+            // someone else is using the camera - return
+            if (locked)
+                return false;
+
+            // lock the camera so others cannot use it
+            locked = true;
+
+            // first frame - open the stream
+            if (state == 0)
+                capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+
+            // snap an image
+            Mat frame = new Mat();
+            capture.Read(frame);
+
+            // convert the snapshot to an image
+            Bitmap image = BitmapConverter.ToBitmap(frame);
+
+            // initialize haar characteristics for detecting faces
+            var cascade = new CascadeClassifier(Application.StartupPath + "haarcascade_frontalface_alt.xml");
+            List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles = new List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>>();
+
+            // detect frontal faces on image
+            var faces = cascade.DetectMultiScale(
+                image: image.ToMat(),
+                scaleFactor: 1.1,
+                minNeighbors: 2,
+                flags: HaarDetectionTypes.DoRoughSearch | HaarDetectionTypes.ScaleImage,
+                minSize: new OpenCvSharp.Size(30, 30)
+                );
+
+            // check if faces are present
+            bool result = false;
+            if (faces.Length > 0)
+                result = true;
+
+            // last frame - close the stream
+            if (state == 2)
+                capture.Release();
+
+            // unlock the camera so others can use it
+            locked = false;
+
+            return result;
         }
 
         #endregion
