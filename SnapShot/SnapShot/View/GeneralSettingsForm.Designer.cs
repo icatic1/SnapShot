@@ -65,6 +65,7 @@
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label24 = new System.Windows.Forms.Label();
             this.textBox9 = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
@@ -322,7 +323,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label6.Location = new System.Drawing.Point(97, 211);
+            this.label6.Location = new System.Drawing.Point(98, 275);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(129, 20);
             this.label6.TabIndex = 36;
@@ -333,7 +334,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label7.ForeColor = System.Drawing.Color.Red;
-            this.label7.Location = new System.Drawing.Point(250, 206);
+            this.label7.Location = new System.Drawing.Point(251, 270);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(119, 25);
             this.label7.TabIndex = 35;
@@ -345,11 +346,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button1.Location = new System.Drawing.Point(160, 162);
+            this.button1.Location = new System.Drawing.Point(161, 226);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(160, 29);
             this.button1.TabIndex = 25;
-            this.button1.Text = "Check connection";
+            this.button1.Text = "Connect to server";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -357,7 +358,7 @@
             // 
             this.label22.AutoSize = true;
             this.label22.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label22.Location = new System.Drawing.Point(14, 261);
+            this.label22.Location = new System.Drawing.Point(14, 165);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(132, 20);
             this.label22.TabIndex = 33;
@@ -368,12 +369,10 @@
             this.textBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox7.Enabled = false;
-            this.textBox7.Location = new System.Drawing.Point(200, 258);
+            this.textBox7.Location = new System.Drawing.Point(236, 162);
             this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(269, 27);
+            this.textBox7.Size = new System.Drawing.Size(233, 27);
             this.textBox7.TabIndex = 34;
-            this.textBox7.Text = "inetpub/wwwroot";
             // 
             // domainUpDown3
             // 
@@ -500,6 +499,7 @@
             // groupBox4
             // 
             this.groupBox4.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.groupBox4.Controls.Add(this.checkBox1);
             this.groupBox4.Controls.Add(this.label24);
             this.groupBox4.Controls.Add(this.textBox9);
             this.groupBox4.Controls.Add(this.label25);
@@ -519,6 +519,17 @@
             this.groupBox4.TabIndex = 42;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Device configuration";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.checkBox1.Location = new System.Drawing.Point(147, 181);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(221, 24);
+            this.checkBox1.TabIndex = 21;
+            this.checkBox1.Text = "Use face detection as trigger";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // label24
             // 
@@ -544,7 +555,7 @@
             // 
             this.label25.AutoSize = true;
             this.label25.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label25.Location = new System.Drawing.Point(293, 279);
+            this.label25.Location = new System.Drawing.Point(293, 291);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(39, 20);
             this.label25.TabIndex = 18;
@@ -552,7 +563,7 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(148, 277);
+            this.numericUpDown3.Location = new System.Drawing.Point(148, 289);
             this.numericUpDown3.Minimum = new decimal(new int[] {
             1,
             0,
@@ -571,7 +582,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label26.Location = new System.Drawing.Point(17, 277);
+            this.label26.Location = new System.Drawing.Point(17, 289);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(123, 20);
             this.label26.TabIndex = 16;
@@ -583,7 +594,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox10.Enabled = false;
-            this.textBox10.Location = new System.Drawing.Point(148, 193);
+            this.textBox10.Location = new System.Drawing.Point(148, 217);
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(322, 27);
             this.textBox10.TabIndex = 14;
@@ -591,7 +602,7 @@
             // button7
             // 
             this.button7.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button7.Location = new System.Drawing.Point(148, 226);
+            this.button7.Location = new System.Drawing.Point(148, 250);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(39, 29);
             this.button7.TabIndex = 15;
@@ -635,7 +646,7 @@
             // 
             this.label30.AutoSize = true;
             this.label30.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label30.Location = new System.Drawing.Point(14, 193);
+            this.label30.Location = new System.Drawing.Point(14, 217);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(113, 40);
             this.label30.TabIndex = 6;
@@ -1334,5 +1345,6 @@
         private System.Windows.Forms.ToolStripMenuItem administratorOptionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

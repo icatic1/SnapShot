@@ -27,6 +27,7 @@ namespace SnapShot.Model
 
         public int TypeOfSaving { get => typeOfSaving; set => typeOfSaving = value; }
 
+        public VideoCapture? Capture { get => capture; set => capture = value; }
         public bool Locked { get => locked; set => locked = value; }
 
         public Bitmap NewestImage { get => newestImage; set => newestImage = value; }
@@ -51,6 +52,9 @@ namespace SnapShot.Model
         /// </summary>
         public void Reconfigure()
         {
+            // wait until camera is unlocked
+            while (locked) ;
+
             // determine image size
             string resolution = Program.Snapshot.Configuration.Cameras[index].Resolution.ToString();
             resolution = resolution.Replace("Resolution", "");
@@ -112,40 +116,37 @@ namespace SnapShot.Model
             if (capture == null)
                 throw new Exception("Camera has not been configured!");
 
-            if (!locked)
-            {
-                // lock the recorder so nobody else can use it
-                locked = true;
+            // wait until camera is unlocked
+            while (locked) ;
 
-                // open the camera for recording
-                capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+            // lock the recorder so nobody else can use it
+            locked = true;
 
-                // take a snapshot
-                Mat frame = new Mat();
-                capture.Read(frame);
+            // open the camera for recording
+            capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
 
-                // convert the snapshot to an image
-                Bitmap image = BitmapConverter.ToBitmap(frame);
+            // take a snapshot
+            Mat frame = new Mat();
+            capture.Read(frame);
 
-                // put demo watermark on image if not licenced
-                if (!Program.Snapshot.Licenced)
-                    using (Graphics g = Graphics.FromImage(image))
-                    {
-                        Font myFont = new Font("Arial", 14);
-                        g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
-                    }
+            // close the camera
+            capture.Release();
 
-                // close the camera
-                capture.Release();
+            // unlock the recorder so others can use it
+            locked = false;
 
-                // unlock the recorder so others can use it
-                locked = false;
+            // convert the snapshot to an image
+            Bitmap image = BitmapConverter.ToBitmap(frame);
 
-                return image;
-            }
-            // if the recorder is locked, instead of taking a new picture just return the latest snapshot
-            else
-                return newestImage;
+            // put demo watermark on image if not licenced
+            if (!Program.Snapshot.Licenced)
+                using (Graphics g = Graphics.FromImage(image))
+                {
+                    Font myFont = new Font("Arial", 14);
+                    g.DrawString("Demo version", myFont, Brushes.Black, new System.Drawing.Point(2, 2));
+                }
+
+            return image;
         }
 
         /// <summary>
@@ -164,18 +165,17 @@ namespace SnapShot.Model
             // determine how many images need to be taken
             int noOfImages = (int)(Program.Snapshot.Configuration.Duration / Program.Snapshot.Configuration.Period);
 
-            if (locked)
-                return images;
-            else
-                locked = true;
-            
+            // wait until camera is unlocked
+            while (locked) ;
+
+            // lock the recorder so nobody else can use it
+            locked = true;
+
+            capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+
             // snap the necessary images
             for (int i = 0; i < noOfImages; i++)
             {
-                // open the camera only the first time
-                if (i == 0)
-                    capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
-
                 // take a snapshot
                 Mat frame = new Mat();
                 capture.Read(frame);
@@ -221,32 +221,20 @@ namespace SnapShot.Model
             VideoWriter videoWriter = new VideoWriter(filename, FourCC.MPG4, (int)capture.Fps, new OpenCvSharp.Size(Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1])));
             Mat frame = new Mat();
             int frames = 0;
-            bool videoLocked = false;
+
+            // wait until camera is unlocked
+            while (locked) ;
+
+            // lock the camera so nobody else can use it
+            locked = true;
+
+            // open the camera for recording
+            capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
 
             // calculate the necessary number of frames by using the FPS of the camera
             while (frames < Program.Snapshot.Configuration.Duration * capture.Fps)
             {
-                // setup the camera when taking the first frame
-                if (!locked && frames == 0)
-                {
-                    // lock the camera so nobody else can use it
-                    locked = true;
-                    videoLocked = true;
-
-                    // open the camera for recording
-                    capture.Open(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
-                    
-                    // snap the first frame
-                    capture.Read(frame);
-                }
-
-                // just read the next frame
-                else if (videoLocked)
-                    capture.Read(frame);
-
-                // capture is locked - use latest snap
-                else
-                    frame = newestImage.ToMat();
+                capture.Read(frame);
 
                 // put demo watermark to frame if not licenced
                 if (!Program.Snapshot.Licenced)
@@ -261,24 +249,26 @@ namespace SnapShot.Model
             videoWriter.Release();
 
             // unlock the recorder so others can use it
-            if (videoLocked)
-            {
-                locked = false;
-                capture.Release();
-            }
+            locked = false;
+            capture.Release();
         }
 
         /// <summary>
-        /// Take a single picture, but optimized for fast usage by exploiting the capture already being opened
+        /// Take a single picture, but optimized for fast usage
+        /// by exploiting the capture already being opened
         /// </summary>
         /// <param name="type"></param>
         /// <param name="overrided"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public Bitmap Snap(int type, bool overrided)
+        public Bitmap Snap(int type)
         {
-            if ((locked && !overrided) || capture == null)
+            if (capture == null)
                 throw new Exception("Cannot allocate camera!");
+
+            // wait until camera is unlocked
+            if (type == 0 && locked)
+                while (locked) ;
 
             // we are opening the capture for the first time
             if (type == 0)
@@ -309,10 +299,14 @@ namespace SnapShot.Model
         /// <param name="overrided"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public string SnapBase64(int type, bool overrided)
+        public string SnapBase64(int type)
         {
-            if ((locked && !overrided) || capture == null)
+            if (capture == null)
                 throw new Exception("Cannot allocate camera!");
+
+            // wait until camera is unlocked
+            if (type == 0 && locked)
+                while (locked) ;
 
             // we are opening the capture for the first time
             if (type == 0)
@@ -338,7 +332,7 @@ namespace SnapShot.Model
 
         #endregion
 
-        #region Saving Output
+        #region Saving output
 
         /// <summary>
         /// Save picture to the local path
@@ -387,7 +381,7 @@ namespace SnapShot.Model
 
         #endregion
 
-        #region Face Detection
+        #region Face detection
 
         public bool FaceDetection(int state)
         {
@@ -395,9 +389,9 @@ namespace SnapShot.Model
             if (capture == null)
                 throw new Exception("Camera has not been configured!");
 
-            // someone else is using the camera - return
-            if (locked)
-                return false;
+            // wait until camera is unlocked
+            if (state == 0 && locked)
+                while (locked) ;
 
             // lock the camera so others cannot use it
             locked = true;

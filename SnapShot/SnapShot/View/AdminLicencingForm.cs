@@ -149,7 +149,7 @@ namespace SnapShot.View
 
             Program.LicencingURL = serverIP;
             if (port != 0)
-                Program.LicencingURL += port;
+                Program.LicencingURL += ":" + port;
 
             return DialogResult.OK;
         }

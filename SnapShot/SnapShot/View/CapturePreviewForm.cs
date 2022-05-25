@@ -73,14 +73,14 @@ namespace SnapShot
         void CaptureCameraCallback()
         {
             // start the camera recorder
-            Program.Recorders[cameraNumber].Snap(0, true);
+            Program.Recorders[cameraNumber].Snap(0);
 
             while (1 == 1)
             {
                 try
                 {
                     // snap picture
-                    image = Program.Recorders[cameraNumber].Snap(1, true);
+                    image = Program.Recorders[cameraNumber].Snap(1);
 
                     // frame face if face detection is selected
                     List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles =
@@ -102,7 +102,7 @@ namespace SnapShot
             }
 
             // stop the camera recorder
-            Program.Recorders[cameraNumber].Snap(2, true);
+            Program.Recorders[cameraNumber].Snap(2);
         }
 
         /// <summary>

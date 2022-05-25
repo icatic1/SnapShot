@@ -79,6 +79,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.administratorOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
@@ -94,7 +95,6 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.button7 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -631,7 +631,7 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBox1.Location = new System.Drawing.Point(21, 272);
+            this.checkBox1.Location = new System.Drawing.Point(21, 281);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(146, 24);
             this.checkBox1.TabIndex = 18;
@@ -751,6 +751,13 @@
             this.administratorOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
             this.administratorOptionsToolStripMenuItem.Text = "Administrator Options";
             this.administratorOptionsToolStripMenuItem.Click += new System.EventHandler(this.administratorOptionsToolStripMenuItem_Click);
+            // 
+            // licencingOptionsToolStripMenuItem
+            // 
+            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
+            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
+            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -877,13 +884,6 @@
             this.button7.Text = "Save configuration";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // licencingOptionsToolStripMenuItem
-            // 
-            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
-            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
-            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
-            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
             // 
             // CameraSettingsForm
             // 

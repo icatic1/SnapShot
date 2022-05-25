@@ -25,6 +25,7 @@ namespace SnapShot
                regex = "",
                outputFolderPath = "";
         int outputValidity;
+        bool faceDetectionTrigger = false;
 
         // cameras
         List<Camera> cameras = new List<Camera>()
@@ -38,7 +39,7 @@ namespace SnapShot
         string serverIP = "",
                mediaFolderPath = "";
         int serverPort;
-        bool connectionStatus = false;
+        static string token = "";
         int JSONSynchronizationPeriod = 0,
             JSONLatestSynchronizationTicks = 0,
             mediaSynchronizationPeriod = 0,
@@ -64,7 +65,9 @@ namespace SnapShot
         public string OutputFolderPath { get => outputFolderPath; set => outputFolderPath = value; }
         
         public int OutputValidity { get => outputValidity; set => outputValidity = value; }
-        
+
+        public bool FaceDetectionTrigger { get => faceDetectionTrigger; set => faceDetectionTrigger = value; }
+
         public List<Camera> Cameras { get => cameras; set => cameras = value; }
                 
         public string ServerIP { get => serverIP; set => serverIP = value; }
@@ -85,7 +88,7 @@ namespace SnapShot
 
         public TimeSpan MediaTime { get => mediaSyncTime; set => mediaSyncTime = value; }
 
-        public bool ConnectionStatus { get => connectionStatus; set => connectionStatus = value; }
+        public static string Token { get => token; set => token = value; }
         
         public bool ImageCapture { get => imageCapture; set => imageCapture = value; }
         
@@ -172,43 +175,49 @@ namespace SnapShot
             }
             return new Tuple<string, bool>(terminalID, debugLog);
         }
-
+        
         /// <summary>
-        /// Check information about the device on remote server
+        /// Check if configured token is valid for the given user
         /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="Exception"></exception>
-        public static void DeviceCheck(string url)
+        /// <returns></returns>
+        public static bool ValidateToken(string predefinedUrl = "")
         {
-            try
-            {
-                // create web-request for getting device information
-                HttpWebRequest webRequest;
-                string requestParams = "MacAddress=" + Configuration.GetMACAddress();
-                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/GetDeviceByMAC" + "?" + requestParams);
-                webRequest.Method = "GET";
+            // server has not been setup - immediately invalidate token
+            if (Program.Snapshot.Configuration.ServerIP.Length < 9 && predefinedUrl.Length < 9)
+                return false;
 
-                // send the web-request and check whether it returns a valid response
-                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
-                if (response.StatusCode != HttpStatusCode.OK)
-                    throw new Exception("Bad request!");
+            // formulate URL from form or existing connection
+            string url = "";
+            if (predefinedUrl.Length > 0)
+                url = predefinedUrl;
+            else
+            {
+                url = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    url += ":" + Program.Snapshot.Configuration.ServerPort;
             }
 
-            // information about the device is not present at the server - 
-            // create new configuration at the server
+            HttpWebRequest webRequest;
+            string requestParams = GetMACAddress() ?? "";
+
+            webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/GetActivationStatus/" + requestParams);
+            webRequest.Method = "GET";
+
+            // verify token
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                // read the resulting string
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                    string Json = rdr.ReadToEnd();
+                    return Json == "true";
+                }
+            }
             catch
             {
-                // create web-request for adding a new device
-                HttpWebRequest webRequest;
-                string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
-                                       + "TerminalID=" + Program.Snapshot.TerminalName;
-                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/AddDevice" + "?" + requestParams);
-                webRequest.Method = "POST";
-
-                // send the web-request and check whether it returns a valid response
-                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
-                if (response.StatusCode != HttpStatusCode.OK)
-                    throw new Exception("Bad request!");
+                return false;
             }
         }
 

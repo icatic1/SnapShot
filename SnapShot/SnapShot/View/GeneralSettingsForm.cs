@@ -44,6 +44,7 @@ namespace SnapShot
         public GeneralSettingsForm()
         {
             InitializeComponent();
+
             toolStripStatusLabel1.Text = "";
             comboBox1.Text = "https://";
 
@@ -219,6 +220,14 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button6_Click(object sender, EventArgs e)
         {
+            // if server information is specified but no connection, do not allow the
+            // configuration to be saved
+            if (textBox3.Text.Length > 0 && label7.Text == "Disconnected")
+            {
+                toolStripStatusLabel1.Text = "Configuration could not be saved because server connection was not established!";
+                return;
+            }
+
             // clear all errors if they exist
             string errorText = "";
             errorProvider1.Clear();
@@ -228,6 +237,7 @@ namespace SnapShot
                    regex = textBox9.Text,
                    outputPath = textBox10.Text;
             int validity = (int)numericUpDown3.Value;
+            bool faceDetectionTrigger = checkBox1.Checked;
 
             // control validation
 
@@ -289,37 +299,49 @@ namespace SnapShot
                    mediaPath = textBox7.Text;
 
             string statusText = label7.Text;
-            bool status = statusText == "Connected" ? true : false;
             int port = 0;
 
             // control validation
-
-            // if IP port is specified, it needs to be a valid number
-            if (textBox4.Text.Length > 0)
+            if (textBox3.Text.Length > 0)
             {
-                try
+                // if IP port is specified, it needs to be a valid number
+                if (textBox4.Text.Length > 0)
                 {
-                    port = Int32.Parse(textBox4.Text);
-                    textBox4.BackColor = Color.White;
-                    errorProvider1.SetError(textBox4, null);
+                    try
+                    {
+                        port = Int32.Parse(textBox4.Text);
+                        textBox4.BackColor = Color.White;
+                        errorProvider1.SetError(textBox4, null);
+                    }
+                    catch
+                    {
+                        errorText = "Server port must be a valid number!";
+                        errorProvider1.SetError(textBox4, errorText);
+                        textBox4.BackColor = Color.Red;
+                    }
                 }
-                catch
-                {
-                    errorText = "Server port must be a valid number!";
-                    errorProvider1.SetError(textBox4, errorText);
-                    textBox4.BackColor = Color.Red;
-                }
-            }
 
-            // validate media route path
-            if (mediaPath.Length < 1)
-            {
-                errorText = "Server media path needs to be specified!";
-                errorProvider1.SetError(textBox7, errorText);
-                textBox7.BackColor = Color.Red;
+                // validate media route path
+                if (mediaPath.Length < 1)
+                {
+                    errorText = "Server media path needs to be specified!";
+                    errorProvider1.SetError(textBox7, errorText);
+                    textBox7.BackColor = Color.Red;
+                }
+                else
+                {
+                    textBox7.BackColor = Color.White;
+                    errorProvider1.SetError(textBox7, null);
+                }
             }
             else
             {
+                textBox3.BackColor = Color.White;
+                errorProvider1.SetError(textBox3, null);
+
+                textBox4.BackColor = Color.White;
+                errorProvider1.SetError(textBox4, null);
+
                 textBox7.BackColor = Color.White;
                 errorProvider1.SetError(textBox7, null);
             }
@@ -357,7 +379,6 @@ namespace SnapShot
                     JSONSyncPeriod *= 3600;
                 else if (domainUpDown4.Text == "days")
                     JSONSyncPeriod *= 86400;
-                
             }
             else
                 JSONSync = dateTimePicker1.Value.TimeOfDay;
@@ -401,11 +422,11 @@ namespace SnapShot
                 Regex = regex,
                 OutputFolderPath = outputPath,
                 OutputValidity = validity,
+                FaceDetectionTrigger = faceDetectionTrigger,
                 Cameras = oldCameras,
                 ServerIP = ip,
                 MediaFolderPath = mediaPath,
                 ServerPort = port,
-                ConnectionStatus = status,
                 JSONSyncPeriod = JSONSyncPeriod,
                 JSONTicks = JSONTicks,
                 JSONTime = JSONSync,
@@ -448,6 +469,7 @@ namespace SnapShot
                 numericUpDown3.Value = config.OutputValidity;
             else
                 numericUpDown3.Value = 1;
+            checkBox1.Checked = config.FaceDetectionTrigger;
 
             // server configuration
             string type = "", ip = "";
@@ -474,7 +496,7 @@ namespace SnapShot
                 textBox4.Text = config.ServerPort.ToString();
             else
                 textBox4.Text = "";
-            if (config.ConnectionStatus)
+            if (Configuration.ValidateToken())
             {
                 label7.Text = "Connected";
                 label7.ForeColor = Color.Green;
@@ -811,26 +833,91 @@ namespace SnapShot
         {
             try
             {
-                ServerConnectionForm popup = new ServerConnectionForm();
-                var result = popup.ShowDialog();
-                if (result == DialogResult.OK)
+                // create url from currently entered content
+                string url = comboBox1.Text + textBox3.Text;
+                if (textBox4.Text.Length > 0)
+                    url += ":" + textBox4.Text;
+
+                // check if user already has a valid token
+                if (!Configuration.ValidateToken(url))
                 {
-                    label7.Text = "Connected";
-                    label7.ForeColor = Color.Green;
-                    toolStripStatusLabel1.Text = "Successfully connected to server!";
+                    // ask the user to enter activation code
+                    ServerConnectionForm popup = new ServerConnectionForm(url);
+                    var result = popup.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        // set media folder path
+                        var success = SetMediaFolderPath(url, textBox7.Text);
+
+                        label7.Text = "Connected";
+                        label7.ForeColor = Color.Green;
+                        if (success)
+                            toolStripStatusLabel1.Text = "Successfully updated media folder path!";
+                    }
+                    else
+                    {
+                        label7.Text = "Disconnected";
+                        label7.ForeColor = Color.Red;
+                        toolStripStatusLabel1.Text = "Could not connect to server and/or update media folder path!";
+                    }
                 }
                 else
                 {
-                    label7.Text = "Disconnected";
-                    label7.ForeColor = Color.Red;
-                    toolStripStatusLabel1.Text = "Could not connect to server!";
+                    // set media folder path
+                    var success = SetMediaFolderPath(url, textBox7.Text);
+
+                    label7.Text = "Connected";
+                    label7.ForeColor = Color.Green;
+                    if (success)
+                        toolStripStatusLabel1.Text = "Successfully updated media folder path!";
                 }
+
+                // add the computer to device table if it is not already present
+                DeviceCheck();
+                 
             }
             catch
             {
                 label7.Text = "Disconnected";
                 label7.ForeColor = Color.Red;
-                toolStripStatusLabel1.Text = "Could not connect to server!";
+                toolStripStatusLabel1.Text = "Could not connect to server and/or update media folder path!";
+            }
+        }
+
+        /// <summary>
+        /// Send new media folder path to server
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool SetMediaFolderPath(string url, string path)
+        {
+            try
+            {
+                HttpWebRequest webRequest;
+                string requestParams = Configuration.GetMACAddress() ?? "";
+                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/FileUpload/SetPathForUser" + "/" + requestParams);
+                webRequest.ContentType = "application/json; charset=utf-8";
+                webRequest.Accept = "application/json, text/javascript, */*";
+                webRequest.Method = "POST";
+                using (StreamWriter writer = new StreamWriter(webRequest.GetRequestStream()))
+                {
+                    writer.Write("{ \"path\": \"" + path + "\" }");
+                }
+
+                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    toolStripStatusLabel1.Text = "Could not set media folder path!";
+                    return false;
+                }
+
+                return true;
+            }
+            catch
+            {
+                toolStripStatusLabel1.Text = "Could not set media folder path!";
+                return false;
             }
         }
 
@@ -994,6 +1081,40 @@ namespace SnapShot
 
                 label14.Text = "Synchronization failed.";
             }
+        }
+
+        #endregion
+
+        #region Device check
+
+        /// <summary>
+        /// Adding computer to device list when connecting to server
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void DeviceCheck()
+        {
+            string baseUrl = comboBox1.Text + textBox3.Text;
+            try
+            {
+                baseUrl += ":" + Int32.Parse(textBox4.Text);
+            }
+            catch
+            {
+                // base url does not need a port
+            }
+
+            // add to device table if not exists
+            HttpWebRequest webRequest;
+            string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
+                                    + "TerminalID=" + Program.Snapshot.TerminalName;
+
+            webRequest = (HttpWebRequest)WebRequest.Create(baseUrl + "/api/Licence/AddDevice" + "?" + requestParams);
+
+            webRequest.Method = "POST";
+
+            HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception("Bad request!");
         }
 
         #endregion

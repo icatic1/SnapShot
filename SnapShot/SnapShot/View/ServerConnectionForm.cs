@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,12 +14,19 @@ namespace SnapShot.View
 {
     public partial class ServerConnectionForm : Form
     {
+        #region Attributes
+
+        string url = "";
+
+        #endregion
+
         #region Constructor
 
-        public ServerConnectionForm()
+        public ServerConnectionForm(string baseUrl)
         {
             InitializeComponent();
 
+            url = baseUrl;
             toolStripStatusLabel1.Text = "";
         }
 
@@ -27,14 +35,13 @@ namespace SnapShot.View
         #region Button redirect
 
         /// <summary>
-        /// Either attempt to login the user or save the new licencing server
-        /// configuration on OK button click
+        /// Attempt to validate user activation code
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            this.DialogResult = Login();
+            this.DialogResult = Activation();
             if (this.DialogResult == DialogResult.OK)
                 this.Close();
         }
@@ -51,42 +58,42 @@ namespace SnapShot.View
 
         #endregion
 
-        #region Login
+        #region Activation code
 
         /// <summary>
-        /// Attempt to login the user by contacting the local server
+        /// Attempt to verify the user credentials by contacting the local server
         /// </summary>
-        public DialogResult Login()
+        public DialogResult Activation()
         {
             try
             {
                 HttpWebRequest webRequest;
+                string requestParams = Configuration.GetMACAddress() +
+                                       "?activationKey=" + textBox1.Text;
 
-                string baseUrl = "https://siset1.ga";
-                if (Program.Snapshot.Configuration.ServerIP.Length > 0)
-                    baseUrl = Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    baseUrl += ":" + Program.Snapshot.Configuration.ServerPort;
+                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/ActivateDevice/" + requestParams);
+                webRequest.Method = "GET";
 
-                string requestParams = "email=" + textBox1.Text +
-                       "&password=" + textBox2.Text;
-
-                webRequest = (HttpWebRequest)WebRequest.Create(baseUrl + "/api/User/login" + "?" + requestParams);
-
-                webRequest.Method = "POST";
-
+                // verify activation code
                 HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    toolStripStatusLabel1.Text = "Wrong email and/or password!";
+                    toolStripStatusLabel1.Text = "Invalid activation code!";
                     return DialogResult.None;
                 }
+
+                // add received token to configuration
+                Stream responseStream = response.GetResponseStream();
+                StreamReader rdr = new StreamReader(responseStream, Encoding.UTF8);
+                string Json = rdr.ReadToEnd();
+
+                Configuration.Token = Json;
 
                 return DialogResult.OK;
             }
             catch
             {
-                toolStripStatusLabel1.Text = "Wrong email and/or password!";
+                toolStripStatusLabel1.Text = "Invalid activation code!";
                 return DialogResult.None;
             }
         }

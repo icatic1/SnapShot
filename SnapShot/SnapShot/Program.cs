@@ -21,7 +21,7 @@ namespace SnapShot
 {
     internal static class Program
     {
-        #region Attributes and Properties
+        #region Attributes and properties
 
         static Snapshot snapshot = new Snapshot();
 
@@ -53,6 +53,9 @@ namespace SnapShot
         static List<bool> stopFaceDetection = new List<bool>()
         { false, false, false };
 
+        static List<bool> syncsActive = new List<bool>()
+        { false, false };
+        
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
 
         public static List<Recorder> Recorders { get => recorders; set => recorders = value; }
@@ -239,6 +242,10 @@ namespace SnapShot
         {
             while (1 == 1)
             {
+                // not connected - don't even try to contact the server
+                if (snapshot.Configuration.ServerIP.Length < 1)
+                    continue;
+
                 try
                 {
                     // first, check if we need to synchronize JSON
@@ -249,7 +256,7 @@ namespace SnapShot
                     else if (snapshot.Configuration.JSONSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.JSONTime.Hours && DateTime.Now.Minute == snapshot.Configuration.JSONTime.Minutes)
                         typeOfSync = 2;
 
-                    if (typeOfSync > 0)
+                    if (typeOfSync > 0 && !syncsActive[0])
                     {
                         Thread JSONSynchronization = new Thread(() => SynchronizeJSON(ref snapshot, typeOfSync));
                         JSONSynchronization.IsBackground = true;
@@ -263,7 +270,7 @@ namespace SnapShot
                     else if (snapshot.Configuration.MediaSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.MediaTime.Hours && DateTime.Now.Minute == snapshot.Configuration.MediaTime.Minutes)
                         typeOfSync = 2;
 
-                    if (typeOfSync > 0)
+                    if (typeOfSync > 0 && !syncsActive[1])
                     {
                         Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, typeOfSync));
                         mediaSynchronization.IsBackground = true;
@@ -293,7 +300,7 @@ namespace SnapShot
                     bool mediaSync = result.filestate;
 
                     // media needs to be synchronized
-                    if (mediaSync)
+                    if (mediaSync && !syncsActive[1])
                     {
                         Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, 2));
                         mediaSynchronization.IsBackground = true;
@@ -320,7 +327,7 @@ namespace SnapShot
                             streamsActive[i] = false;
                             stopFaceDetection[i] = false;
                             cancels[i] = true;
-                            buffer[i].Add(recorders[i].SnapBase64(2, true));
+                            buffer[i].Add(recorders[i].SnapBase64(2));
                             buffer[i].Clear();
                         }
                     }
@@ -335,7 +342,7 @@ namespace SnapShot
 
         #endregion
 
-        #region Server Synchronization
+        #region Server synchronization
 
         /// <summary>
         /// Method for synchronizing JSON configuration with server
@@ -344,11 +351,18 @@ namespace SnapShot
         /// <param name="snapshot"></param>
         static void SynchronizeJSON(ref Snapshot snapshot, int typeOfSync)
         {
+            // sync is already active - return
+            if (syncsActive[0])
+                return;
+
             try
             {
                 // check if camera is connected to the specified server
-                if (snapshot.Configuration.ConnectionStatus && snapshot.Configuration.OutputFolderPath.Length > 0)
+                if (Configuration.ValidateToken() && snapshot.Configuration.OutputFolderPath.Length > 0)
                 {
+                    // sync currently being done - do not try to sync again
+                    syncsActive[0] = true;
+
                     // formulate the path for importing JSON configuration from server
                     string path = snapshot.Configuration.ServerIP;
                     if (snapshot.Configuration.ServerPort != 0)
@@ -371,6 +385,9 @@ namespace SnapShot
                      if (typeOfSync == 1)
                         // wait for next synchronization
                         Thread.Sleep(snapshot.Configuration.JSONSyncPeriod * 1000);
+
+                    // sync finished - release lock
+                    syncsActive[0] = false;
                 }
             }
             catch
@@ -378,6 +395,7 @@ namespace SnapShot
                 // send failed signal to general settings form
                 GeneralSettingsForm.SyncStatus[0] = false;
                 GeneralSettingsForm.UpdateLabel[0] = true;
+                syncsActive[0] = false;
             }
         }
 
@@ -388,11 +406,18 @@ namespace SnapShot
         /// <param name="snapshot"></param>
         static void SynchronizeMedia(ref Snapshot snapshot, int type)
         {
+            // sync is already active - return
+            if (syncsActive[1])
+                return;
+
             try
             {
                 // check if camera is connected to the specified server
-                if (snapshot.Configuration.ConnectionStatus && snapshot.Configuration.OutputFolderPath.Length > 0)
+                if (Configuration.ValidateToken() && snapshot.Configuration.OutputFolderPath.Length > 0)
                 {
+                    // sync currently being done - do not try to sync again
+                    syncsActive[1] = true;
+
                     // formulate the path for exporting files to server
                     string path = snapshot.Configuration.ServerIP;
                     if (snapshot.Configuration.ServerPort != 0)
@@ -426,6 +451,9 @@ namespace SnapShot
                     if (type == 1)
                         // wait for next synchronization
                         Thread.Sleep(snapshot.Configuration.MediaSyncPeriod * 1000);
+
+                    // sync finished - release lock
+                    syncsActive[1] = false;
                 }
             }
             catch
@@ -433,6 +461,7 @@ namespace SnapShot
                 // send failed signal to general settings form
                 GeneralSettingsForm.SyncStatus[1] = false;
                 GeneralSettingsForm.UpdateLabel[1] = true;
+                syncsActive[1] = false;
             }
         }
 
@@ -502,7 +531,7 @@ namespace SnapShot
 
         #endregion
 
-        #region Livestreaming on Server
+        #region Livestreaming on server
 
         /// <summary>
         /// Method which initializes threads for sending livestream media to server
@@ -511,11 +540,12 @@ namespace SnapShot
         /// <param name="index"></param>
         static void SendSnaps(Recorder camera, int index)
         {
-            // fill the first frame
             camera.Reconfigure();
+
+            // fill the first frame
             Stopwatch sw = new Stopwatch();
             sw.Restart();
-            buffer[index].Add(camera.SnapBase64(0, true));
+            buffer[index].Add(camera.SnapBase64(0));
             while (sw.ElapsedMilliseconds < 100) ;
             sw.Stop();
 
@@ -543,12 +573,12 @@ namespace SnapShot
             while (!cancels[index])
             {
                 sw.Restart();
-                buffer[index].Add(camera.SnapBase64(1, true));
+                buffer[index].Add(camera.SnapBase64(1));
                 while (sw.ElapsedMilliseconds < 100) ;
                 sw.Stop();
             }
 
-            buffer[index].Add(camera.SnapBase64(2, true));
+            buffer[index].Add(camera.SnapBase64(2));
             cancels[index] = false;
             }
             catch
@@ -600,7 +630,7 @@ namespace SnapShot
 
         #endregion
 
-        #region Face Detection Trigger
+        #region Face detection trigger
 
         /// <summary>
         /// Constantly check if there are faces on the camera and start recording if it is true
@@ -611,6 +641,9 @@ namespace SnapShot
             {
                 while (1 == 1)
                 {
+                    if (!snapshot.Configuration.FaceDetectionTrigger)
+                        continue;
+
                     List<int> initializeStream = new List<int>() { 0, 0, 0 };
                     for (int i = 0; i < recorders.Count; i++)
                     {
@@ -652,6 +685,5 @@ namespace SnapShot
         }
 
         #endregion
-
     }
 }
