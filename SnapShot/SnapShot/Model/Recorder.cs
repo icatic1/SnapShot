@@ -67,10 +67,10 @@ namespace SnapShot.Model
             // change image color
             
             // define remote path (for uploading media)
-            string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+            string path = Program.Snapshot.Configuration.ServerIP;
             if (Program.Snapshot.Configuration.ServerPort != 0)
                 path += ":" + Program.Snapshot.Configuration.ServerPort;
-            mediaPath = path + "/" + Program.Snapshot.Configuration.MediaPath;
+            mediaPath = path + "/" + Program.Snapshot.MediaExport;
         }
 
         /// <summary>

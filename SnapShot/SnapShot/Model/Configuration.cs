@@ -36,9 +36,7 @@ namespace SnapShot
 
         // network configuration
         string serverIP = "",
-               mediaPath = "",
-               JSONImportPath = "",
-               JSONExportPath = "";
+               mediaFolderPath = "";
         int serverPort;
         bool connectionStatus = false;
         int JSONSynchronizationPeriod = 0,
@@ -71,11 +69,7 @@ namespace SnapShot
                 
         public string ServerIP { get => serverIP; set => serverIP = value; }
 
-        public string MediaPath { get => mediaPath; set => mediaPath = value; }
-
-        public string JSONImportLocation { get => JSONImportPath; set => JSONImportPath = value; }
-
-        public string JSONExportLocation { get => JSONExportPath; set => JSONExportPath = value; }
+        public string MediaFolderPath { get => mediaFolderPath; set => mediaFolderPath = value; }
 
         public int ServerPort { get => serverPort; set => serverPort = value; }
 
@@ -139,7 +133,7 @@ namespace SnapShot
                     // create web-request for getting device information
                     HttpWebRequest webRequest;
                     string requestParams = "MacAddress=" + Configuration.GetMACAddress();
-                    webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+                    webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
                     webRequest.Method = "GET";
 
                     // send the web-request and check whether it returns a valid response
@@ -167,7 +161,7 @@ namespace SnapShot
                     string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
                                            + "TerminalID=" + terminalID + "&"
                                            + "DebugLog=" + debugLog;
-                    webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/InitialAddDevice" + "?" + requestParams);
+                    webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/InitialAddDevice" + "?" + requestParams);
                     webRequest.Method = "POST";
 
                     // send the web-request and check whether it returns a valid response
@@ -191,7 +185,7 @@ namespace SnapShot
                 // create web-request for getting device information
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress();
-                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/GetDeviceByMAC" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/GetDeviceByMAC" + "?" + requestParams);
                 webRequest.Method = "GET";
 
                 // send the web-request and check whether it returns a valid response
@@ -208,7 +202,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress() + "&"
                                        + "TerminalID=" + Program.Snapshot.TerminalName;
-                webRequest = (HttpWebRequest)WebRequest.Create("http://" + url + "/api/Licence/AddDevice" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/Licence/AddDevice" + "?" + requestParams);
                 webRequest.Method = "POST";
 
                 // send the web-request and check whether it returns a valid response
@@ -506,7 +500,13 @@ namespace SnapShot
                 newSnapshot.Connected = Program.Snapshot.Connected;
                 newSnapshot.TerminalName = terminalInformation.Item1;
                 newSnapshot.DebugLog = terminalInformation.Item2;
+                string oldTrigger = Program.Snapshot.Configuration.TriggerFilePath;
                 Program.Snapshot = newSnapshot;
+
+                // change the trigger file that is being monitored
+                if (oldTrigger != newSnapshot.Configuration.TriggerFilePath)
+                    Program.ChangeTrigger();
+                
                 return true;
             }
             catch

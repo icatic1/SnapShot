@@ -100,19 +100,19 @@ namespace SnapShot.View
             comboBox2.Items.Clear();
 
             // add the JSON export path of the server to the list of items
-            string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+            string path = Program.Snapshot.Configuration.ServerIP;
             if (Program.Snapshot.Configuration.ServerPort != 0)
                 path += ":" + Program.Snapshot.Configuration.ServerPort;
-            if (Program.Snapshot.Configuration.JSONExportLocation != "")
-                path += "/" + Program.Snapshot.Configuration.JSONExportLocation;
+            if (Program.Snapshot.JSONExport != "")
+                path += "/" + Program.Snapshot.JSONExport;
             comboBox2.Items.Add(path);
 
             // add the JSON import path of the server to the list of items
-            path = "http://" + Program.Snapshot.Configuration.ServerIP;
+            path = Program.Snapshot.Configuration.ServerIP;
             if (Program.Snapshot.Configuration.ServerPort != 0)
                 path += ":" + Program.Snapshot.Configuration.ServerPort;
-            if (Program.Snapshot.Configuration.JSONImportLocation != "")
-                path += "/" + Program.Snapshot.Configuration.JSONImportLocation;
+            if (Program.Snapshot.JSONImport != "")
+                path += "/" + Program.Snapshot.JSONImport;
             comboBox2.Items.Add(path);
 
             // add any other local path the user has selected to the list of items
