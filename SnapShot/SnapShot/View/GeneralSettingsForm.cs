@@ -811,25 +811,26 @@ namespace SnapShot
         {
             try
             {
-                // contact the server IP address
-                var ping = new Ping();
-                var reply = ping.Send(textBox3.Text, 1000);
-
-                label7.Text = "Connected";
-                label7.ForeColor = Color.Green;
-                
-                // check whether the device is registered on the server
-                string url = textBox3.Text;
-                if (textBox4.Text.Length > 0)
-                    url += ":" + textBox4.Text;
-
-                // uncomment this if it is necessary - prolongs the connection time
-                //Configuration.DeviceCheck(url);
+                ServerConnectionForm popup = new ServerConnectionForm();
+                var result = popup.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    label7.Text = "Connected";
+                    label7.ForeColor = Color.Green;
+                    toolStripStatusLabel1.Text = "Successfully connected to server!";
+                }
+                else
+                {
+                    label7.Text = "Disconnected";
+                    label7.ForeColor = Color.Red;
+                    toolStripStatusLabel1.Text = "Could not connect to server!";
+                }
             }
             catch
             {
                 label7.Text = "Disconnected";
                 label7.ForeColor = Color.Red;
+                toolStripStatusLabel1.Text = "Could not connect to server!";
             }
         }
 
