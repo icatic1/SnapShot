@@ -77,12 +77,25 @@ namespace SnapShot
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
+        private void licencingOptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LicencingForm f = new LicencingForm();
             this.Hide();
             f.ShowDialog();
             this.Close();
+        }
+
+        /// <summary>
+        /// Redirect to licencing server change form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void administratorOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AdminLicencingForm popup = new AdminLicencingForm();
+            var result = popup.ShowDialog();
+            if (result == DialogResult.OK)
+                toolStripStatusLabel1.Text = "Licencing server successfully changed!";
         }
 
         /// <summary>
@@ -195,6 +208,10 @@ namespace SnapShot
 
         #region Settings changes
 
+        /// <summary>
+        /// Using existing information about the computer from remote server
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         private void GetInformationFromServer()
         {
             try
@@ -202,7 +219,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = "MacAddress=" + Configuration.GetMACAddress();
 
-                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/GetTerminalAndDebugLog" + "?" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -254,7 +271,7 @@ namespace SnapShot
                                        + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                        + "DebugLog=" + Program.Snapshot.DebugLog;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/InitialAddDevice" + "?" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/InitialAddDevice" + "?" + requestParams);
 
                 webRequest.Method = "POST";
 
@@ -264,6 +281,10 @@ namespace SnapShot
             }
         }
 
+        /// <summary>
+        /// Saving configuration info on remote server
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         private void SendInformationToServer()
         {
             // request will fail if terminal name is empty
@@ -280,7 +301,7 @@ namespace SnapShot
                                    + "TerminalID=" + Program.Snapshot.TerminalName + "&"
                                    + "DebugLog=" + Program.Snapshot.DebugLog;
 
-            webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
+            webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/UpdateTerminalAndDebugLog" + "?" + requestParams);
 
             webRequest.Method = "POST";
 
@@ -309,6 +330,9 @@ namespace SnapShot
             Program.Snapshot.DebugLog = checkBox1.Checked;
         }
 
+        /// <summary>
+        /// Updating local file with configuration info (backup for offline mode)
+        /// </summary>
         private void UpdateConfigurationFile()
         {
             // we are not connected - locally save terminal name and debug log
@@ -366,7 +390,7 @@ namespace SnapShot
                 HttpWebRequest webRequest;
                 string requestParams = Configuration.GetMACAddress() ?? "";
 
-                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/" + requestParams);
+                webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/" + requestParams);
 
                 webRequest.Method = "GET";
 
@@ -399,7 +423,7 @@ namespace SnapShot
             {
                 HttpWebRequest webRequest;
 
-                webRequest = (HttpWebRequest)WebRequest.Create("https://siset1.ga/api/Licence/ConnectionCheck");
+                webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/ConnectionCheck");
 
                 webRequest.Method = "GET";
 
@@ -425,5 +449,6 @@ namespace SnapShot
         }
 
         #endregion
+
     }
 }

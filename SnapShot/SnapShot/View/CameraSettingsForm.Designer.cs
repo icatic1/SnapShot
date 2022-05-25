@@ -78,6 +78,7 @@
             this.button8 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.administratorOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +94,7 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.button7 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -735,11 +737,20 @@
             // 
             // registracijaToolStripMenuItem
             // 
+            this.registracijaToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.administratorOptionsToolStripMenuItem,
+            this.licencingOptionsToolStripMenuItem});
             this.registracijaToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.registracijaToolStripMenuItem.Name = "registracijaToolStripMenuItem";
             this.registracijaToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.registracijaToolStripMenuItem.Text = "Licence";
-            this.registracijaToolStripMenuItem.Click += new System.EventHandler(this.registracijaToolStripMenuItem_Click);
+            // 
+            // administratorOptionsToolStripMenuItem
+            // 
+            this.administratorOptionsToolStripMenuItem.Name = "administratorOptionsToolStripMenuItem";
+            this.administratorOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.administratorOptionsToolStripMenuItem.Text = "Administrator Options";
+            this.administratorOptionsToolStripMenuItem.Click += new System.EventHandler(this.administratorOptionsToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -867,6 +878,13 @@
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
+            // licencingOptionsToolStripMenuItem
+            // 
+            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
+            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
+            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
+            // 
             // CameraSettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -974,5 +992,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.ToolStripMenuItem administratorOptionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
     }
 }

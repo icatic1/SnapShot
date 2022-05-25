@@ -33,6 +33,8 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.administratorOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,8 +46,7 @@
             this.importFromJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -56,8 +57,6 @@
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -178,11 +177,27 @@
             // 
             // registracijaToolStripMenuItem
             // 
+            this.registracijaToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.administratorOptionsToolStripMenuItem,
+            this.licencingOptionsToolStripMenuItem});
             this.registracijaToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.registracijaToolStripMenuItem.Name = "registracijaToolStripMenuItem";
             this.registracijaToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.registracijaToolStripMenuItem.Text = "Licence";
-            this.registracijaToolStripMenuItem.Click += new System.EventHandler(this.registracijaToolStripMenuItem_Click);
+            // 
+            // administratorOptionsToolStripMenuItem
+            // 
+            this.administratorOptionsToolStripMenuItem.Name = "administratorOptionsToolStripMenuItem";
+            this.administratorOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.administratorOptionsToolStripMenuItem.Text = "Administrator Options";
+            this.administratorOptionsToolStripMenuItem.Click += new System.EventHandler(this.administratorOptionsToolStripMenuItem_Click);
+            // 
+            // licencingOptionsToolStripMenuItem
+            // 
+            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
+            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
+            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -267,8 +282,7 @@
             // groupBox3
             // 
             this.groupBox3.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Controls.Add(this.textBox1);
+            this.groupBox3.Controls.Add(this.comboBox1);
             this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Controls.Add(this.button1);
@@ -279,8 +293,6 @@
             this.groupBox3.Controls.Add(this.label17);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.button2);
-            this.groupBox3.Controls.Add(this.label10);
-            this.groupBox3.Controls.Add(this.textBox5);
             this.groupBox3.Controls.Add(this.textBox4);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.label4);
@@ -294,31 +306,23 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Server configuration";
             // 
-            // label1
+            // comboBox1
             // 
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label1.Location = new System.Drawing.Point(15, 274);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(128, 20);
-            this.label1.TabIndex = 37;
-            this.label1.Text = "JSON export path:";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(200, 271);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(269, 27);
-            this.textBox1.TabIndex = 38;
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "http://",
+            "https://"});
+            this.comboBox1.Location = new System.Drawing.Point(145, 52);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(87, 28);
+            this.comboBox1.TabIndex = 39;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label6.Location = new System.Drawing.Point(197, 133);
+            this.label6.Location = new System.Drawing.Point(97, 211);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(129, 20);
             this.label6.TabIndex = 36;
@@ -329,7 +333,7 @@
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label7.ForeColor = System.Drawing.Color.Red;
-            this.label7.Location = new System.Drawing.Point(350, 128);
+            this.label7.Location = new System.Drawing.Point(250, 206);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(119, 25);
             this.label7.TabIndex = 35;
@@ -341,7 +345,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button1.Location = new System.Drawing.Point(15, 129);
+            this.button1.Location = new System.Drawing.Point(160, 162);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(160, 29);
             this.button1.TabIndex = 25;
@@ -353,21 +357,23 @@
             // 
             this.label22.AutoSize = true;
             this.label22.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label22.Location = new System.Drawing.Point(14, 186);
+            this.label22.Location = new System.Drawing.Point(14, 261);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(88, 20);
+            this.label22.Size = new System.Drawing.Size(132, 20);
             this.label22.TabIndex = 33;
-            this.label22.Text = "Media path:";
+            this.label22.Text = "Media folder path:";
             // 
             // textBox7
             // 
             this.textBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox7.Location = new System.Drawing.Point(200, 183);
+            this.textBox7.Enabled = false;
+            this.textBox7.Location = new System.Drawing.Point(200, 258);
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(269, 27);
             this.textBox7.TabIndex = 34;
+            this.textBox7.Text = "inetpub/wwwroot";
             // 
             // domainUpDown3
             // 
@@ -424,41 +430,21 @@
             this.button2.Text = "Check connection";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label10.Location = new System.Drawing.Point(15, 228);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(130, 20);
-            this.label10.TabIndex = 14;
-            this.label10.Text = "JSON import path:";
-            // 
-            // textBox5
-            // 
-            this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox5.Location = new System.Drawing.Point(200, 225);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(269, 27);
-            this.textBox5.TabIndex = 15;
-            // 
             // textBox4
             // 
             this.textBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox4.Location = new System.Drawing.Point(200, 81);
+            this.textBox4.Location = new System.Drawing.Point(236, 108);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(269, 27);
+            this.textBox4.Size = new System.Drawing.Size(233, 27);
             this.textBox4.TabIndex = 13;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label9.Location = new System.Drawing.Point(15, 81);
+            this.label9.Location = new System.Drawing.Point(15, 108);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(85, 20);
             this.label9.TabIndex = 12;
@@ -468,7 +454,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label4.Location = new System.Drawing.Point(15, 42);
+            this.label4.Location = new System.Drawing.Point(15, 53);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(124, 20);
             this.label4.TabIndex = 10;
@@ -479,9 +465,9 @@
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(200, 42);
+            this.textBox3.Location = new System.Drawing.Point(236, 53);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(269, 27);
+            this.textBox3.Size = new System.Drawing.Size(233, 27);
             this.textBox3.TabIndex = 11;
             // 
             // errorProvider1
@@ -1269,8 +1255,6 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label4;
@@ -1289,8 +1273,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -1349,5 +1331,8 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.ToolStripMenuItem administratorOptionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }

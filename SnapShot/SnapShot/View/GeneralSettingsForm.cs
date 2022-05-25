@@ -45,6 +45,7 @@ namespace SnapShot
         {
             InitializeComponent();
             toolStripStatusLabel1.Text = "";
+            comboBox1.Text = "https://";
 
             panel1.BorderStyle = BorderStyle.None;
             panel2.BorderStyle = BorderStyle.None;
@@ -77,12 +78,25 @@ namespace SnapShot
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
+        private void licencingOptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LicencingForm f = new LicencingForm();
             this.Hide();
             f.ShowDialog();
             this.Close();
+        }
+
+        /// <summary>
+        /// Redirect to licencing server change form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void administratorOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AdminLicencingForm popup = new AdminLicencingForm();
+            var result = popup.ShowDialog();
+            if (result == DialogResult.OK)
+                toolStripStatusLabel1.Text = "Licencing server successfully changed!";
         }
 
         /// <summary>
@@ -271,10 +285,8 @@ namespace SnapShot
             }
 
             // server configuration
-            string ip = textBox3.Text,
-                   mediaPath = textBox7.Text,
-                   JSONImportPath = textBox5.Text,
-                   JSONExportPath = textBox1.Text;
+            string ip = comboBox1.Text + textBox3.Text,
+                   mediaPath = textBox7.Text;
 
             string statusText = label7.Text;
             bool status = statusText == "Connected" ? true : false;
@@ -310,32 +322,6 @@ namespace SnapShot
             {
                 textBox7.BackColor = Color.White;
                 errorProvider1.SetError(textBox7, null);
-            }
-
-            // validate JSON import route path
-            if (JSONImportPath.Length < 1)
-            {
-                errorText = "Server JSON import configuration path needs to be specified!";
-                errorProvider1.SetError(textBox5, errorText);
-                textBox5.BackColor = Color.Red;
-            }
-            else
-            {
-                textBox5.BackColor = Color.White;
-                errorProvider1.SetError(textBox5, null);
-            }
-
-            // validate JSON export route path
-            if (JSONExportPath.Length < 1)
-            {
-                errorText = "Server JSON export configuration path needs to be specified!";
-                errorProvider1.SetError(textBox1, errorText);
-                textBox1.BackColor = Color.Red;
-            }
-            else
-            {
-                textBox1.BackColor = Color.White;
-                errorProvider1.SetError(textBox1, null);
             }
 
             // capture configuration
@@ -406,6 +392,8 @@ namespace SnapShot
             // retain all earlier camera configurations
             List<Camera> oldCameras = Program.Snapshot.Configuration.Cameras;
 
+            string oldTrigger = Program.Snapshot.Configuration.TriggerFilePath;
+
             // create new configuration for the specified camera
             Program.Snapshot.Configuration = new Configuration()
             {
@@ -415,9 +403,7 @@ namespace SnapShot
                 OutputValidity = validity,
                 Cameras = oldCameras,
                 ServerIP = ip,
-                MediaPath = mediaPath,
-                JSONImportLocation = JSONImportPath,
-                JSONExportLocation = JSONExportPath,
+                MediaFolderPath = mediaPath,
                 ServerPort = port,
                 ConnectionStatus = status,
                 JSONSyncPeriod = JSONSyncPeriod,
@@ -431,6 +417,10 @@ namespace SnapShot
                 Duration = duration,
                 Period = period
             };
+
+            // change the trigger file that is being monitored
+            if (oldTrigger != triggerPath)
+                Program.ChangeTrigger();
 
             // reconfigure all recorders with new configurations
             Program.Recorders.ForEach(r => r.Reconfigure());
@@ -460,10 +450,26 @@ namespace SnapShot
                 numericUpDown3.Value = 1;
 
             // server configuration
-            textBox3.Text = config.ServerIP;
-            textBox7.Text = config.MediaPath;
-            textBox5.Text = config.JSONImportLocation;
-            textBox1.Text = config.JSONExportLocation;
+            string type = "", ip = "";
+
+            if (config.ServerIP.Length > 0)
+            {
+                type = config.ServerIP.Substring(0, 7);
+                ip = config.ServerIP.Substring(7);
+
+                if (type == "http://")
+                    comboBox1.Text = type;
+                else
+                {
+                    comboBox1.Text = "https://";
+                    ip = config.ServerIP.Substring(8);
+                }
+            }
+            else
+                comboBox1.Text = "https://";
+
+            textBox3.Text = ip;
+            textBox7.Text = config.MediaFolderPath;
             if (config.ServerIP.Length > 0 && config.ServerPort != 0)
                 textBox4.Text = config.ServerPort.ToString();
             else
@@ -878,7 +884,7 @@ namespace SnapShot
                 UpdateConfigurationWindow();
             }
         }
-        
+
         /// <summary>
         /// Method which updates the labels to show current synchronization status for media files
         /// </summary>
@@ -908,10 +914,10 @@ namespace SnapShot
             try
             {
                 // formulate the path for importing JSON configuration from server
-                string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+                string path = Program.Snapshot.Configuration.ServerIP;
                 if (Program.Snapshot.Configuration.ServerPort != 0)
                     path += ":" + Program.Snapshot.Configuration.ServerPort;
-                string JSONPath = path + "/" + Program.Snapshot.Configuration.JSONImportLocation;
+                string JSONPath = path + "/" + Program.Snapshot.JSONImport;
 
                 Configuration.ImportFromJSON(JSONPath);
 
@@ -950,10 +956,10 @@ namespace SnapShot
             try
             {
                 // formulate the path for exporting files to server
-                string path = "http://" + Program.Snapshot.Configuration.ServerIP;
+                string path = Program.Snapshot.Configuration.ServerIP;
                 if (Program.Snapshot.Configuration.ServerPort != 0)
                     path += ":" + Program.Snapshot.Configuration.ServerPort;
-                string mediaPath = path + "/" + Program.Snapshot.Configuration.MediaPath;
+                string mediaPath = path + "/" + Program.Snapshot.MediaExport;
 
                 // get all locally created images and videos
                 string[] localEntries = Directory.GetFileSystemEntries(Program.Snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
@@ -962,7 +968,7 @@ namespace SnapShot
                     localEntries[i] = localEntries[i].Replace(Program.Snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
 
                 // get all images and videos located on the server
-                string[] serverEntries = Program.GetEntriesFromServer(Program.Snapshot.Configuration.ServerIP, Program.Snapshot.Configuration.ServerPort.ToString(), Program.Snapshot.Configuration.MediaPath);
+                string[] serverEntries = Program.GetEntriesFromServer(Program.Snapshot.Configuration.ServerIP, Program.Snapshot.Configuration.ServerPort.ToString(), Program.Snapshot.MediaExport);
 
                 // find all local entries which are not present among server entries
                 List<string> newEntries = Program.FindNewEntries(localEntries, serverEntries);

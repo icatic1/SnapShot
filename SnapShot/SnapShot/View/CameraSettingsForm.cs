@@ -48,12 +48,25 @@ namespace SnapShot.View
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void registracijaToolStripMenuItem_Click(object sender, EventArgs e)
+        private void licencingOptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LicencingForm f = new LicencingForm();
             this.Hide();
             f.ShowDialog();
             this.Close();
+        }
+
+        /// <summary>
+        /// Redirect to licencing server change form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void administratorOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AdminLicencingForm popup = new AdminLicencingForm();
+            var result = popup.ShowDialog();
+            if (result == DialogResult.OK)
+                toolStripStatusLabel1.Text = "Licencing server successfully changed!";
         }
 
         /// <summary>
@@ -316,5 +329,6 @@ namespace SnapShot.View
         }
 
         #endregion
+
     }
 }
