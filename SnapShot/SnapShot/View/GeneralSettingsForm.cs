@@ -13,6 +13,7 @@ using SnapShot.View;
 using System.Net.NetworkInformation;
 using System.Net;
 using SnapShot.Model;
+using System.Threading;
 
 namespace SnapShot
 {
@@ -932,8 +933,8 @@ namespace SnapShot
         /// <param name="e"></param>
         private void ConfigurationForm_Load(object sender, EventArgs e)
         {
-            Timer timerJSON = new Timer();
-            Timer timerMedia = new Timer();
+            System.Windows.Forms.Timer timerJSON = new System.Windows.Forms.Timer();
+            System.Windows.Forms.Timer timerMedia = new System.Windows.Forms.Timer();
 
             // minimum possible sync time is 1000 ms (1 s) - check for updates every 1 s
             timerJSON.Interval = 1000;
@@ -999,38 +1000,13 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button3_Click(object sender, EventArgs e)
         {
-            try
+            if (!Program.SyncsActive[0])
             {
-                // formulate the path for importing JSON configuration from server
-                string path = Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    path += ":" + Program.Snapshot.Configuration.ServerPort;
-                string JSONPath = path + "/" + Program.Snapshot.JSONImport;
-
-                Configuration.ImportFromJSON(JSONPath);
-
-                // send update signal to keep the label active
-                firstCheck[0] = true;
-                syncStatus[0] = true;
-                refreshNeeded[0] = true;
-                updateLabel[0] = true;
-
-                label3.Text = "Synchronization successful.";
-
-                // denote that the synchronization has occured
-                Program.Snapshot.Configuration.JSONTicks = (int)DateTime.Now.Ticks;
-
-                // when the JSON config is synchronized, camera recorders need to be reset
-                Program.Recorders.ForEach(r => r.Reconfigure());
-                UpdateConfigurationWindow();
-            }
-            catch
-            {
-                // send failed signal to keep the label active
-                syncStatus[0] = false;
-                updateLabel[0] = true;
-
-                label3.Text = "Synchronization failed.";
+                Program.SyncsActive[0] = true;
+                var snapshot = Program.Snapshot;
+                Thread JSONSynchronization = new Thread(() => Program.SynchronizeJSON(ref snapshot, 2));
+                JSONSynchronization.IsBackground = true;
+                JSONSynchronization.Start();
             }
         }
 
@@ -1041,45 +1017,31 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            try
+            if (!Program.SyncsActive[1])
             {
-                // formulate the path for exporting files to server
-                string path = Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    path += ":" + Program.Snapshot.Configuration.ServerPort;
-                string mediaPath = path + "/" + Program.Snapshot.MediaExport;
-
-                // get all locally created images and videos
-                string[] localEntries = Directory.GetFileSystemEntries(Program.Snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
-
-                for (int i = 0; i < localEntries.Length; i++)
-                    localEntries[i] = localEntries[i].Replace(Program.Snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
-
-                // get all images and videos located on the server
-                string[] serverEntries = Program.GetEntriesFromServer(Program.Snapshot.Configuration.ServerIP, Program.Snapshot.Configuration.ServerPort.ToString(), Program.Snapshot.MediaExport);
-
-                // find all local entries which are not present among server entries
-                List<string> newEntries = Program.FindNewEntries(localEntries, serverEntries);
-
-                // upload every new local file to server
-                foreach (var newEntry in newEntries)
-                    Configuration.UploadFile(mediaPath, newEntry, Program.Snapshot.Configuration.OutputFolderPath);
-
-                // send update signal to keep the label active
-                firstCheck[1] = true;
-                syncStatus[1] = true;
-                refreshNeeded[1] = true;
-                updateLabel[1] = true;
-
-                label14.Text = "Synchronization successful.";
+                Program.SyncsActive[1] = true;
+                var snapshot = Program.Snapshot;
+                Thread mediaSynchronization = new Thread(() => Program.SynchronizeMedia(ref snapshot, 2));
+                mediaSynchronization.IsBackground = true;
+                mediaSynchronization.Start();
             }
-            catch
-            {
-                // send failed signal to keep the label active
-                syncStatus[1] = false;
-                updateLabel[1] = true;
+        }
 
-                label14.Text = "Synchronization failed.";
+        /// <summary>
+        /// Disable the user from changing media file path when using deployed server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox3.Text == "siset1.ga")
+            {
+                textBox7.Text = @"h:\\root\\home\\sigrupa4-001\\www\\site1\\wwwroot\\UserContent";
+                textBox7.Enabled = false;
+            }
+            else
+            {
+                textBox7.Enabled = true;
             }
         }
 

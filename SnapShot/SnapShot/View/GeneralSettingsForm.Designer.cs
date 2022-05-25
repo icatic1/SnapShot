@@ -468,6 +468,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(233, 27);
             this.textBox3.TabIndex = 11;
+            this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
             // errorProvider1
             // 
@@ -740,12 +741,11 @@
             this.domainUpDown2.Items.Add("days");
             this.domainUpDown2.Items.Add("hours");
             this.domainUpDown2.Items.Add("minutes");
-            this.domainUpDown2.Items.Add("seconds");
             this.domainUpDown2.Location = new System.Drawing.Point(224, 12);
             this.domainUpDown2.Name = "domainUpDown2";
             this.domainUpDown2.Size = new System.Drawing.Size(113, 27);
             this.domainUpDown2.TabIndex = 41;
-            this.domainUpDown2.Text = "seconds";
+            this.domainUpDown2.Text = "minutes";
             // 
             // numericUpDown2
             // 

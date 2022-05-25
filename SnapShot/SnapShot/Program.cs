@@ -64,6 +64,8 @@ namespace SnapShot
 
         public static List<bool> StopFaceDetection { get => stopFaceDetection; set => stopFaceDetection = value; }
 
+        public static List<bool> SyncsActive { get => syncsActive; set => syncsActive = value; }
+
         #endregion
 
         #region Main
@@ -249,30 +251,37 @@ namespace SnapShot
                 try
                 {
                     // first, check if we need to synchronize JSON
-                    int typeOfSync = 0;
-
-                    if (snapshot.Configuration.JSONSyncPeriod != 0)
-                        typeOfSync = 1;
-                    else if (snapshot.Configuration.JSONSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.JSONTime.Hours && DateTime.Now.Minute == snapshot.Configuration.JSONTime.Minutes)
-                        typeOfSync = 2;
-
-                    if (typeOfSync > 0 && !syncsActive[0])
+                    if (!syncsActive[0] && snapshot.Configuration.JSONSyncPeriod != 0)
                     {
-                        Thread JSONSynchronization = new Thread(() => SynchronizeJSON(ref snapshot, typeOfSync));
+                        syncsActive[0] = true;
+
+                        Thread JSONSynchronization = new Thread(() => SynchronizeJSON(ref snapshot, 1));
+                        JSONSynchronization.IsBackground = true;
+                        JSONSynchronization.Start();
+                    }
+                    else if (!syncsActive[0] && snapshot.Configuration.JSONSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.JSONTime.Hours && DateTime.Now.Minute == snapshot.Configuration.JSONTime.Minutes)
+                    {
+                        syncsActive[0] = true;
+
+                        Thread JSONSynchronization = new Thread(() => SynchronizeJSON(ref snapshot, 3));
                         JSONSynchronization.IsBackground = true;
                         JSONSynchronization.Start();
                     }
 
                     // next, check if we need to synchronize media
-                    typeOfSync = 0;
-                    if (snapshot.Configuration.MediaSyncPeriod != 0)
-                        typeOfSync = 1;
-                    else if (snapshot.Configuration.MediaSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.MediaTime.Hours && DateTime.Now.Minute == snapshot.Configuration.MediaTime.Minutes)
-                        typeOfSync = 2;
-
-                    if (typeOfSync > 0 && !syncsActive[1])
+                    if (!syncsActive[1] && snapshot.Configuration.MediaSyncPeriod != 0)
                     {
-                        Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, typeOfSync));
+                        syncsActive[1] = true;
+
+                        Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, 1));
+                        mediaSynchronization.IsBackground = true;
+                        mediaSynchronization.Start();
+                    }
+                    else if (!syncsActive[1] && snapshot.Configuration.MediaSyncPeriod == 0 && DateTime.Now.Hour == snapshot.Configuration.MediaTime.Hours && DateTime.Now.Minute == snapshot.Configuration.MediaTime.Minutes)
+                    {
+                        syncsActive[1] = true;
+
+                        Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, 3));
                         mediaSynchronization.IsBackground = true;
                         mediaSynchronization.Start();
                     }
@@ -302,6 +311,8 @@ namespace SnapShot
                     // media needs to be synchronized
                     if (mediaSync && !syncsActive[1])
                     {
+                        syncsActive[1] = true;
+
                         Thread mediaSynchronization = new Thread(() => SynchronizeMedia(ref snapshot, 2));
                         mediaSynchronization.IsBackground = true;
                         mediaSynchronization.Start();
@@ -332,6 +343,8 @@ namespace SnapShot
                         }
                     }
 
+                    // wait a little bit before trying again
+                    Thread.Sleep(100);
                 }
                 catch
                 {
@@ -349,20 +362,13 @@ namespace SnapShot
         /// Two scenarios - every X ticks and at the designated time every day
         /// </summary>
         /// <param name="snapshot"></param>
-        static void SynchronizeJSON(ref Snapshot snapshot, int typeOfSync)
+        public static void SynchronizeJSON(ref Snapshot snapshot, int typeOfSync)
         {
-            // sync is already active - return
-            if (syncsActive[0])
-                return;
-
             try
             {
                 // check if camera is connected to the specified server
                 if (Configuration.ValidateToken() && snapshot.Configuration.OutputFolderPath.Length > 0)
                 {
-                    // sync currently being done - do not try to sync again
-                    syncsActive[0] = true;
-
                     // formulate the path for importing JSON configuration from server
                     string path = snapshot.Configuration.ServerIP;
                     if (snapshot.Configuration.ServerPort != 0)
@@ -386,6 +392,10 @@ namespace SnapShot
                         // wait for next synchronization
                         Thread.Sleep(snapshot.Configuration.JSONSyncPeriod * 1000);
 
+                     // wait until the designated minute passes
+                     else if (typeOfSync == 3)
+                        Thread.Sleep(60 * 1000);
+
                     // sync finished - release lock
                     syncsActive[0] = false;
                 }
@@ -395,6 +405,8 @@ namespace SnapShot
                 // send failed signal to general settings form
                 GeneralSettingsForm.SyncStatus[0] = false;
                 GeneralSettingsForm.UpdateLabel[0] = true;
+
+                // sync finished - release lock
                 syncsActive[0] = false;
             }
         }
@@ -404,20 +416,13 @@ namespace SnapShot
         /// Two scenarios - every X ticks and at the designated time every day
         /// </summary>
         /// <param name="snapshot"></param>
-        static void SynchronizeMedia(ref Snapshot snapshot, int type)
+        public static void SynchronizeMedia(ref Snapshot snapshot, int typeOfSync)
         {
-            // sync is already active - return
-            if (syncsActive[1])
-                return;
-
             try
             {
                 // check if camera is connected to the specified server
                 if (Configuration.ValidateToken() && snapshot.Configuration.OutputFolderPath.Length > 0)
                 {
-                    // sync currently being done - do not try to sync again
-                    syncsActive[1] = true;
-
                     // formulate the path for exporting files to server
                     string path = snapshot.Configuration.ServerIP;
                     if (snapshot.Configuration.ServerPort != 0)
@@ -448,9 +453,13 @@ namespace SnapShot
                     GeneralSettingsForm.UpdateLabel[1] = true;
 
                     // scenario 2 - we synchronize every X ticks
-                    if (type == 1)
+                    if (typeOfSync == 1)
                         // wait for next synchronization
                         Thread.Sleep(snapshot.Configuration.MediaSyncPeriod * 1000);
+
+                    // wait until the designated minute passes
+                    else if (typeOfSync == 3)
+                        Thread.Sleep(60 * 1000);
 
                     // sync finished - release lock
                     syncsActive[1] = false;
@@ -461,6 +470,8 @@ namespace SnapShot
                 // send failed signal to general settings form
                 GeneralSettingsForm.SyncStatus[1] = false;
                 GeneralSettingsForm.UpdateLabel[1] = true;
+
+                // sync finished - release lock
                 syncsActive[1] = false;
             }
         }
