@@ -25,7 +25,7 @@ namespace SnapShot
 
         static Snapshot snapshot = new Snapshot();
 
-        static string licencingURL = "https://siset1.ga";
+        static string licencingURL = "";
 
         static int previousContent = 0;
 

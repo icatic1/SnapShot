@@ -46,12 +46,7 @@ namespace SnapShot
 
             // we are connected - grab information from server
             else
-            {
-                label7.Text = "Connected";
-                label7.ForeColor = System.Drawing.Color.Green;
-
                 GetInformationFromServer();
-            }
 
             textBox2.Text = Program.Snapshot.TerminalName;
             checkBox1.Checked = Program.Snapshot.DebugLog;
@@ -357,26 +352,44 @@ namespace SnapShot
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            // cannot check licence status if we are disconnected
-            if (!Program.Snapshot.Connected)
+            try
             {
-                toolStripStatusLabel1.Text = "You need to connect to the server first.";
-                return;
+                // if no licencing server has been created, ask the user to enter their own server
+                if (Program.LicencingURL.Length < 1)
+                {
+                    // enter the form for configuring the licencing server
+                    AdminLicencingForm popup = new AdminLicencingForm();
+                    var result = popup.ShowDialog();
+                    if (result != DialogResult.OK)
+                    {
+                        toolStripStatusLabel1.Text = "Licencing server was not configured!";
+                        return;
+                    }
+                }
+
+                // get terminal ID and debug log from server if the device already exists,
+                // or create a new device on the server
+                GetInformationFromServer();
+
+                // get licencing information
+                LicenceCheck();
+
+                toolStripStatusLabel1.Text = "";
+
+                if (Program.Snapshot.Licenced)
+                {
+                    label3.Text = "Licenced version";
+                    textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
+                }
+                else
+                {
+                    label3.Text = "Demo version";
+                    textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
+                }
             }
-
-            toolStripStatusLabel1.Text = "";
-
-            LicenceCheck();
-
-            if (Program.Snapshot.Licenced)
+            catch
             {
-                label3.Text = "Licenced version";
-                textBox1.Text = "Your licence has been successfully found. Enjoy using the application!";
-            }
-            else
-            {
-                label3.Text = "Demo version";
-                textBox1.Text = "Unfortunately, this machine has not been licenced yet. Contact us at icatic1@etf.unsa.ba to get your licence.";
+                toolStripStatusLabel1.Text = "An error has occured while checking your licence. Check licencing server URL.";
             }
         }
 
@@ -412,43 +425,5 @@ namespace SnapShot
         }
 
         #endregion
-
-        #region Server connection
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            toolStripStatusLabel1.Text = "";
-
-            try
-            {
-                HttpWebRequest webRequest;
-
-                webRequest = (HttpWebRequest)WebRequest.Create(Program.LicencingURL + "/api/Licence/ConnectionCheck");
-
-                webRequest.Method = "GET";
-
-                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
-                if (response.StatusCode != HttpStatusCode.OK)
-                    throw new Exception("Disconnected!");
-
-                label7.Text = "Connected";
-                label7.ForeColor = System.Drawing.Color.Green;
-
-                Program.Snapshot.Connected = true;
-
-                // get terminal ID and debug log from server
-                GetInformationFromServer();
-            }
-            catch
-            {
-                label7.Text = "Disconnected";
-                label7.ForeColor = System.Drawing.Color.Red;
-
-                Program.Snapshot.Connected = false;
-            }
-        }
-
-        #endregion
-
     }
 }

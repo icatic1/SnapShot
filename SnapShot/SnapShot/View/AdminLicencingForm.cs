@@ -75,23 +75,8 @@ namespace SnapShot.View
         {
             try
             {
-                HttpWebRequest webRequest;
-
-                string baseUrl = "https://siset1.ga";
-                if (Program.Snapshot.Configuration.ServerIP.Length > 0)
-                    baseUrl = Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    baseUrl += ":" + Program.Snapshot.Configuration.ServerPort;
-
-                string requestParams = "email=" + textBox1.Text +
-                       "&password=" + textBox2.Text;
-
-                webRequest = (HttpWebRequest)WebRequest.Create(baseUrl + "/api/User/login" + "?" + requestParams);
-
-                webRequest.Method = "POST";
-
-                HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
-                if (response.StatusCode != HttpStatusCode.OK)
+                // use static data for login                
+                if (textBox1.Text != "administrator" || textBox2.Text != "administrator")
                 {
                     toolStripStatusLabel1.Text = "Wrong email and/or password!";
                     return;
@@ -155,6 +140,5 @@ namespace SnapShot.View
         }
 
         #endregion
-
     }
 }
