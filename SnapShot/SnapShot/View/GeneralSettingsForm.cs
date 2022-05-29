@@ -14,6 +14,7 @@ using System.Net.NetworkInformation;
 using System.Net;
 using SnapShot.Model;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace SnapShot
 {
@@ -53,7 +54,7 @@ namespace SnapShot
             panel2.BorderStyle = BorderStyle.None;
             panel3.BorderStyle = BorderStyle.None;
             panel4.BorderStyle = BorderStyle.None;
-            
+
             dateTimePicker1.CustomFormat = "HH:mm";
             dateTimePicker2.CustomFormat = "HH:mm";
 
@@ -323,17 +324,17 @@ namespace SnapShot
                 }
 
                 // validate media route path
-                if (mediaPath.Length < 1)
-                {
-                    errorText = "Server media path needs to be specified!";
-                    errorProvider1.SetError(textBox7, errorText);
-                    textBox7.BackColor = Color.Red;
-                }
-                else
-                {
-                    textBox7.BackColor = Color.White;
-                    errorProvider1.SetError(textBox7, null);
-                }
+                //if (mediaPath.Length < 1)
+                //{
+                //    errorText = "Server media path needs to be specified!";
+                //    errorProvider1.SetError(textBox7, errorText);
+                //    textBox7.BackColor = Color.Red;
+                //}
+                //else
+                //{
+                textBox7.BackColor = Color.White;
+                errorProvider1.SetError(textBox7, null);
+                //}
             }
             else
             {
@@ -492,7 +493,10 @@ namespace SnapShot
                 comboBox1.Text = "https://";
 
             textBox3.Text = ip;
-            textBox7.Text = config.MediaFolderPath;
+
+            var splittedMediaPath = config.MediaFolderPath.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+            textBox7.Text = string.Join((char)92, splittedMediaPath);
+            
             if (config.ServerIP.Length > 0 && config.ServerPort != 0)
                 textBox4.Text = config.ServerPort.ToString();
             else
@@ -726,7 +730,7 @@ namespace SnapShot
                 radioButton5.Checked = true;
 
                 // unselect burst button
-                radioButton6.Checked = false; 
+                radioButton6.Checked = false;
 
                 // enable duration
                 numericUpDown6.Enabled = true;
@@ -875,7 +879,7 @@ namespace SnapShot
 
                 // add the computer to device table if it is not already present
                 DeviceCheck();
-                 
+
             }
             catch
             {
@@ -895,6 +899,11 @@ namespace SnapShot
         {
             try
             {
+                if (path == null || path == "") path = @"C:\\inetpub\\site\\wwwroot\\UserContent";
+                else
+                {
+                    path = Regex.Replace(path, @"(?<!\\)\\(?!\\)", @"\\");
+                }
                 HttpWebRequest webRequest;
                 string requestParams = Configuration.GetMACAddress() ?? "";
                 webRequest = (HttpWebRequest)WebRequest.Create(url + "/api/FileUpload/SetPathForUser" + "/" + requestParams);
@@ -1036,7 +1045,7 @@ namespace SnapShot
         {
             if (textBox3.Text == "siset1.ga")
             {
-                textBox7.Text = @"h:\\root\\home\\sigrupa4-001\\www\\site1\\wwwroot\\UserContent";
+                textBox7.Text = @"h:\root\home\sigrupa4-001\www\site1\wwwroot\UserContent";
                 textBox7.Enabled = false;
             }
             else
