@@ -129,9 +129,24 @@ namespace SnapShot
             bool res = Configuration.ImportFromJSON(path);
             if (res)
             {
+                // change the trigger file that is being monitored
+                Thread newThread = new Thread(() => Program.ChangeTrigger());
+                newThread.IsBackground = true;
+                newThread.Start();
+
+                // reconfigure all cameras in a separate thread
                 Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
                 threadReconfigure.IsBackground = true;
                 threadReconfigure.Start();
+
+                // start thread which will constantly check if faces are present
+                if (Program.Snapshot.Configuration.FaceDetectionTrigger)
+                {
+                    var snap = Program.Snapshot;
+                    Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
+                    faceChecker.IsBackground = true;
+                    faceChecker.Start();
+                }
 
                 toolStripStatusLabel1.Text = "Import successfully completed.";
             }

@@ -87,17 +87,29 @@ namespace SnapShot
             listener.Start();
 
             // create demo configuration if it doesn't already exist
+            string path = Directory.GetCurrentDirectory();
             if (!File.Exists(Directory.GetCurrentDirectory() + "\\configuration.json"))
-            {
-                Thread export = new Thread(() => CreateDemoConfiguration());
-                export.IsBackground = true;
-                export.Start();
-            }
+                CreateDemoConfiguration();
             else
+                Configuration.ImportFromJSON("configuration.json");
+
+            // change the trigger file that is being monitored
+            Thread newThread = new Thread(() => Program.ChangeTrigger());
+            newThread.IsBackground = true;
+            newThread.Start();
+
+            // reconfigure all cameras in a separate thread
+            Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+            threadReconfigure.IsBackground = true;
+            threadReconfigure.Start();
+
+            // start thread which will constantly check if faces are present
+            if (Program.Snapshot.Configuration.FaceDetectionTrigger)
             {
-                Thread import = new Thread(() => Configuration.ImportFromJSON("configuration.json"));
-                import.IsBackground = true;
-                import.Start();
+                var snap = Program.Snapshot;
+                Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
+                faceChecker.IsBackground = true;
+                faceChecker.Start();
             }
 
             Application.Run(new LicencingForm());
@@ -676,6 +688,7 @@ namespace SnapShot
         /// </summary>
         public static void FaceDetectionTrigger(ref Snapshot snapshot)
         {
+            Thread.Sleep(100);
             try
             {
                 while (snapshot.Configuration.FaceDetectionTrigger)
@@ -716,7 +729,12 @@ namespace SnapShot
                 }
 
                 for (int i = 0; i < recorders.Count; i++)
+                {
+                    if (snapshot.Configuration.Cameras[i].Id.Length < 1)
+                        continue;
+
                     recorders[i].FaceDetection(2);
+                }
             }
             catch
             {

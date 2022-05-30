@@ -1237,6 +1237,9 @@
             this.button6.Size = new System.Drawing.Size(160, 28);
             this.button6.TabIndex = 24;
             this.button6.Text = "Save configuration";
+            this.toolTip1.SetToolTip(this.button6, "Clicking on this button will save the configuration locally and to the server (if" +
+        " provided). The trigger file watcher will be initialized and the configured came" +
+        "ras initialized for recording.");
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
