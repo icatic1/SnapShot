@@ -383,6 +383,12 @@ namespace SnapShot.Model
 
         #region Face detection
 
+        /// <summary>
+        /// Method which check if faces are present on the live image
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public bool FaceDetection(int state)
         {
             // camera has not been configured - return
@@ -392,6 +398,13 @@ namespace SnapShot.Model
             // wait until camera is unlocked
             if (state == 0 && locked)
                 while (locked) ;
+
+            // last frame - close the stream
+            if (state == 2)
+            {
+                capture.Release();
+                return true;
+            }
 
             // lock the camera so others cannot use it
             locked = true;
@@ -424,10 +437,6 @@ namespace SnapShot.Model
             bool result = false;
             if (faces.Length > 0)
                 result = true;
-
-            // last frame - close the stream
-            if (state == 2)
-                capture.Release();
 
             // unlock the camera so others can use it
             locked = false;

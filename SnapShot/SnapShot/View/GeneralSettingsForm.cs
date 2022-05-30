@@ -443,6 +443,16 @@ namespace SnapShot
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
         }
 
+        /// <summary>
+        /// Clicking on the cancel button which brings the currently saved configuration back
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button9_Click(object sender, EventArgs e)
+        {
+            UpdateConfigurationWindow();
+        }
+
         #endregion
 
         #region Update configuration

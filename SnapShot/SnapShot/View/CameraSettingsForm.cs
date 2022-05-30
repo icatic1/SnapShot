@@ -28,6 +28,7 @@ namespace SnapShot.View
         {
             InitializeComponent();
             cameraNumber = cameraIndex;
+            panel1.BorderStyle = BorderStyle.None;
             InitializeForm();
         }
 
@@ -335,6 +336,16 @@ namespace SnapShot.View
 
             // notify the user that the new configuration has been saved
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
+        }
+
+        /// <summary>
+        /// Clicking on the cancel button which brings the currently saved configuration back
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button2_Click(object sender, EventArgs e)
+        {
+            UpdateConfigurationWindow();
         }
 
         #endregion

@@ -260,6 +260,8 @@ namespace SnapShot
                     Program.recorders[i].CreateFolders();
 
                     Program.recorders[i].TakeAVideo();
+
+                    Program.recorders[i].Reconfigure();
                 }
             }
         }
@@ -738,7 +740,13 @@ namespace SnapShot
             }
             catch
             {
-                // ignore any errors
+                for (int i = 0; i < recorders.Count; i++)
+                {
+                    if (snapshot.Configuration.Cameras[i].Id.Length < 1)
+                        continue;
+
+                    recorders[i].Reconfigure();
+                }
             }
         }
 

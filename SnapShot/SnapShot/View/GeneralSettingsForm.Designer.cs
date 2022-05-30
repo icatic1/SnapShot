@@ -120,6 +120,7 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.button6 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -477,6 +478,7 @@
             this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.groupBox6, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.button6, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.button9, 2, 2);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(30, 47);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
@@ -1243,6 +1245,18 @@
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
+            // button9
+            // 
+            this.button9.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button9.Location = new System.Drawing.Point(1300, 645);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(160, 28);
+            this.button9.TabIndex = 44;
+            this.button9.Text = "Cancel";
+            this.toolTip1.SetToolTip(this.button9, "Cancel the current changes and revert to the saved configuration.");
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
             // GeneralSettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -1386,5 +1400,6 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button button9;
     }
 }
