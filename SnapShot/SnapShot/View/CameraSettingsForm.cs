@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Management;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,6 +18,7 @@ namespace SnapShot.View
         #region Attributes
 
         int cameraNumber;
+        static List<string> devices = new List<string>();
 
         #endregion
 
@@ -122,30 +124,11 @@ namespace SnapShot.View
         }
 
         /// <summary>
-        /// Redirect to JSON export
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                bool res = Configuration.ExportToJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                    toolStripStatusLabel1.Text = "Export successfully completed.";
-                else
-                    toolStripStatusLabel1.Text = "The export could not be completed successfully.";
-            }
-        }
-
-        /// <summary>
         /// Redirect to JSON import
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             JSONPopupForm popup = new JSONPopupForm();
             var result = popup.ShowDialog();
@@ -154,7 +137,10 @@ namespace SnapShot.View
                 bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
                 if (res)
                 {
-                    Program.Recorders.ForEach(r => r.Reconfigure());
+                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                    threadReconfigure.IsBackground = true;
+                    threadReconfigure.Start();
+
                     toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
                 else
@@ -192,14 +178,10 @@ namespace SnapShot.View
             comboBox3.Text = "USB camera";
 
             // add all available USB camera devices to combo box list
-            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
-            {
-                foreach (var device in searcher.Get())
-                {
-                    comboBox4.Items.Add(device["Caption"].ToString());
-                    comboBox4.Text = device["Caption"].ToString();
-                }
-            }
+            // in a separate thread
+            Thread thread = new Thread(() => AddAllAvailableDevices());
+            thread.IsBackground = true;
+            thread.Start();
 
             // automatically select standard resolution
             comboBox5.Text = "640x480";
@@ -209,14 +191,53 @@ namespace SnapShot.View
         }
 
         /// <summary>
+        /// Get all available devices and set them as combo box items
+        /// </summary>
+        public void AddAllAvailableDevices()
+        {
+            devices = GetAllAvailableDevices();
+
+            foreach (var device in devices)
+            {
+                if (comboBox4.InvokeRequired)
+                {
+                    comboBox4.Invoke(new MethodInvoker(
+                    delegate ()
+                    {
+                        comboBox4.Items.Add(device);
+                        comboBox4.Text = device;
+                    }));
+                }
+                else
+                {
+                    comboBox4.Items.Add(device);
+                    comboBox4.Text = device;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get all available devices for recording
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetAllAvailableDevices()
+        {
+            List<string> devicesString = new List<string>();
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
+            {
+                foreach (var device in searcher.Get())
+                    devicesString.Add(device["Caption"].ToString() ?? "");
+            }
+
+            return devicesString;
+        }
+
+        /// <summary>
         /// Update form controls by using existing configuration
         /// </summary>
         public void UpdateConfigurationWindow()
         {
             var config = Program.Snapshot.Configuration.Cameras[cameraNumber];
-
-            // initialize recorder for the selected camera - make recording available
-            Program.Recorders[cameraNumber].Reconfigure();
             
             // initialize all other controls
             comboBox3.Text = config.Type.ToString();
@@ -270,9 +291,6 @@ namespace SnapShot.View
             };
 
             Program.Snapshot.Configuration.Cameras[cameraNumber] = camera;
-
-            // reconfigure the recorder to use new settings
-            Program.Recorders[cameraNumber].Reconfigure();
 
             // notify the user that the new configuration has been saved
             toolStripStatusLabel1.Text = "Configuration successfully saved!";

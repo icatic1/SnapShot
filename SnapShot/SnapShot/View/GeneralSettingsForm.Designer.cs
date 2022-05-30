@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -41,9 +40,6 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
-            this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importFromJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -62,20 +58,21 @@
             this.label4 = new System.Windows.Forms.Label();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.label24 = new System.Windows.Forms.Label();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.textBox9 = new System.Windows.Forms.TextBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.button8 = new System.Windows.Forms.Button();
+            this.textBox11 = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label26 = new System.Windows.Forms.Label();
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.button7 = new System.Windows.Forms.Button();
-            this.label29 = new System.Windows.Forms.Label();
-            this.textBox11 = new System.Windows.Forms.TextBox();
-            this.button8 = new System.Windows.Forms.Button();
             this.label30 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -121,12 +118,13 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.button6 = new System.Windows.Forms.Button();
+            this.importExistingConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -167,7 +165,6 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.registracijaToolStripMenuItem,
             this.toolStripMenuItem1,
-            this.postavkeToolStripMenuItem,
             this.pomoćToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -204,7 +201,8 @@
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2,
-            this.toolStripMenuItem3});
+            this.toolStripMenuItem3,
+            this.importExistingConfigurationToolStripMenuItem});
             this.toolStripMenuItem1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(114, 24);
@@ -213,7 +211,7 @@
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 26);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(285, 26);
             this.toolStripMenuItem2.Text = "General settings";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -224,7 +222,7 @@
             this.toolStripMenuItem5,
             this.toolStripMenuItem6});
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(198, 26);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(285, 26);
             this.toolStripMenuItem3.Text = "Camera settings";
             // 
             // toolStripMenuItem4
@@ -247,30 +245,6 @@
             this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem6.Text = "Camera 3";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
-            // 
-            // postavkeToolStripMenuItem
-            // 
-            this.postavkeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportToJSONToolStripMenuItem,
-            this.importFromJSONToolStripMenuItem});
-            this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
-            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
-            this.postavkeToolStripMenuItem.Text = "JSON Import/Export";
-            // 
-            // exportToJSONToolStripMenuItem
-            // 
-            this.exportToJSONToolStripMenuItem.Name = "exportToJSONToolStripMenuItem";
-            this.exportToJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
-            this.exportToJSONToolStripMenuItem.Text = "Export to JSON";
-            this.exportToJSONToolStripMenuItem.Click += new System.EventHandler(this.exportToJSONToolStripMenuItem_Click);
-            // 
-            // importFromJSONToolStripMenuItem
-            // 
-            this.importFromJSONToolStripMenuItem.Name = "importFromJSONToolStripMenuItem";
-            this.importFromJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
-            this.importFromJSONToolStripMenuItem.Text = "Import from JSON";
-            this.importFromJSONToolStripMenuItem.Click += new System.EventHandler(this.importFromJSONToolStripMenuItem_Click);
             // 
             // pomoćToolStripMenuItem
             // 
@@ -470,10 +444,6 @@
             this.textBox3.TabIndex = 11;
             this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
-            // errorProvider1
-            // 
-            this.errorProvider1.ContainerControl = this;
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -500,17 +470,12 @@
             // groupBox4
             // 
             this.groupBox4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.groupBox4.Controls.Add(this.checkBox1);
-            this.groupBox4.Controls.Add(this.label24);
-            this.groupBox4.Controls.Add(this.textBox9);
+            this.groupBox4.Controls.Add(this.groupBox7);
             this.groupBox4.Controls.Add(this.label25);
             this.groupBox4.Controls.Add(this.numericUpDown3);
             this.groupBox4.Controls.Add(this.label26);
             this.groupBox4.Controls.Add(this.textBox10);
             this.groupBox4.Controls.Add(this.button7);
-            this.groupBox4.Controls.Add(this.label29);
-            this.groupBox4.Controls.Add(this.textBox11);
-            this.groupBox4.Controls.Add(this.button8);
             this.groupBox4.Controls.Add(this.label30);
             this.groupBox4.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.groupBox4.Location = new System.Drawing.Point(609, 5);
@@ -521,42 +486,102 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Device configuration";
             // 
-            // checkBox1
+            // groupBox7
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBox1.Location = new System.Drawing.Point(147, 181);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(221, 24);
-            this.checkBox1.TabIndex = 21;
-            this.checkBox1.Text = "Use face detection as trigger";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.groupBox7.Controls.Add(this.label24);
+            this.groupBox7.Controls.Add(this.checkBox2);
+            this.groupBox7.Controls.Add(this.textBox9);
+            this.groupBox7.Controls.Add(this.checkBox1);
+            this.groupBox7.Controls.Add(this.label29);
+            this.groupBox7.Controls.Add(this.button8);
+            this.groupBox7.Controls.Add(this.textBox11);
+            this.groupBox7.Location = new System.Drawing.Point(17, 28);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(466, 176);
+            this.groupBox7.TabIndex = 24;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Trigger type";
             // 
             // label24
             // 
             this.label24.AutoSize = true;
             this.label24.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label24.Location = new System.Drawing.Point(14, 140);
+            this.label24.Location = new System.Drawing.Point(17, 105);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(100, 20);
             this.label24.TabIndex = 19;
             this.label24.Text = "Trigger regex:";
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.checkBox2.Location = new System.Drawing.Point(23, 30);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(152, 24);
+            this.checkBox2.TabIndex = 23;
+            this.checkBox2.Text = "File system trigger";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // textBox9
             // 
             this.textBox9.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox9.Location = new System.Drawing.Point(148, 140);
+            this.textBox9.Location = new System.Drawing.Point(146, 101);
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(322, 27);
+            this.textBox9.Size = new System.Drawing.Size(244, 27);
             this.textBox9.TabIndex = 20;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.checkBox1.Location = new System.Drawing.Point(23, 138);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(176, 24);
+            this.checkBox1.TabIndex = 21;
+            this.checkBox1.Text = "Face detection trigger";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label29.Location = new System.Drawing.Point(17, 68);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(118, 20);
+            this.label29.TabIndex = 3;
+            this.label29.Text = "Trigger file path:";
+            // 
+            // button8
+            // 
+            this.button8.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.button8.Location = new System.Drawing.Point(414, 67);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(39, 29);
+            this.button8.TabIndex = 5;
+            this.button8.Text = "...";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // textBox11
+            // 
+            this.textBox11.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox11.Enabled = false;
+            this.textBox11.Location = new System.Drawing.Point(146, 68);
+            this.textBox11.Name = "textBox11";
+            this.textBox11.Size = new System.Drawing.Size(244, 27);
+            this.textBox11.TabIndex = 4;
             // 
             // label25
             // 
             this.label25.AutoSize = true;
             this.label25.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label25.Location = new System.Drawing.Point(293, 291);
+            this.label25.Location = new System.Drawing.Point(293, 279);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(39, 20);
             this.label25.TabIndex = 18;
@@ -564,7 +589,7 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(148, 289);
+            this.numericUpDown3.Location = new System.Drawing.Point(148, 277);
             this.numericUpDown3.Minimum = new decimal(new int[] {
             1,
             0,
@@ -583,7 +608,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label26.Location = new System.Drawing.Point(17, 289);
+            this.label26.Location = new System.Drawing.Point(17, 277);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(123, 20);
             this.label26.TabIndex = 16;
@@ -597,51 +622,19 @@
             this.textBox10.Enabled = false;
             this.textBox10.Location = new System.Drawing.Point(148, 217);
             this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new System.Drawing.Size(322, 27);
+            this.textBox10.Size = new System.Drawing.Size(259, 27);
             this.textBox10.TabIndex = 14;
             // 
             // button7
             // 
             this.button7.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button7.Location = new System.Drawing.Point(148, 250);
+            this.button7.Location = new System.Drawing.Point(431, 213);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(39, 29);
             this.button7.TabIndex = 15;
             this.button7.Text = "...";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label29.Location = new System.Drawing.Point(14, 44);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(118, 20);
-            this.label29.TabIndex = 3;
-            this.label29.Text = "Trigger file path:";
-            // 
-            // textBox11
-            // 
-            this.textBox11.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox11.Enabled = false;
-            this.textBox11.Location = new System.Drawing.Point(148, 44);
-            this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new System.Drawing.Size(319, 27);
-            this.textBox11.TabIndex = 4;
-            // 
-            // button8
-            // 
-            this.button8.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button8.Location = new System.Drawing.Point(148, 82);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(39, 29);
-            this.button8.TabIndex = 5;
-            this.button8.Text = "...";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // label30
             // 
@@ -1204,6 +1197,13 @@
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
+            // importExistingConfigurationToolStripMenuItem
+            // 
+            this.importExistingConfigurationToolStripMenuItem.Name = "importExistingConfigurationToolStripMenuItem";
+            this.importExistingConfigurationToolStripMenuItem.Size = new System.Drawing.Size(285, 26);
+            this.importExistingConfigurationToolStripMenuItem.Text = "Import existing configuration";
+            this.importExistingConfigurationToolStripMenuItem.Click += new System.EventHandler(this.importExistingConfigurationToolStripMenuItem_Click);
+            // 
             // GeneralSettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -1223,10 +1223,11 @@
             this.menuStrip1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -1256,12 +1257,9 @@
         #endregion
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem postavkeToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripMenuItem registracijaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pomoćToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportToJSONToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importFromJSONToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label16;
@@ -1271,7 +1269,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-        private System.Windows.Forms.ErrorProvider errorProvider1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.DomainUpDown domainUpDown3;
         private System.Windows.Forms.Label label21;
@@ -1346,5 +1343,8 @@
         private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
     }
 }

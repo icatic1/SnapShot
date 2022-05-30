@@ -16,6 +16,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using SnapShot.Model;
 using Newtonsoft.Json.Linq;
+using SnapShot.View;
 
 namespace SnapShot
 {
@@ -85,10 +86,13 @@ namespace SnapShot
             listener.IsBackground = true;
             listener.Start();
 
-            // start thread which will constantly check if faces are present
-            Thread faceChecker = new Thread(() => FaceDetectionTrigger());
-            faceChecker.IsBackground = true;
-            faceChecker.Start();
+            // create demo configuration if it doesn't already exist
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\configuration.json"))
+            {
+                Thread export = new Thread(() => CreateDemoConfiguration());
+                export.IsBackground = true;
+                export.Start();
+            }
 
             Application.Run(new LicencingForm());
         }
@@ -193,6 +197,9 @@ namespace SnapShot
                         if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
                             continue;
 
+                        if (Program.recorders[i].Capture == null)
+                            Program.recorders[i].Reconfigure();
+
                         Program.recorders[i].CreateFolders();
 
                         Bitmap image = Program.recorders[i].TakeAPicture();
@@ -207,6 +214,9 @@ namespace SnapShot
                         // skip cameras which have not been configured
                         if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
                             continue;
+
+                        if (Program.recorders[i].Capture == null)
+                            Program.recorders[i].Reconfigure();
 
                         Program.recorders[i].CreateFolders(1);
 
@@ -226,11 +236,22 @@ namespace SnapShot
                     if (Program.Snapshot.Configuration.Cameras[i].Id.Length < 1)
                         continue;
 
+                    if (Program.recorders[i].Capture == null)
+                        Program.recorders[i].Reconfigure();
+
                     Program.recorders[i].CreateFolders();
 
                     Program.recorders[i].TakeAVideo();
                 }
             }
+        }
+
+        /// <summary>
+        /// Reconfigure all recorders
+        /// </summary>
+        public static void ReconfigureAllRecorders()
+        {
+            Program.Recorders.ForEach(r => r.Reconfigure());
         }
 
         #endregion
@@ -551,6 +572,7 @@ namespace SnapShot
         /// <param name="index"></param>
         static void SendSnaps(Recorder camera, int index)
         {
+            if (camera.Capture == null)
             camera.Reconfigure();
 
             // fill the first frame
@@ -646,15 +668,12 @@ namespace SnapShot
         /// <summary>
         /// Constantly check if there are faces on the camera and start recording if it is true
         /// </summary>
-        public static void FaceDetectionTrigger()
+        public static void FaceDetectionTrigger(ref Snapshot snapshot)
         {
             try
             {
-                while (1 == 1)
+                while (snapshot.Configuration.FaceDetectionTrigger)
                 {
-                    if (!snapshot.Configuration.FaceDetectionTrigger)
-                        continue;
-
                     List<int> initializeStream = new List<int>() { 0, 0, 0 };
                     for (int i = 0; i < recorders.Count; i++)
                     {
@@ -674,6 +693,7 @@ namespace SnapShot
                         }
 
                         // configure camera for opening stream
+                        if (recorders[i].Capture == null)
                         recorders[i].Reconfigure();
 
                         // check if face is present on the camera
@@ -693,6 +713,34 @@ namespace SnapShot
             {
                 // ignore any errors
             }
+        }
+
+        #endregion
+
+        #region Demo configuration
+
+        /// <summary>
+        /// Create first demo configuration for new users
+        /// </summary>
+        public static void CreateDemoConfiguration()
+        {
+            // create demo trigger file
+            File.Create(Directory.GetCurrentDirectory() + "\\trigger.txt");
+            snapshot.Configuration.TriggerFilePath = Directory.GetCurrentDirectory() + "\\trigger.txt";
+
+            snapshot.Configuration.Regex = "[a-z]+";
+
+            // create demo output folder
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Media");
+            snapshot.Configuration.OutputFolderPath = Directory.GetCurrentDirectory() + "\\Media";
+
+            // set at least one camera if possible
+            var devices = CameraSettingsForm.GetAllAvailableDevices();
+            snapshot.Configuration.Cameras[0].Id = devices.Count > 0 ? devices[0] : "";
+            snapshot.Configuration.Cameras[0].CameraNumber = 0;
+
+            // save demo configuration locally
+            Configuration.ExportToJSON("configuration.json");
         }
 
         #endregion

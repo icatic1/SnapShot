@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -146,30 +147,11 @@ namespace SnapShot
         }
 
         /// <summary>
-        /// Redirect to JSON export
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                bool res = Configuration.ExportToJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                    toolStripStatusLabel1.Text = "Export successfully completed.";
-                else
-                    toolStripStatusLabel1.Text = "The export could not be completed successfully.";
-            }
-        }
-
-        /// <summary>
         /// Redirect to JSON import
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             JSONPopupForm popup = new JSONPopupForm();
             var result = popup.ShowDialog();
@@ -178,7 +160,10 @@ namespace SnapShot
                 bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
                 if (res)
                 {
-                    Program.Recorders.ForEach(r => r.Reconfigure());
+                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                    threadReconfigure.IsBackground = true;
+                    threadReconfigure.Start();
+
                     toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
                 else

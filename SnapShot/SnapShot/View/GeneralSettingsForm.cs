@@ -58,6 +58,8 @@ namespace SnapShot
             dateTimePicker1.CustomFormat = "HH:mm";
             dateTimePicker2.CustomFormat = "HH:mm";
 
+            checkBox2.Checked = true;
+
             // show information from existing configuration
             UpdateConfigurationWindow();
         }
@@ -155,30 +157,11 @@ namespace SnapShot
         }
 
         /// <summary>
-        /// Redirect to JSON export
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void exportToJSONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                bool res = Configuration.ExportToJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                    toolStripStatusLabel1.Text = "Export successfully completed.";
-                else
-                    toolStripStatusLabel1.Text = "The export could not be completed successfully.";
-            }
-        }
-
-        /// <summary>
         /// Redirect to JSON import
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void importFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             JSONPopupForm popup = new JSONPopupForm();
             var result = popup.ShowDialog();
@@ -187,7 +170,10 @@ namespace SnapShot
                 bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
                 if (res)
                 {
-                    Program.Recorders.ForEach(r => r.Reconfigure());
+                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                    threadReconfigure.IsBackground = true;
+                    threadReconfigure.Start();
+
                     toolStripStatusLabel1.Text = "Import successfully completed.";
                 }
                 else
@@ -229,10 +215,14 @@ namespace SnapShot
                 toolStripStatusLabel1.Text = "Configuration could not be saved because server connection was not established!";
                 return;
             }
+            else if (!checkBox2.Checked && !checkBox1.Checked)
+            {
+                toolStripStatusLabel1.Text = "You must select at least one trigger!";
+                return;
+            }
 
             // clear all errors if they exist
             string errorText = "";
-            errorProvider1.Clear();
 
             // device configuration
             string triggerPath = textBox11.Text,
@@ -244,57 +234,30 @@ namespace SnapShot
             // control validation
 
             // validate trigger file path
-            if (triggerPath == "")
-            {
+            if (checkBox2.Checked && triggerPath == "")
                 errorText = "Trigger path must not be empty!";
-                errorProvider1.SetError(textBox11, errorText);
-                textBox11.BackColor = Color.Red;
-            }
-            else if (!File.Exists(triggerPath))
-            {
-                errorText = "Trigger file must exist!";
-                errorProvider1.SetError(textBox11, errorText);
-                textBox11.BackColor = Color.Red;
-            }
             else
-            {
                 textBox11.Text = textBox11.Text.Replace("\\", "/");
-                textBox11.BackColor = Color.White;
-                errorProvider1.SetError(textBox11, null);
-            }
+
+            if (!checkBox2.Checked)
+                triggerPath = "";
 
             // validate trigger regex
-            if (regex == "")
-            {
+            if (checkBox2.Checked && regex == "")
                 errorText = "Regex must not be empty!";
-                errorProvider1.SetError(textBox9, errorText);
-                textBox9.BackColor = Color.Red;
-            }
             else
-            {
                 textBox9.BackColor = Color.White;
-                errorProvider1.SetError(textBox9, null);
-            }
+
+            if (!checkBox2.Checked)
+                regex = "";
 
             // validate output folder path
             if (outputPath == "")
-            {
                 errorText = "Output path must not be empty!";
-                errorProvider1.SetError(textBox10, errorText);
-                textBox10.BackColor = Color.Red;
-            }
             else if (!Directory.Exists(outputPath))
-            {
                 errorText = "Directory must exist!";
-                errorProvider1.SetError(textBox10, errorText);
-                textBox10.BackColor = Color.Red;
-            }
             else
-            {
                 textBox10.Text = textBox10.Text.Replace("\\", "/");
-                textBox10.BackColor = Color.White;
-                errorProvider1.SetError(textBox10, null);
-            }
 
             // server configuration
             string ip = comboBox1.Text + textBox3.Text,
@@ -312,40 +275,12 @@ namespace SnapShot
                     try
                     {
                         port = Int32.Parse(textBox4.Text);
-                        textBox4.BackColor = Color.White;
-                        errorProvider1.SetError(textBox4, null);
                     }
                     catch
                     {
                         errorText = "Server port must be a valid number!";
-                        errorProvider1.SetError(textBox4, errorText);
-                        textBox4.BackColor = Color.Red;
                     }
                 }
-
-                // validate media route path
-                //if (mediaPath.Length < 1)
-                //{
-                //    errorText = "Server media path needs to be specified!";
-                //    errorProvider1.SetError(textBox7, errorText);
-                //    textBox7.BackColor = Color.Red;
-                //}
-                //else
-                //{
-                textBox7.BackColor = Color.White;
-                errorProvider1.SetError(textBox7, null);
-                //}
-            }
-            else
-            {
-                textBox3.BackColor = Color.White;
-                errorProvider1.SetError(textBox3, null);
-
-                textBox4.BackColor = Color.White;
-                errorProvider1.SetError(textBox4, null);
-
-                textBox7.BackColor = Color.White;
-                errorProvider1.SetError(textBox7, null);
             }
 
             // capture configuration
@@ -405,12 +340,9 @@ namespace SnapShot
             // something was not correct - do not allow configuration to be created
             if (errorText.Length > 0)
             {
-                toolStripStatusLabel1.Text = "Configuration could not be saved due to errors!";
+                toolStripStatusLabel1.Text = errorText;
                 return;
             }
-
-            // clear all errors from previous attempts
-            errorProvider1.Clear();
 
             // retain all earlier camera configurations
             List<Camera> oldCameras = Program.Snapshot.Configuration.Cameras;
@@ -441,12 +373,46 @@ namespace SnapShot
                 Period = period
             };
 
-            // change the trigger file that is being monitored
-            if (oldTrigger != triggerPath)
-                Program.ChangeTrigger();
+            // export the configuration locally or to the connected server
+            bool res = false;
+            string path = "configuration.json";
+            if (label7.Text == "Connected")
+            {
+                path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                if (Program.Snapshot.JSONExport != "")
+                    path += "/" + Program.Snapshot.JSONExport;
 
-            // reconfigure all recorders with new configurations
-            Program.Recorders.ForEach(r => r.Reconfigure());
+                res = Configuration.ExportToJSON(path);
+            }
+
+            // export the configuration in a new thread
+            Thread thread = new Thread(() => Configuration.ExportToJSON(path));
+            thread.IsBackground = true;
+            thread.Start();
+
+            // change the trigger file that is being monitored
+            if (oldTrigger != triggerPath && triggerPath.Length > 0)
+            {
+                Thread newThread = new Thread(() => Program.ChangeTrigger());
+                newThread.IsBackground = true;
+                newThread.Start();
+            }
+
+            // reconfigure all cameras in a separate thread
+            Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+            threadReconfigure.IsBackground = true;
+            threadReconfigure.Start();
+
+            // start thread which will constantly check if faces are present
+            if (faceDetectionTrigger)
+            {
+                var snap = Program.Snapshot;
+                Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
+                faceChecker.IsBackground = true;
+                faceChecker.Start();
+            }
 
             // notify the user that the configuration has been saved
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
@@ -655,11 +621,7 @@ namespace SnapShot
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
                     textBox11.Text = openFileDialog.FileName;
-                    errorProvider1.SetError(textBox11, null);
-                    textBox11.BackColor = Color.White;
-                }
             }
 
             toolStripStatusLabel1.Text = "";
@@ -674,18 +636,14 @@ namespace SnapShot
         {
             DialogResult result = folderBrowserDialog1.ShowDialog();
             if (result == DialogResult.OK)
-            {
                 textBox10.Text = folderBrowserDialog1.SelectedPath;
-                errorProvider1.SetError(textBox10, null);
-                textBox10.BackColor = Color.White;
-            }
 
             toolStripStatusLabel1.Text = "";
         }
 
         #endregion
 
-        #region Radio buttons
+        #region Radio buttons and checkboxes
 
         /// <summary>
         /// Enable/disable burst period selection
@@ -823,6 +781,18 @@ namespace SnapShot
 
             numericUpDown2.Enabled = !radioButton3.Checked;
             domainUpDown2.Enabled = !radioButton3.Checked;
+        }
+
+        /// <summary>
+        /// Change the availability of trigger file configuration
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            textBox11.Enabled = checkBox2.Checked;
+            button8.Enabled = checkBox2.Checked;
+            textBox9.Enabled = checkBox2.Checked;
         }
 
         #endregion

@@ -99,16 +99,8 @@ namespace SnapShot.View
         {
             comboBox2.Items.Clear();
 
-            // add the JSON export path of the server to the list of items
-            string path = Program.Snapshot.Configuration.ServerIP;
-            if (Program.Snapshot.Configuration.ServerPort != 0)
-                path += ":" + Program.Snapshot.Configuration.ServerPort;
-            if (Program.Snapshot.JSONExport != "")
-                path += "/" + Program.Snapshot.JSONExport;
-            comboBox2.Items.Add(path);
-
             // add the JSON import path of the server to the list of items
-            path = Program.Snapshot.Configuration.ServerIP;
+            string path = Program.Snapshot.Configuration.ServerIP;
             if (Program.Snapshot.Configuration.ServerPort != 0)
                 path += ":" + Program.Snapshot.Configuration.ServerPort;
             if (Program.Snapshot.JSONImport != "")

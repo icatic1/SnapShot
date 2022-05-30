@@ -38,6 +38,10 @@ namespace SnapShot
             deviceType = type;
             toolStripStatusLabel1.Text = "";
 
+            // reconfigure camera if it is not already configured
+            if (Program.Recorders[cameraNumber].Capture == null)
+                Program.Recorders[cameraNumber].Reconfigure();
+
             // configure and start using camera input
             CaptureCamera();
         }

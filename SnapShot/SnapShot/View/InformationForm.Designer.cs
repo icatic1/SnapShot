@@ -35,17 +35,15 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.registracijaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.administratorOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
-            this.postavkeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importFromJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importExistingConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.licencingOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -96,7 +94,6 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.registracijaToolStripMenuItem,
             this.toolStripMenuItem1,
-            this.postavkeToolStripMenuItem,
             this.pomoćToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -122,11 +119,19 @@
             this.administratorOptionsToolStripMenuItem.Text = "Administrator Options";
             this.administratorOptionsToolStripMenuItem.Click += new System.EventHandler(this.administratorOptionsToolStripMenuItem_Click);
             // 
+            // licencingOptionsToolStripMenuItem
+            // 
+            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
+            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
+            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
+            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
+            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2,
-            this.toolStripMenuItem3});
+            this.toolStripMenuItem3,
+            this.importExistingConfigurationToolStripMenuItem});
             this.toolStripMenuItem1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(114, 24);
@@ -135,7 +140,7 @@
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(198, 26);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(285, 26);
             this.toolStripMenuItem2.Text = "General settings";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -146,53 +151,36 @@
             this.toolStripMenuItem5,
             this.toolStripMenuItem6});
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(198, 26);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(285, 26);
             this.toolStripMenuItem3.Text = "Camera settings";
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(224, 26);
             this.toolStripMenuItem4.Text = "Camera 1";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(224, 26);
             this.toolStripMenuItem5.Text = "Camera 2";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 26);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(224, 26);
             this.toolStripMenuItem6.Text = "Camera 3";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
-            // postavkeToolStripMenuItem
+            // importExistingConfigurationToolStripMenuItem
             // 
-            this.postavkeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportToJSONToolStripMenuItem,
-            this.importFromJSONToolStripMenuItem});
-            this.postavkeToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.postavkeToolStripMenuItem.Name = "postavkeToolStripMenuItem";
-            this.postavkeToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
-            this.postavkeToolStripMenuItem.Text = "JSON Import/Export";
-            // 
-            // exportToJSONToolStripMenuItem
-            // 
-            this.exportToJSONToolStripMenuItem.Name = "exportToJSONToolStripMenuItem";
-            this.exportToJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
-            this.exportToJSONToolStripMenuItem.Text = "Export to JSON";
-            this.exportToJSONToolStripMenuItem.Click += new System.EventHandler(this.exportToJSONToolStripMenuItem_Click);
-            // 
-            // importFromJSONToolStripMenuItem
-            // 
-            this.importFromJSONToolStripMenuItem.Name = "importFromJSONToolStripMenuItem";
-            this.importFromJSONToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
-            this.importFromJSONToolStripMenuItem.Text = "Import from JSON";
-            this.importFromJSONToolStripMenuItem.Click += new System.EventHandler(this.importFromJSONToolStripMenuItem_Click);
+            this.importExistingConfigurationToolStripMenuItem.Name = "importExistingConfigurationToolStripMenuItem";
+            this.importExistingConfigurationToolStripMenuItem.Size = new System.Drawing.Size(285, 26);
+            this.importExistingConfigurationToolStripMenuItem.Text = "Import existing configuration";
+            this.importExistingConfigurationToolStripMenuItem.Click += new System.EventHandler(this.importExistingConfigurationToolStripMenuItem_Click);
             // 
             // pomoćToolStripMenuItem
             // 
@@ -201,13 +189,6 @@
             this.pomoćToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.pomoćToolStripMenuItem.Text = "Help";
             this.pomoćToolStripMenuItem.Click += new System.EventHandler(this.pomoćToolStripMenuItem_Click);
-            // 
-            // licencingOptionsToolStripMenuItem
-            // 
-            this.licencingOptionsToolStripMenuItem.Name = "licencingOptionsToolStripMenuItem";
-            this.licencingOptionsToolStripMenuItem.Size = new System.Drawing.Size(239, 26);
-            this.licencingOptionsToolStripMenuItem.Text = "Licencing Options";
-            this.licencingOptionsToolStripMenuItem.Click += new System.EventHandler(this.licencingOptionsToolStripMenuItem_Click);
             // 
             // InformationForm
             // 
@@ -241,17 +222,15 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem registracijaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem administratorOptionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
-        private System.Windows.Forms.ToolStripMenuItem postavkeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportToJSONToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importFromJSONToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pomoćToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem administratorOptionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem licencingOptionsToolStripMenuItem;
     }
 }
