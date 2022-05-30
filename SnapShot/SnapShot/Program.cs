@@ -93,6 +93,12 @@ namespace SnapShot
                 export.IsBackground = true;
                 export.Start();
             }
+            else
+            {
+                Thread import = new Thread(() => Configuration.ImportFromJSON("configuration.json"));
+                import.IsBackground = true;
+                import.Start();
+            }
 
             Application.Run(new LicencingForm());
         }

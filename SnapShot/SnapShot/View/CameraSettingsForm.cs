@@ -271,8 +271,8 @@ namespace SnapShot.View
             int cameraNumber = (int)comboBox4.SelectedIndex;
 
             // video configuration
-            string res = "Resolution" + comboBox5.Text;
-            Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), res);
+            string resol = "Resolution" + comboBox5.Text;
+            Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), resol);
 
             int contrast = trackBar1.Value;
             Color color = pictureBox1.BackColor;
@@ -291,6 +291,29 @@ namespace SnapShot.View
             };
 
             Program.Snapshot.Configuration.Cameras[cameraNumber] = camera;
+
+            bool res = false;
+            string path = "configuration.json";
+            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
+            {
+                path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                if (Program.Snapshot.JSONExport != "")
+                    path += "/" + Program.Snapshot.JSONExport;
+
+                res = Configuration.ExportToJSON(path);
+            }
+
+            // export the configuration in a new thread
+            Thread thread = new Thread(() => Configuration.ExportToJSON(path));
+            thread.IsBackground = true;
+            thread.Start();
+
+            // reconfigure all cameras in a separate thread
+            Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+            threadReconfigure.IsBackground = true;
+            threadReconfigure.Start();
 
             // notify the user that the new configuration has been saved
             toolStripStatusLabel1.Text = "Configuration successfully saved!";
