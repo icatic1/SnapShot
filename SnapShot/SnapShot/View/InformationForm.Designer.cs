@@ -83,9 +83,9 @@
             this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label2.Location = new System.Drawing.Point(27, 51);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(221, 28);
+            this.label2.Size = new System.Drawing.Size(204, 28);
             this.label2.TabIndex = 6;
-            this.label2.Text = "SnapShot, version: 7.1";
+            this.label2.Text = "SnapShot, version: 9";
             // 
             // menuStrip1
             // 
@@ -157,21 +157,21 @@
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem4.Text = "Camera 1";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem5.Text = "Camera 2";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem6.Text = "Camera 3";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 

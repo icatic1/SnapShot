@@ -26,6 +26,8 @@ namespace SnapShot.View
             InitializeComponent();
 
             toolStripStatusLabel1.Text = "";
+            toolTip1.SetToolTip(textBox1, "Enter your username. Hint: the username is 'administrator'.");
+            toolTip1.SetToolTip(textBox2, "Enter your password. Hint: the password is 'administrator'.");
         }
 
         #endregion
@@ -110,6 +112,10 @@ namespace SnapShot.View
             comboBox1.Visible = true;
             comboBox1.SelectedItem = "https://";
             label3.Visible = true;
+
+            toolTip1.SetToolTip(textBox1, "Enter the licencing server IP address. 'localhost' and web-addresses are also supported.");
+            toolTip1.SetToolTip(textBox2, "Enter the licencing server port. The port value can be ommitted if it is not necessary. Port must be a valid integer number.");
+
         }
 
         /// <summary>

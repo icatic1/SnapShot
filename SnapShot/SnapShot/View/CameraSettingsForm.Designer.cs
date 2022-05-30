@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -93,6 +94,7 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.importExistingConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -549,6 +551,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(265, 28);
             this.comboBox3.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.comboBox3, "The type of camera. USB cameras and IP cameras are supported.");
             // 
             // button5
             // 
@@ -558,6 +561,7 @@
             this.button5.Size = new System.Drawing.Size(160, 29);
             this.button5.TabIndex = 18;
             this.button5.Text = "Camera preview";
+            this.toolTip1.SetToolTip(this.button5, "If you click this button, a preview of the selected camera will be shown.");
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -592,6 +596,7 @@
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(265, 28);
             this.comboBox4.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.comboBox4, "One of available devices that are connected to your computer.");
             // 
             // groupBox5
             // 
@@ -634,6 +639,7 @@
             this.checkBox1.Size = new System.Drawing.Size(146, 24);
             this.checkBox1.TabIndex = 18;
             this.checkBox1.Text = "Motion detection";
+            this.toolTip1.SetToolTip(this.checkBox1, "Turn motion detection on the image on or off.");
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
@@ -645,6 +651,7 @@
             this.button6.Size = new System.Drawing.Size(135, 27);
             this.button6.TabIndex = 14;
             this.button6.Text = "Color palette";
+            this.toolTip1.SetToolTip(this.button6, "Choose your desired color.");
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -666,6 +673,7 @@
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(272, 41);
             this.trackBar1.TabIndex = 16;
+            this.toolTip1.SetToolTip(this.trackBar1, "The level of contrast of the camera capture.");
             // 
             // label24
             // 
@@ -696,6 +704,8 @@
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(278, 28);
             this.comboBox5.TabIndex = 14;
+            this.toolTip1.SetToolTip(this.comboBox5, "The resolution which will be used for saving images. It is recommended to use onl" +
+        "y the resolution supported by the camera.");
             // 
             // label25
             // 
@@ -761,6 +771,7 @@
             this.button7.Size = new System.Drawing.Size(160, 29);
             this.button7.TabIndex = 37;
             this.button7.Text = "Save configuration";
+            this.toolTip1.SetToolTip(this.button7, "Save the configured camera.");
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
@@ -834,21 +845,21 @@
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem4.Text = "Camera 1";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem5.Text = "Camera 2";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(224, 26);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 26);
             this.toolStripMenuItem6.Text = "Camera 3";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
@@ -974,5 +985,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pomoćToolStripMenuItem;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

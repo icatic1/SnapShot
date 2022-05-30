@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -40,6 +41,7 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.importExistingConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pomoćToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -118,7 +120,7 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.button6 = new System.Windows.Forms.Button();
-            this.importExistingConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -246,6 +248,13 @@
             this.toolStripMenuItem6.Text = "Camera 3";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
+            // importExistingConfigurationToolStripMenuItem
+            // 
+            this.importExistingConfigurationToolStripMenuItem.Name = "importExistingConfigurationToolStripMenuItem";
+            this.importExistingConfigurationToolStripMenuItem.Size = new System.Drawing.Size(285, 26);
+            this.importExistingConfigurationToolStripMenuItem.Text = "Import existing configuration";
+            this.importExistingConfigurationToolStripMenuItem.Click += new System.EventHandler(this.importExistingConfigurationToolStripMenuItem_Click);
+            // 
             // pomoćToolStripMenuItem
             // 
             this.pomoćToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
@@ -325,6 +334,9 @@
             this.button1.Size = new System.Drawing.Size(160, 29);
             this.button1.TabIndex = 25;
             this.button1.Text = "Connect to server";
+            this.toolTip1.SetToolTip(this.button1, "When you click this button, you will be connected to the server provided. If you " +
+        "have not used this device before, an activation code will be required for authen" +
+        "ticating the connection.");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -347,6 +359,9 @@
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(233, 27);
             this.textBox7.TabIndex = 34;
+            this.toolTip1.SetToolTip(this.textBox7, "The path where media will be saved on your local server. \"\\\" sign must be used fo" +
+        "r splitting folders in the path. If no path is provided, the default path will b" +
+        "e used.");
             // 
             // domainUpDown3
             // 
@@ -412,6 +427,8 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(233, 27);
             this.textBox4.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.textBox4, "The port of your desired server. This field can be ommited if no port is necessar" +
+        "y. Port value must be a valid integer number.");
             // 
             // label9
             // 
@@ -442,6 +459,8 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(233, 27);
             this.textBox3.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.textBox3, "The IP address of your desired server. \"localhost\" and web-adresses are also supp" +
+        "orted.");
             this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
             // tableLayoutPanel1
@@ -521,6 +540,7 @@
             this.checkBox2.Size = new System.Drawing.Size(152, 24);
             this.checkBox2.TabIndex = 23;
             this.checkBox2.Text = "File system trigger";
+            this.toolTip1.SetToolTip(this.checkBox2, "If this option is chosen, a local file will be used for triggering capture.");
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
@@ -533,6 +553,7 @@
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(244, 27);
             this.textBox9.TabIndex = 20;
+            this.toolTip1.SetToolTip(this.textBox9, "The regex which will be used for triggering capture from the trigger file.");
             // 
             // checkBox1
             // 
@@ -543,6 +564,8 @@
             this.checkBox1.Size = new System.Drawing.Size(176, 24);
             this.checkBox1.TabIndex = 21;
             this.checkBox1.Text = "Face detection trigger";
+            this.toolTip1.SetToolTip(this.checkBox1, "If this option is chosen, detecting faces on the active cameras will be used for " +
+        "triggering capture.");
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // label29
@@ -576,6 +599,8 @@
             this.textBox11.Name = "textBox11";
             this.textBox11.Size = new System.Drawing.Size(244, 27);
             this.textBox11.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.textBox11, "The local path of your trigger file. It must be selected by clicking on the \"...\"" +
+        " button to the right of this control.");
             // 
             // label25
             // 
@@ -598,6 +623,7 @@
             this.numericUpDown3.Name = "numericUpDown3";
             this.numericUpDown3.Size = new System.Drawing.Size(139, 27);
             this.numericUpDown3.TabIndex = 17;
+            this.toolTip1.SetToolTip(this.numericUpDown3, "The number of days for which the capture will be kept.");
             this.numericUpDown3.Value = new decimal(new int[] {
             1,
             0,
@@ -624,6 +650,8 @@
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(259, 27);
             this.textBox10.TabIndex = 14;
+            this.toolTip1.SetToolTip(this.textBox10, "The local path of your desired folder where the media will be saved locally. It m" +
+        "ust be selected by clicking on the \"...\" button to the right of this control.");
             // 
             // button7
             // 
@@ -766,6 +794,8 @@
             this.button5.Size = new System.Drawing.Size(160, 29);
             this.button5.TabIndex = 44;
             this.button5.Text = "Synchronize now";
+            this.toolTip1.SetToolTip(this.button5, "Attempt to trigger synchronization. If synchronization is already setup, this wil" +
+        "l not override the current synchronization.");
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -788,6 +818,9 @@
             this.label15.Size = new System.Drawing.Size(114, 40);
             this.label15.TabIndex = 42;
             this.label15.Text = "Synchronization\r\nperiod:";
+            this.toolTip1.SetToolTip(this.label15, "The type of synchronization period for locally captured media. You can either syn" +
+        "chronize periodically at the exact same time every day, or in shorter manually d" +
+        "efined periods.");
             // 
             // label14
             // 
@@ -899,6 +932,8 @@
             this.button3.Size = new System.Drawing.Size(160, 29);
             this.button3.TabIndex = 43;
             this.button3.Text = "Synchronize now";
+            this.toolTip1.SetToolTip(this.button3, "Attempt to trigger synchronization. If synchronization is already setup, this wil" +
+        "l not override the current synchronization.");
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -921,6 +956,9 @@
             this.label5.Size = new System.Drawing.Size(114, 40);
             this.label5.TabIndex = 21;
             this.label5.Text = "Synchronization\r\nperiod:";
+            this.toolTip1.SetToolTip(this.label5, "The type of synchronization period for JSON configuration. You can either synchro" +
+        "nize periodically at the exact same time every day, or in shorter manually defin" +
+        "ed periods.");
             // 
             // label3
             // 
@@ -1123,6 +1161,7 @@
             this.label18.Size = new System.Drawing.Size(93, 20);
             this.label18.TabIndex = 25;
             this.label18.Text = "Burst period:";
+            this.toolTip1.SetToolTip(this.label18, "The time between snapping two images, supported only for burst image mode.");
             // 
             // domainUpDown6
             // 
@@ -1146,6 +1185,8 @@
             this.label19.Size = new System.Drawing.Size(123, 20);
             this.label19.TabIndex = 23;
             this.label19.Text = "Mode of capture:";
+            this.toolTip1.SetToolTip(this.label19, "Your desired mode of capture. You can select a single shot or burst - multiple im" +
+        "ages (available for images only).");
             // 
             // numericUpDown6
             // 
@@ -1175,6 +1216,7 @@
             this.label20.Size = new System.Drawing.Size(70, 20);
             this.label20.TabIndex = 19;
             this.label20.Text = "Duration:";
+            this.toolTip1.SetToolTip(this.label20, "The duration of the capture.");
             // 
             // label23
             // 
@@ -1185,6 +1227,7 @@
             this.label23.Size = new System.Drawing.Size(115, 20);
             this.label23.TabIndex = 16;
             this.label23.Text = "Type of capture:";
+            this.toolTip1.SetToolTip(this.label23, "Your desired type of capture. You can capture images or videos.");
             // 
             // button6
             // 
@@ -1196,13 +1239,6 @@
             this.button6.Text = "Save configuration";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // importExistingConfigurationToolStripMenuItem
-            // 
-            this.importExistingConfigurationToolStripMenuItem.Name = "importExistingConfigurationToolStripMenuItem";
-            this.importExistingConfigurationToolStripMenuItem.Size = new System.Drawing.Size(285, 26);
-            this.importExistingConfigurationToolStripMenuItem.Text = "Import existing configuration";
-            this.importExistingConfigurationToolStripMenuItem.Click += new System.EventHandler(this.importExistingConfigurationToolStripMenuItem_Click);
             // 
             // GeneralSettingsForm
             // 
@@ -1346,5 +1382,6 @@
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
