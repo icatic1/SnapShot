@@ -577,6 +577,8 @@
             this.label29.Size = new System.Drawing.Size(118, 20);
             this.label29.TabIndex = 3;
             this.label29.Text = "Trigger file path:";
+            this.toolTip1.SetToolTip(this.label29, "The local path of your trigger file. It must be selected by clicking on the \"...\"" +
+        " button to the right of this control.");
             // 
             // button8
             // 
@@ -594,13 +596,11 @@
             this.textBox11.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox11.Enabled = false;
             this.textBox11.Location = new System.Drawing.Point(146, 68);
             this.textBox11.Name = "textBox11";
+            this.textBox11.ReadOnly = true;
             this.textBox11.Size = new System.Drawing.Size(244, 27);
             this.textBox11.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.textBox11, "The local path of your trigger file. It must be selected by clicking on the \"...\"" +
-        " button to the right of this control.");
             // 
             // label25
             // 
@@ -645,13 +645,11 @@
             this.textBox10.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox10.Enabled = false;
             this.textBox10.Location = new System.Drawing.Point(148, 217);
             this.textBox10.Name = "textBox10";
+            this.textBox10.ReadOnly = true;
             this.textBox10.Size = new System.Drawing.Size(259, 27);
             this.textBox10.TabIndex = 14;
-            this.toolTip1.SetToolTip(this.textBox10, "The local path of your desired folder where the media will be saved locally. It m" +
-        "ust be selected by clicking on the \"...\" button to the right of this control.");
             // 
             // button7
             // 
@@ -673,6 +671,8 @@
             this.label30.Size = new System.Drawing.Size(113, 40);
             this.label30.TabIndex = 6;
             this.label30.Text = "Save the output\r\ncapture to:";
+            this.toolTip1.SetToolTip(this.label30, "The local path of your desired folder where the media will be saved locally. It m" +
+        "ust be selected by clicking on the \"...\" button to the right of this control.");
             // 
             // groupBox1
             // 

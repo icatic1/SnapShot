@@ -130,22 +130,27 @@ namespace SnapShot.View
         /// <param name="e"></param>
         private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
+            string path = "configuration.json";
+            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
             {
-                bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                {
-                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
-                    threadReconfigure.IsBackground = true;
-                    threadReconfigure.Start();
-
-                    toolStripStatusLabel1.Text = "Import successfully completed.";
-                }
-                else
-                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                if (Program.Snapshot.JSONImport != "")
+                    path += "/" + Program.Snapshot.JSONImport; ;
             }
+
+            bool res = Configuration.ImportFromJSON(path);
+            if (res)
+            {
+                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                threadReconfigure.IsBackground = true;
+                threadReconfigure.Start();
+
+                toolStripStatusLabel1.Text = "Import successfully completed.";
+            }
+            else
+                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
 
             // update the form to show new configuration
             UpdateConfigurationWindow();
@@ -292,17 +297,15 @@ namespace SnapShot.View
 
             Program.Snapshot.Configuration.Cameras[cameraNumber] = camera;
 
-            bool res = false;
+            // export the configuration locally or to the connected server
             string path = "configuration.json";
             if (Program.Snapshot.Configuration.ServerIP.Length > 9)
             {
                 path = Program.Snapshot.Configuration.ServerIP;
                 if (Program.Snapshot.Configuration.ServerPort != 0)
                     path += ":" + Program.Snapshot.Configuration.ServerPort;
-                if (Program.Snapshot.JSONExport != "")
-                    path += "/" + Program.Snapshot.JSONExport;
-
-                res = Configuration.ExportToJSON(path);
+                if (Program.Snapshot.JSONImport != "")
+                    path += "/" + Program.Snapshot.JSONImport;
             }
 
             // export the configuration in a new thread
@@ -370,6 +373,5 @@ namespace SnapShot.View
         }
 
         #endregion
-
     }
 }

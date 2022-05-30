@@ -62,6 +62,9 @@ namespace SnapShot
 
             // show information from existing configuration
             UpdateConfigurationWindow();
+
+            toolTip1.SetToolTip(textBox10, textBox10.Text);
+            toolTip1.SetToolTip(textBox11, textBox11.Text);
         }
 
         /// <summary>
@@ -163,22 +166,27 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
+            string path = "configuration.json";
+            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
             {
-                bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                {
-                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
-                    threadReconfigure.IsBackground = true;
-                    threadReconfigure.Start();
-
-                    toolStripStatusLabel1.Text = "Import successfully completed.";
-                }
-                else
-                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                if (Program.Snapshot.JSONImport != "")
+                    path += "/" + Program.Snapshot.JSONImport;
             }
+
+            bool res = Configuration.ImportFromJSON(path);
+            if (res)
+            {
+                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                threadReconfigure.IsBackground = true;
+                threadReconfigure.Start();
+
+                toolStripStatusLabel1.Text = "Import successfully completed.";
+            }
+            else
+                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
 
             // update the form to show new configuration
             UpdateConfigurationWindow();
@@ -266,8 +274,15 @@ namespace SnapShot
             string statusText = label7.Text;
             int port = 0;
 
+            // we are not connected - do not save the server
+            if (statusText != "Connected")
+            {
+                ip = "";
+                mediaPath = "";
+            }
+
             // control validation
-            if (textBox3.Text.Length > 0)
+            else if (textBox3.Text.Length > 0)
             {
                 // if IP port is specified, it needs to be a valid number
                 if (textBox4.Text.Length > 0)
@@ -374,17 +389,14 @@ namespace SnapShot
             };
 
             // export the configuration locally or to the connected server
-            bool res = false;
             string path = "configuration.json";
-            if (label7.Text == "Connected")
+            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
             {
                 path = Program.Snapshot.Configuration.ServerIP;
                 if (Program.Snapshot.Configuration.ServerPort != 0)
                     path += ":" + Program.Snapshot.Configuration.ServerPort;
                 if (Program.Snapshot.JSONExport != "")
                     path += "/" + Program.Snapshot.JSONExport;
-
-                res = Configuration.ExportToJSON(path);
             }
 
             // export the configuration in a new thread
@@ -625,6 +637,8 @@ namespace SnapShot
             }
 
             toolStripStatusLabel1.Text = "";
+
+            toolTip1.SetToolTip(textBox11, textBox11.Text);
         }
 
         /// <summary>
@@ -637,6 +651,8 @@ namespace SnapShot
             DialogResult result = folderBrowserDialog1.ShowDialog();
             if (result == DialogResult.OK)
                 textBox10.Text = folderBrowserDialog1.SelectedPath;
+
+            toolTip1.SetToolTip(textBox10, textBox10.Text);
 
             toolStripStatusLabel1.Text = "";
         }
@@ -790,7 +806,6 @@ namespace SnapShot
         /// <param name="e"></param>
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            textBox11.Enabled = checkBox2.Checked;
             button8.Enabled = checkBox2.Checked;
             textBox9.Enabled = checkBox2.Checked;
         }

@@ -714,6 +714,9 @@ namespace SnapShot
                             Record();
                     }
                 }
+
+                for (int i = 0; i < recorders.Count; i++)
+                    recorders[i].FaceDetection(2);
             }
             catch
             {

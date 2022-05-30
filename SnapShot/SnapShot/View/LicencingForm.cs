@@ -153,22 +153,27 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JSONPopupForm popup = new JSONPopupForm();
-            var result = popup.ShowDialog();
-            if (result == DialogResult.OK)
+            string path = "configuration.json";
+            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
             {
-                bool res = Configuration.ImportFromJSON(GeneralSettingsForm.JSONLocation);
-                if (res)
-                {
-                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
-                    threadReconfigure.IsBackground = true;
-                    threadReconfigure.Start();
-
-                    toolStripStatusLabel1.Text = "Import successfully completed.";
-                }
-                else
-                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
+                path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                if (Program.Snapshot.JSONImport != "")
+                    path += "/" + Program.Snapshot.JSONImport;
             }
+
+            bool res = Configuration.ImportFromJSON(path);
+            if (res)
+            {
+                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                threadReconfigure.IsBackground = true;
+                threadReconfigure.Start();
+
+                toolStripStatusLabel1.Text = "Import successfully completed.";
+            }
+            else
+                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
         }
 
         /// <summary>
