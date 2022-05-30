@@ -19,6 +19,7 @@ namespace SnapShot.View
 
         int cameraNumber;
         static List<string> devices = new List<string>();
+        bool closeTheApp = true;
 
         #endregion
 
@@ -39,7 +40,10 @@ namespace SnapShot.View
         /// <param name="e"></param>
         private void CameraSettingsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            if (closeTheApp)
+                Application.Exit();
+            else
+                this.Hide();
         }
 
         #endregion
@@ -55,8 +59,7 @@ namespace SnapShot.View
         {
             LicencingForm f = new LicencingForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -81,8 +84,7 @@ namespace SnapShot.View
         {
             GeneralSettingsForm f = new GeneralSettingsForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -94,8 +96,7 @@ namespace SnapShot.View
         {
             CameraSettingsForm f = new CameraSettingsForm(0);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -107,8 +108,7 @@ namespace SnapShot.View
         {
             CameraSettingsForm f = new CameraSettingsForm(1);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -120,8 +120,7 @@ namespace SnapShot.View
         {
             CameraSettingsForm f = new CameraSettingsForm(2);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -181,8 +180,7 @@ namespace SnapShot.View
         {
             InformationForm f = new InformationForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         #endregion
@@ -396,6 +394,40 @@ namespace SnapShot.View
                 toolStripStatusLabel1.Text = "Motion detection ON!";
             else
                 toolStripStatusLabel1.Text = "Motion detection OFF!";
+        }
+
+        #endregion
+
+        #region Minimizing to system tray
+
+        /// <summary>
+        /// When the form is minimized, it goes to system tray and a notification is shown
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CameraSettingsForm_Resize(object sender, EventArgs e)
+        {
+            notifyIcon1.Icon = SystemIcons.Information;
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                closeTheApp = false;
+                Hide();
+                notifyIcon1.Visible = true;
+                notifyIcon1.ShowBalloonTip(1000);
+            }
+        }
+
+        /// <summary>
+        /// When the form is maximized, the notification is hidden
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            closeTheApp = true;
+            Show();
+            this.WindowState = FormWindowState.Normal;
+            notifyIcon1.Visible = false;
         }
 
         #endregion

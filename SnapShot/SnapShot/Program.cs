@@ -77,42 +77,51 @@ namespace SnapShot
         [STAThread]
         static void Main()
         {
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            // start thread which will synchronize configuration with server
-            Thread listener = new Thread(() => ListenFromServer());
-            listener.IsBackground = true;
-            listener.Start();
-
-            // create demo configuration if it doesn't already exist
-            string path = Directory.GetCurrentDirectory();
-            if (!File.Exists(Directory.GetCurrentDirectory() + "\\configuration.json"))
-                CreateDemoConfiguration();
-            else
-                Configuration.ImportFromJSON("configuration.json");
-
-            // change the trigger file that is being monitored
-            Thread newThread = new Thread(() => Program.ChangeTrigger());
-            newThread.IsBackground = true;
-            newThread.Start();
-
-            // reconfigure all cameras in a separate thread
-            Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
-            threadReconfigure.IsBackground = true;
-            threadReconfigure.Start();
-
-            // start thread which will constantly check if faces are present
-            if (Program.Snapshot.Configuration.FaceDetectionTrigger)
+        mainRegion:
+            try
             {
-                var snap = Program.Snapshot;
-                Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
-                faceChecker.IsBackground = true;
-                faceChecker.Start();
-            }
+                Application.SetHighDpiMode(HighDpiMode.SystemAware);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.Run(new LicencingForm());
+                // start thread which will synchronize configuration with server
+                Thread listener = new Thread(() => ListenFromServer());
+                listener.IsBackground = true;
+                listener.Start();
+
+                // create demo configuration if it doesn't already exist
+                string path = Directory.GetCurrentDirectory();
+                if (!File.Exists(Directory.GetCurrentDirectory() + "\\configuration.json"))
+                    CreateDemoConfiguration();
+                else
+                    Configuration.ImportFromJSON("configuration.json");
+
+                // change the trigger file that is being monitored
+                Thread newThread = new Thread(() => Program.ChangeTrigger());
+                newThread.IsBackground = true;
+                newThread.Start();
+
+                // reconfigure all cameras in a separate thread
+                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                threadReconfigure.IsBackground = true;
+                threadReconfigure.Start();
+
+                // start thread which will constantly check if faces are present
+                if (Program.Snapshot.Configuration.FaceDetectionTrigger)
+                {
+                    var snap = Program.Snapshot;
+                    Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
+                    faceChecker.IsBackground = true;
+                    faceChecker.Start();
+                }
+
+                Application.Run(new LicencingForm());
+            }
+            catch
+            {
+                MessageBox.Show("A fatal error has occured! SnapShot will be restarted to the default configuration.", "Error message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                goto mainRegion;
+            }
         }
 
         #endregion

@@ -119,9 +119,11 @@
             this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.label20 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
+            this.panel5 = new System.Windows.Forms.Panel();
             this.button6 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -141,6 +143,7 @@
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
+            this.panel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -477,8 +480,7 @@
             this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.groupBox6, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.button6, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.button9, 2, 2);
+            this.tableLayoutPanel1.Controls.Add(this.panel5, 1, 2);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(30, 47);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
@@ -1231,10 +1233,19 @@
             this.label23.Text = "Type of capture:";
             this.toolTip1.SetToolTip(this.label23, "Your desired type of capture. You can capture images or videos.");
             // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.button6);
+            this.panel5.Controls.Add(this.button9);
+            this.panel5.Location = new System.Drawing.Point(571, 645);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(562, 28);
+            this.panel5.TabIndex = 45;
+            // 
             // button6
             // 
             this.button6.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button6.Location = new System.Drawing.Point(772, 645);
+            this.button6.Location = new System.Drawing.Point(48, 0);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(160, 28);
             this.button6.TabIndex = 24;
@@ -1248,7 +1259,7 @@
             // button9
             // 
             this.button9.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button9.Location = new System.Drawing.Point(1300, 645);
+            this.button9.Location = new System.Drawing.Point(325, 0);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(160, 28);
             this.button9.TabIndex = 44;
@@ -1256,6 +1267,15 @@
             this.toolTip1.SetToolTip(this.button9, "Cancel the current changes and revert to the saved configuration.");
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon1.BalloonTipText = "Running in the background. Double click to return to the application.";
+            this.notifyIcon1.BalloonTipTitle = "SnapShot Desktop";
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
             // GeneralSettingsForm
             // 
@@ -1270,6 +1290,7 @@
             this.Text = "SnapShot";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigurationForm_FormClosing);
             this.Load += new System.EventHandler(this.ConfigurationForm_Load);
+            this.Resize += new System.EventHandler(this.GeneralSettingsForm_Resize);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -1302,6 +1323,7 @@
             this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
+            this.panel5.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1401,5 +1423,7 @@
         private System.Windows.Forms.ToolStripMenuItem importExistingConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.Panel panel5;
     }
 }

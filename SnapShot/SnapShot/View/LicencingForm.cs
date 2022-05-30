@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,12 @@ namespace SnapShot
 {
     public partial class LicencingForm : Form
     {
+        #region Attributes
+
+        bool closeTheApp = true;
+
+        #endregion
+
         #region Constructor
 
         public LicencingForm()
@@ -60,8 +67,13 @@ namespace SnapShot
         /// <param name="e"></param>
         private void LicencingForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            UpdateConfigurationFile();
-            Application.Exit();
+            if (closeTheApp)
+            {
+                UpdateConfigurationFile();
+                Application.Exit();
+            }
+            else
+                this.Hide();
         }
 
         #endregion
@@ -77,8 +89,7 @@ namespace SnapShot
         {
             LicencingForm f = new LicencingForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -103,8 +114,7 @@ namespace SnapShot
         {
             GeneralSettingsForm f = new GeneralSettingsForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -116,8 +126,7 @@ namespace SnapShot
         {
             CameraSettingsForm f = new CameraSettingsForm(0);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -129,8 +138,7 @@ namespace SnapShot
         {
             CameraSettingsForm f = new CameraSettingsForm(1);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -142,8 +150,7 @@ namespace SnapShot
         {
             CameraSettingsForm f = new CameraSettingsForm(2);
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         /// <summary>
@@ -200,8 +207,7 @@ namespace SnapShot
         {
             InformationForm f = new InformationForm();
             this.Hide();
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         #endregion
@@ -427,6 +433,40 @@ namespace SnapShot
                 // user not licenced
                 Program.Snapshot.Licenced = false;
             }
+        }
+
+        #endregion
+
+        #region Minimizing to system tray
+
+        /// <summary>
+        /// When the form is minimized, it goes to system tray and a notification is shown
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LicencingForm_Resize(object sender, EventArgs e)
+        {
+            notifyIcon1.Icon = SystemIcons.Information;
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                closeTheApp = false;
+                Hide();
+                notifyIcon1.Visible = true;
+                notifyIcon1.ShowBalloonTip(1000);
+            }
+        }
+
+        /// <summary>
+        /// When the form is maximized, the notification is hidden
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            closeTheApp = true;
+            Show();
+            this.WindowState = FormWindowState.Normal;
+            notifyIcon1.Visible = false;
         }
 
         #endregion
