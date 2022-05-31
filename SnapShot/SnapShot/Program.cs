@@ -77,7 +77,7 @@ namespace SnapShot
         [STAThread]
         static void Main()
         {
-        mainRegion:
+            mainRegion:
             try
             {
                 Application.SetHighDpiMode(HighDpiMode.SystemAware);
@@ -136,6 +136,12 @@ namespace SnapShot
         {
             try
             {
+                if (snapshot.Configuration.TriggerFilePath.Length < 1)
+                {
+                    watcher.EnableRaisingEvents = false;
+                    return;
+                }
+
                 previousContent = File.ReadAllLines(snapshot.Configuration.TriggerFilePath).Length;
                 watcher.Path = Path.GetDirectoryName(snapshot.Configuration.TriggerFilePath) ?? "";
                 watcher.Filter = Path.GetFileName(snapshot.Configuration.TriggerFilePath);
@@ -147,7 +153,7 @@ namespace SnapShot
             }
             catch
             {
-                // ignore any errors
+                watcher.EnableRaisingEvents = false;
             }
         }
 
@@ -602,7 +608,7 @@ namespace SnapShot
         static void SendSnaps(Recorder camera, int index)
         {
             if (camera.Capture == null)
-            camera.Reconfigure();
+                camera.Reconfigure();
 
             // fill the first frame
             Stopwatch sw = new Stopwatch();
@@ -724,7 +730,7 @@ namespace SnapShot
 
                         // configure camera for opening stream
                         if (recorders[i].Capture == null)
-                        recorders[i].Reconfigure();
+                            recorders[i].Reconfigure();
 
                         // check if face is present on the camera
                         bool facePresent = recorders[i].FaceDetection(initializeStream[i]);
@@ -749,13 +755,7 @@ namespace SnapShot
             }
             catch
             {
-                for (int i = 0; i < recorders.Count; i++)
-                {
-                    if (snapshot.Configuration.Cameras[i].Id.Length < 1)
-                        continue;
-
-                    recorders[i].Reconfigure();
-                }
+                // ignore any errors
             }
         }
 

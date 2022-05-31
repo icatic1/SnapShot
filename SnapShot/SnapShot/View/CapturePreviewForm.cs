@@ -76,37 +76,44 @@ namespace SnapShot
         /// </summary>
         void CaptureCameraCallback()
         {
-            // start the camera recorder
-            Program.Recorders[cameraNumber].Snap(0);
-
-            while (1 == 1)
+            try
             {
-                try
+                // start the camera recorder
+                Program.Recorders[cameraNumber].Snap(0);
+
+                while (1 == 1)
                 {
-                    // snap picture
-                    image = Program.Recorders[cameraNumber].Snap(1);
+                    try
+                    {
+                        // snap picture
+                        image = Program.Recorders[cameraNumber].Snap(1);
 
-                    // frame face if face detection is selected
-                    List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles =
-                        new List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>>();
-                    if (faceDetection)
-                        rectangles = FrameFace(image);
+                        // frame face if face detection is selected
+                        List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>> rectangles =
+                            new List<Tuple<OpenCvSharp.Point, OpenCvSharp.Point>>();
+                        if (faceDetection)
+                            rectangles = FrameFace(image);
 
-                    // set the pictureBox value
-                    SetPicture(image, rectangles);
+                        // set the pictureBox value
+                        SetPicture(image, rectangles);
 
-                    // stop the livestream
-                    if (cancel)
-                        break;
+                        // stop the livestream
+                        if (cancel)
+                            break;
+                    }
+                    catch
+                    {
+                        // ignore any errors
+                    }
                 }
-                catch
-                {
-                    // ignore any errors
-                }
+
+                // stop the camera recorder
+                Program.Recorders[cameraNumber].Snap(2);
             }
-
-            // stop the camera recorder
-            Program.Recorders[cameraNumber].Snap(2);
+            catch
+            {
+                MessageBox.Show("The camera cannot be allocated, it is already in use.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>

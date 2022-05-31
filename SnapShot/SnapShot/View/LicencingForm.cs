@@ -41,14 +41,15 @@ namespace SnapShot
             if (!Program.Snapshot.Connected)
             {
                 if (!File.Exists("config.txt"))
-                    File.WriteAllText("config.txt", Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog);
+                    File.WriteAllText("config.txt", Program.LicencingURL + "\n" + Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog);
 
                 else
                 {
                     string IMPORT = File.ReadAllText("config.txt");
                     string[] rows = IMPORT.Split('\n');
-                    Program.Snapshot.TerminalName = rows[0];
-                    Program.Snapshot.DebugLog = Convert.ToBoolean(rows[1]);
+                    Program.LicencingURL = rows[0];
+                    Program.Snapshot.TerminalName = rows[1];
+                    Program.Snapshot.DebugLog = Convert.ToBoolean(rows[2]);
                 }
             }
 
@@ -87,6 +88,7 @@ namespace SnapShot
         /// <param name="e"></param>
         private void licencingOptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            UpdateConfigurationFile();
             LicencingForm f = new LicencingForm();
             this.Hide();
             f.Show();
@@ -99,6 +101,7 @@ namespace SnapShot
         /// <param name="e"></param>
         private void administratorOptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            UpdateConfigurationFile();
             AdminLicencingForm popup = new AdminLicencingForm();
             var result = popup.ShowDialog();
             if (result == DialogResult.OK)
@@ -112,9 +115,15 @@ namespace SnapShot
         /// <param name="e"></param>
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            GeneralSettingsForm f = new GeneralSettingsForm();
-            this.Hide();
-            f.Show();
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot access general settings without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                GeneralSettingsForm f = new GeneralSettingsForm();
+                this.Hide();
+                f.Show();
+            }
         }
 
         /// <summary>
@@ -124,9 +133,15 @@ namespace SnapShot
         /// <param name="e"></param>
         private void toolStripMenuItem4_Click(object sender, EventArgs e)
         {
-            CameraSettingsForm f = new CameraSettingsForm(0);
-            this.Hide();
-            f.Show();
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot access camera settings without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                CameraSettingsForm f = new CameraSettingsForm(0);
+                this.Hide();
+                f.Show();
+            }
         }
 
         /// <summary>
@@ -136,9 +151,15 @@ namespace SnapShot
         /// <param name="e"></param>
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-            CameraSettingsForm f = new CameraSettingsForm(1);
-            this.Hide();
-            f.Show();
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot access camera settings without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                CameraSettingsForm f = new CameraSettingsForm(1);
+                this.Hide();
+                f.Show();
+            }
         }
 
         /// <summary>
@@ -148,9 +169,15 @@ namespace SnapShot
         /// <param name="e"></param>
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
-            CameraSettingsForm f = new CameraSettingsForm(2);
-            this.Hide();
-            f.Show();
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot access camera settings without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                CameraSettingsForm f = new CameraSettingsForm(2);
+                this.Hide();
+                f.Show();
+            }
         }
 
         /// <summary>
@@ -160,42 +187,48 @@ namespace SnapShot
         /// <param name="e"></param>
         private void importExistingConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string path = "configuration.json";
-            if (Program.Snapshot.Configuration.ServerIP.Length > 9)
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot import configurations without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
             {
-                path = Program.Snapshot.Configuration.ServerIP;
-                if (Program.Snapshot.Configuration.ServerPort != 0)
-                    path += ":" + Program.Snapshot.Configuration.ServerPort;
-                if (Program.Snapshot.JSONImport != "")
-                    path += "/" + Program.Snapshot.JSONImport;
-            }
-
-            bool res = Configuration.ImportFromJSON(path);
-            if (res)
-            {
-                // change the trigger file that is being monitored
-                Thread newThread = new Thread(() => Program.ChangeTrigger());
-                newThread.IsBackground = true;
-                newThread.Start();
-
-                // reconfigure all cameras in a separate thread
-                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
-                threadReconfigure.IsBackground = true;
-                threadReconfigure.Start();
-
-                // start thread which will constantly check if faces are present
-                if (Program.Snapshot.Configuration.FaceDetectionTrigger)
+                string path = "configuration.json";
+                if (Program.Snapshot.Configuration.ServerIP.Length > 9)
                 {
-                    var snap = Program.Snapshot;
-                    Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
-                    faceChecker.IsBackground = true;
-                    faceChecker.Start();
+                    path = Program.Snapshot.Configuration.ServerIP;
+                    if (Program.Snapshot.Configuration.ServerPort != 0)
+                        path += ":" + Program.Snapshot.Configuration.ServerPort;
+                    if (Program.Snapshot.JSONImport != "")
+                        path += "/" + Program.Snapshot.JSONImport;
                 }
 
-                toolStripStatusLabel1.Text = "Import successfully completed.";
+                bool res = Configuration.ImportFromJSON(path);
+                if (res)
+                {
+                    // change the trigger file that is being monitored
+                    Thread newThread = new Thread(() => Program.ChangeTrigger());
+                    newThread.IsBackground = true;
+                    newThread.Start();
+
+                    // reconfigure all cameras in a separate thread
+                    Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                    threadReconfigure.IsBackground = true;
+                    threadReconfigure.Start();
+
+                    // start thread which will constantly check if faces are present
+                    if (Program.Snapshot.Configuration.FaceDetectionTrigger)
+                    {
+                        var snap = Program.Snapshot;
+                        Thread faceChecker = new Thread(() => Program.FaceDetectionTrigger(ref snap));
+                        faceChecker.IsBackground = true;
+                        faceChecker.Start();
+                    }
+
+                    toolStripStatusLabel1.Text = "Import successfully completed.";
+                }
+                else
+                    toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
             }
-            else
-                toolStripStatusLabel1.Text = "The import could not be completed successfully. Check JSON file for errors.";
         }
 
         /// <summary>
@@ -205,9 +238,15 @@ namespace SnapShot
         /// <param name="e"></param>
         private void pomoćToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InformationForm f = new InformationForm();
-            this.Hide();
-            f.Show();
+            UpdateConfigurationFile();
+            if (Program.LicencingURL.Length < 1)
+                MessageBox.Show("You cannot exit this form without being licenced first!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                InformationForm f = new InformationForm();
+                this.Hide();
+                f.Show();
+            }
         }
 
         #endregion
@@ -342,7 +381,7 @@ namespace SnapShot
         private void UpdateConfigurationFile()
         {
             // we are not connected - locally save terminal name and debug log
-            string EXPORT = Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog;
+            string EXPORT = Program.LicencingURL + "\n" + Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog;
             File.WriteAllText("config.txt", EXPORT);
 
             // we are connected - save information to server

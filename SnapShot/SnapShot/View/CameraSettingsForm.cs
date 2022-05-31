@@ -358,8 +358,11 @@ namespace SnapShot.View
         private void button5_Click(object sender, EventArgs e)
         {
             // just show new form (without closing the currently active one)
-            CapturePreviewForm f = new CapturePreviewForm(comboBox4.Text, comboBox4.SelectedIndex, "USB");
-            f.Show();
+            if (comboBox4.SelectedIndex > -1)
+            {
+                CapturePreviewForm f = new CapturePreviewForm(comboBox4.Text, comboBox4.SelectedIndex, "USB");
+                f.Show();
+            }
         }
 
         #endregion

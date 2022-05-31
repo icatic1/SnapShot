@@ -52,30 +52,40 @@ namespace SnapShot.Model
         /// </summary>
         public void Reconfigure()
         {
-            // wait until camera is unlocked
-            while (locked) ;
+            if (Program.Snapshot.Configuration.Cameras[index].Id.Length < 1)
+                return;
 
-            // determine image size
-            string resolution = Program.Snapshot.Configuration.Cameras[index].Resolution.ToString();
-            resolution = resolution.Replace("Resolution", "");
-            dimensions = resolution.Split("x");
+            try
+            {
+                // wait until camera is unlocked
+                while (locked) ;
 
-            // set video source - USB camera
-            capture = new VideoCapture(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+                // determine image size
+                string resolution = Program.Snapshot.Configuration.Cameras[index].Resolution.ToString();
+                resolution = resolution.Replace("Resolution", "");
+                dimensions = resolution.Split("x");
 
-            // set desired resolution
-            capture.FrameHeight = Int32.Parse(dimensions[0]);
-            capture.FrameWidth = Int32.Parse(dimensions[1]);
+                // set video source - USB camera
+                capture = new VideoCapture(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
 
-            // change contrast
+                // set desired resolution
+                capture.FrameHeight = Int32.Parse(dimensions[0]);
+                capture.FrameWidth = Int32.Parse(dimensions[1]);
 
-            // change image color
-            
-            // define remote path (for uploading media)
-            string path = Program.Snapshot.Configuration.ServerIP;
-            if (Program.Snapshot.Configuration.ServerPort != 0)
-                path += ":" + Program.Snapshot.Configuration.ServerPort;
-            mediaPath = path + "/" + Program.Snapshot.MediaExport;
+                // change contrast
+
+                // change image color
+
+                // define remote path (for uploading media)
+                string path = Program.Snapshot.Configuration.ServerIP;
+                if (Program.Snapshot.Configuration.ServerPort != 0)
+                    path += ":" + Program.Snapshot.Configuration.ServerPort;
+                mediaPath = path + "/" + Program.Snapshot.MediaExport;
+            }
+            catch
+            {
+                // ignore any errors
+            } 
         }
 
         /// <summary>

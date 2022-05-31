@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -141,6 +142,10 @@ namespace SnapShot.View
             Program.LicencingURL = serverIP;
             if (port != 0)
                 Program.LicencingURL += ":" + port;
+
+            // save new information to local file
+            string EXPORT = Program.LicencingURL + "\n" + Program.Snapshot.TerminalName + "\n" + Program.Snapshot.DebugLog;
+            File.WriteAllText("config.txt", EXPORT);
 
             return DialogResult.OK;
         }

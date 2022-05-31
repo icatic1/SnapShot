@@ -418,7 +418,7 @@ namespace SnapShot
             Configuration.ExportToJSON(path);
 
             // change the trigger file that is being monitored
-            if (oldTrigger != triggerPath && triggerPath.Length > 0)
+            if (oldTrigger != triggerPath)
             {
                 Thread newThread = new Thread(() => Program.ChangeTrigger());
                 newThread.IsBackground = true;
@@ -472,6 +472,7 @@ namespace SnapShot
                 numericUpDown3.Value = config.OutputValidity;
             else
                 numericUpDown3.Value = 1;
+            checkBox2.Checked = config.TriggerFilePath.Length > 0;
             checkBox1.Checked = config.FaceDetectionTrigger;
 
             // server configuration
@@ -860,7 +861,8 @@ namespace SnapShot
                     if (result == DialogResult.OK)
                     {
                         // set media folder path
-                        var success = SetMediaFolderPath(url, textBox7.Text);
+                        string media = textBox7.Text;
+                        var success = SetMediaFolderPath(url, media);
 
                         label7.Text = "Connected";
                         label7.ForeColor = Color.Green;
