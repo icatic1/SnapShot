@@ -498,7 +498,12 @@ namespace SnapShot
                     string[] localEntries = Directory.GetFileSystemEntries(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
 
                     for (int i = 0; i < localEntries.Length; i++)
-                        localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+                    {
+                        if (Configuration.CheckExpiration(localEntries[i], Program.Snapshot.Configuration.OutputValidity))
+                            localEntries[i] = "";
+                        else
+                            localEntries[i] = localEntries[i].Replace(snapshot.Configuration.OutputFolderPath, "").TrimStart('\\');
+                    }
 
                     GeneralSettingsForm.FirstCheck[1] = true;
 

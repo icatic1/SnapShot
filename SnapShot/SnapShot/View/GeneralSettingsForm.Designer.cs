@@ -628,6 +628,7 @@
             this.numericUpDown3.Size = new System.Drawing.Size(139, 27);
             this.numericUpDown3.TabIndex = 17;
             this.toolTip1.SetToolTip(this.numericUpDown3, "The number of days for which the capture will be kept.");
+            this.numericUpDown3.Minimum = 0;
             this.numericUpDown3.Value = new decimal(new int[] {
             1,
             0,
