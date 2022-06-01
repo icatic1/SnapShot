@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using SnapShot.Model;
 using Newtonsoft.Json.Linq;
 using SnapShot.View;
+using System.Timers;
 
 namespace SnapShot
 {
@@ -56,6 +57,8 @@ namespace SnapShot
 
         static List<bool> syncsActive = new List<bool>()
         { false, false };
+
+        static System.Timers.Timer? timer;
         
         public static Snapshot Snapshot { get => snapshot; set => snapshot = value; }
 
@@ -107,9 +110,10 @@ namespace SnapShot
                 threadReconfigure.Start();
 
                 // start checking media files for deleting
-                Thread threadMedia = new Thread(() => CheckAllFiles());
-                threadMedia.IsBackground = true;
-                threadMedia.Start();
+                timer = new System.Timers.Timer(60 * 1000); 
+                timer.Elapsed += CheckAllFiles;
+                timer.AutoReset = true;
+                timer.Enabled = true;
 
                 // start thread which will constantly check if faces are present
                 if (Program.Snapshot.Configuration.FaceDetectionTrigger)
@@ -800,26 +804,21 @@ namespace SnapShot
         /// <summary>
         /// Thread which checks all files for expiration and deletes them if expiration date has passed
         /// </summary>
-        public static void CheckAllFiles()
+        public static void CheckAllFiles(Object source, ElapsedEventArgs e)
         {
-            startChecking:
             try
             {
-                while (1 == 1)
-                {
-                    string[] localEntries = Directory.GetFiles(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+                string[] localEntries = Directory.GetFiles(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
 
-                    foreach (string entry in localEntries)
-                    {
-                        if (Configuration.CheckExpiration(entry, Program.Snapshot.Configuration.OutputValidity))
-                            Configuration.DeleteFile(entry);
-                    }
+                foreach (string entry in localEntries)
+                {
+                    if (Configuration.CheckExpiration(entry, Program.Snapshot.Configuration.OutputValidity))
+                        Configuration.DeleteFile(entry);
                 }
             }
             catch
             {
-                // go back to checking files again
-                goto startChecking;
+                // ignore any errors
             }
         }
 
