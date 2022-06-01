@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GUI_Tests
@@ -80,9 +81,34 @@ namespace GUI_Tests
         }
 
         [TestMethod]
-        public void Test3_CheckLabel()
+        public void Test3_Admin_registration()
         {
-            
+            var licence = desktopSession.FindElementByName("Licence");
+            Assert.IsNotNull(licence);
+            licence.Click();
+
+            var admin_options = desktopSession.FindElementByName("Administrator Options");
+            Assert.IsNotNull(admin_options);
+            admin_options.Click();
+
+            //Thread.Sleep(1000);
+            var tb1 = desktopSession.FindElementByAccessibilityId("textBox1");
+            Assert.IsNotNull(tb1);
+            tb1.SendKeys("administrator");
+
+            var tb2 = desktopSession.FindElementByAccessibilityId("textBox2");
+            Assert.IsNotNull(tb2);
+            tb2.SendKeys("administrator");
+
+            var ok = desktopSession.FindElementByAccessibilityId("button2");
+            Assert.IsNotNull(ok);
+            ok.Click();
+
+            ok.Click();
+
+            var config = desktopSession.FindElementByName("Configuration");
+            Assert.IsNotNull(config);
+            config.Click();
         }
 
     }
