@@ -97,14 +97,19 @@ namespace SnapShot
                     Configuration.ImportFromJSON("configuration.json");
 
                 // change the trigger file that is being monitored
-                Thread newThread = new Thread(() => Program.ChangeTrigger());
+                Thread newThread = new Thread(() => ChangeTrigger());
                 newThread.IsBackground = true;
                 newThread.Start();
 
                 // reconfigure all cameras in a separate thread
-                Thread threadReconfigure = new Thread(() => Program.ReconfigureAllRecorders());
+                Thread threadReconfigure = new Thread(() => ReconfigureAllRecorders());
                 threadReconfigure.IsBackground = true;
                 threadReconfigure.Start();
+
+                // start checking media files for deleting
+                Thread threadMedia = new Thread(() => CheckAllFiles());
+                threadMedia.IsBackground = true;
+                threadMedia.Start();
 
                 // start thread which will constantly check if faces are present
                 if (Program.Snapshot.Configuration.FaceDetectionTrigger)
@@ -705,7 +710,7 @@ namespace SnapShot
         /// </summary>
         public static void FaceDetectionTrigger(ref Snapshot snapshot)
         {
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             try
             {
                 while (snapshot.Configuration.FaceDetectionTrigger)
@@ -769,7 +774,7 @@ namespace SnapShot
         public static void CreateDemoConfiguration()
         {
             // create demo trigger file
-            File.Create(Directory.GetCurrentDirectory() + "\\trigger.txt");
+            File.Create(Directory.GetCurrentDirectory() + "\\trigger.txt").Close();
             snapshot.Configuration.TriggerFilePath = Directory.GetCurrentDirectory() + "\\trigger.txt";
 
             snapshot.Configuration.Regex = "[a-z]+";
@@ -777,6 +782,7 @@ namespace SnapShot
             // create demo output folder
             Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Media");
             snapshot.Configuration.OutputFolderPath = Directory.GetCurrentDirectory() + "\\Media";
+            snapshot.Configuration.OutputValidity = 1;
 
             // set at least one camera if possible
             var devices = CameraSettingsForm.GetAllAvailableDevices();
@@ -785,6 +791,36 @@ namespace SnapShot
 
             // save demo configuration locally
             Configuration.ExportToJSON("configuration.json");
+        }
+
+        #endregion
+
+        #region Deleting files
+
+        /// <summary>
+        /// Thread which checks all files for expiration and deletes them if expiration date has passed
+        /// </summary>
+        public static void CheckAllFiles()
+        {
+            startChecking:
+            try
+            {
+                while (1 == 1)
+                {
+                    string[] localEntries = Directory.GetFiles(snapshot.Configuration.OutputFolderPath, "*", SearchOption.AllDirectories);
+
+                    foreach (string entry in localEntries)
+                    {
+                        if (Configuration.CheckExpiration(entry, Program.Snapshot.Configuration.OutputValidity))
+                            Configuration.DeleteFile(entry);
+                    }
+                }
+            }
+            catch
+            {
+                // go back to checking files again
+                goto startChecking;
+            }
         }
 
         #endregion

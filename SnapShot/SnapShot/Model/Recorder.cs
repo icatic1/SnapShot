@@ -3,6 +3,8 @@ using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -67,6 +69,9 @@ namespace SnapShot.Model
 
                 // set video source - USB camera
                 capture = new VideoCapture(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
+                
+                if (capture.IsOpened())
+                    capture.Release();
 
                 // set desired resolution
                 capture.FrameHeight = Int32.Parse(dimensions[0]);
@@ -345,6 +350,37 @@ namespace SnapShot.Model
         #region Saving output
 
         /// <summary>
+        /// Change base camera resolution to the desired one
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public Bitmap ChangeImageResolution(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+            return destImage;
+        }
+
+        /// <summary>
         /// Save picture to the local path
         /// </summary>
         /// <param name="image"></param>
@@ -352,6 +388,7 @@ namespace SnapShot.Model
         /// <param name="number"></param>
         public void SavePictureLocally(Bitmap image, int type, int number = 0)
         {
+            image = ChangeImageResolution(image, Int32.Parse(dimensions[0]), Int32.Parse(dimensions[1]));
             // save single image
             if (type == 0)
                 image.Save(@Program.Snapshot.Configuration.OutputFolderPath + "\\" + folderName + "\\IMG" + timestamp + ".png");

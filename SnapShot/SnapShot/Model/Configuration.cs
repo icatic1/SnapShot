@@ -550,6 +550,50 @@ namespace SnapShot
 
         #endregion
 
+        #region Deleting Files
+
+        /// <summary>
+        /// Method which deletes the specified file
+        /// </summary>
+        /// <param name="path"></param>
+        public static void DeleteFile(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+            catch
+            {
+                // ignore any errors
+            }
+        }
+
+        /// <summary>
+        /// Method which checks whether the specified file needs to be deleted
+        /// due to expiration
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool CheckExpiration(string path, int outputValidity)
+        {
+            try
+            {
+                if (!File.Exists(path))
+                    return false;
+
+                DateTime createTime = File.GetCreationTime(path);
+
+                return DateTime.Now > createTime + TimeSpan.FromDays(outputValidity);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
         #endregion
     }
 }
