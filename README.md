@@ -39,15 +39,18 @@ The web app device can then be synchronized with the local version.
 ------------
 
 ##Installation:
+
 Download the instalation package from the source corresponding to your OS. The file should be called instal*Version*.zip (ie. *Install64.zip*, *Install32.zip*, etc.). As you have noticed, the instalation package comes in the form of an archive, so you will need to extract it to your desired location.
 
 After extracting, there should be two files at the desired location: *setup.exe* and *setup.msi*, which can be used to install the application.
 
 ###Instalation packages:
+
 - Windows 10 x64
 - Windows 7 x86
 
 ###One click server setup:
+
 - Windows 10
 - Linux Ubuntu 20.04
 
