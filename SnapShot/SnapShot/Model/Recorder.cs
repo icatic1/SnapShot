@@ -70,8 +70,6 @@ namespace SnapShot.Model
                 // set video source - USB camera
                 capture = new VideoCapture(Program.Snapshot.Configuration.Cameras[index].CameraNumber);
                 
-                if (capture.IsOpened())
-                    capture.Release();
 
                 // set desired resolution
                 capture.FrameHeight = Int32.Parse(dimensions[0]);

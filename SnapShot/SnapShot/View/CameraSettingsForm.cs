@@ -243,9 +243,11 @@ namespace SnapShot.View
         public static List<string> GetAllAvailableDevices()
         {
             List<string> devicesString = new List<string>();
-            var devices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
-            foreach (var device in devices)
-                    devicesString.Add(device.Name);
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"))
+            {
+                foreach (var device in searcher.Get())
+                    devicesString.Add(device["Caption"].ToString() ?? "");
+            }
 
             return devicesString;
         }
