@@ -38,26 +38,34 @@ The web app device can then be synchronized with the local version.
 
 ------------
 
-##Installation:
+## Installation:
 
 Download the instalation package from the source corresponding to your OS. The file should be called instal*Version*.zip (ie. *Install64.zip*, *Install32.zip*, etc.). As you have noticed, the instalation package comes in the form of an archive, so you will need to extract it to your desired location.
 
 After extracting, there should be two files at the desired location: *setup.exe* and *setup.msi*, which can be used to install the application.
 
-###Instalation packages:
+### Instalation packages:
 
 - Windows 10 x64
 - Windows 7 x86
 
-###One click server setup:
+### One click server setup:
 
 - Windows 10
 - Linux Ubuntu 20.04
 
 If you have any trouble with the installation, please refer to our [installation guide](https://docs.google.com/document/d/1TrzqUu_w05X0L3bb2tfjRY48pdPEnpBR-CYDOV_qfxQ/edit?usp=sharing "installation guide").
 
+------------
+## Documentation
+
+You can access the project documentation by using the links below:
+- [`Desktop app documentation`](https://docs.google.com/document/d/1H9o-MC_tJZw-Wy91MJu_69T1h39XE_VuEqRSIb8OrGI/edit?usp=sharing "Desktop app documentation")
+- [`Web app documentation`](https://docs.google.com/document/d/1LXWUVZv4MnlIZTzQg41l9gxZCbGrhP20fyKJ8wWL2lU/edit?usp=sharing "`Web app documentation`")
+- [`Use and installation guide`](https://docs.google.com/document/d/1TrzqUu_w05X0L3bb2tfjRY48pdPEnpBR-CYDOV_qfxQ/edit?usp=sharing "`Use and installation guide`")
+- [`Work methodology`](https://docs.google.com/spreadsheets/d/1EHo914r7M4Nbtj-LgT8790qsLBbQ4S19DnoFekKqPfg/edit?usp=sharing "`Work methodology`")
 
 ------------
-#Contact us
+## Contact us
 
 If you have questions about Snapshot, or you would like to reach out to us about an issue you're having or for development advice as you work on a Snapshot issue, you can reach us by opening an issue and prefix the issue title with [Question].
