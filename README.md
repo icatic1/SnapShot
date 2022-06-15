@@ -46,13 +46,13 @@ After extracting, there should be two files at the desired location: *setup.exe*
 
 ### Instalation packages:
 
-- `[ShapShot Install x64](https://drive.google.com/drive/folders/1kllpmla9SMR5FGernHNdCBPSOaW1PoMR?usp=sharing "SnapShot Install x64")`
-- `[SnapShot Install x32](https://drive.google.com/drive/folders/1ZTxn6xJ2dOkwAuld8lN_g7qUsXU2A_qS?usp=sharing)`
+- [`ShapShot Install x64`](https://drive.google.com/drive/folders/1kllpmla9SMR5FGernHNdCBPSOaW1PoMR?usp=sharing "SnapShot Install x64")
+- [`SnapShot Install x32`](https://drive.google.com/drive/folders/1ZTxn6xJ2dOkwAuld8lN_g7qUsXU2A_qS?usp=sharing)
 
 ### One click server setup:
 
-- `[Windows 10](https://drive.google.com/file/d/1Q5XlK-_mV8hCsyr8i_H4F6fL5VXfaHML/view?usp=sharing)`
-- `[Linux Ubuntu 20.04](https://drive.google.com/file/d/1gQkwqvJJS-XrFgN3OUIOKYMlcE7fux9X/view?usp=sharing)`
+- [`Windows 10`](https://drive.google.com/file/d/1Q5XlK-_mV8hCsyr8i_H4F6fL5VXfaHML/view?usp=sharing)
+- [`Linux Ubuntu 20.04`](https://drive.google.com/file/d/1gQkwqvJJS-XrFgN3OUIOKYMlcE7fux9X/view?usp=sharing)
 
 If you have any trouble with the installation, please refer to our [installation guide](https://docs.google.com/document/d/1TrzqUu_w05X0L3bb2tfjRY48pdPEnpBR-CYDOV_qfxQ/edit?usp=sharing "installation guide").
 
