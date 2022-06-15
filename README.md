@@ -46,7 +46,7 @@ After extracting, there should be two files at the desired location: *setup.exe*
 
 ### Instalation packages:
 
-- `[ShapShot Install x64](https://drive.google.com/drive/folders/1kllpmla9SMR5FGernHNdCBPSOaW1PoMR?usp=sharing)`
+- `[ShapShot Install x64](https://drive.google.com/drive/folders/1kllpmla9SMR5FGernHNdCBPSOaW1PoMR?usp=sharing "SnapShot Install x64")`
 - `[SnapShot Install x32](https://drive.google.com/drive/folders/1ZTxn6xJ2dOkwAuld8lN_g7qUsXU2A_qS?usp=sharing)`
 
 ### One click server setup:
